@@ -1,0 +1,33 @@
+name: eeg
+description: "脑电系统"
+publish_to: 'none'
+version: 1.0.0+1
+
+environment:
+  sdk: ^3.5.4
+
+dependencies:
+  flutter:
+    sdk: flutter
+  cupertino_icons: ^1.0.8
+  shared_preferences: ^2.3.3
+  easy_localization: ^3.0.7
+  flutter_smart_dialog: ^4.9.8+5
+  syncfusion_flutter_charts: ^28.1.33
+  provider: ^6.1.2
+  dio: ^5.7.0
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^4.0.0
+
+flutter:
+  uses-material-design: true
+  fonts:
+    - family: 'SiyuanLightFont'
+      fonts:
+        - asset: fonts/Siyuan-Light.otf
+  assets:
+    - images/background/
+    - locals/
