@@ -1,7 +1,6 @@
-import 'package:eeg/app_router.dart';
-import 'package:eeg/business/home/page/home_page.dart';
 import 'package:eeg/business/user/page/register_page.dart';
 import 'package:eeg/core/base/view_model_builder.dart';
+import 'package:eeg/core/utils/router_utils.dart';
 import 'package:flutter/material.dart';
 
 import '../../../core/utils/toast.dart';
@@ -27,13 +26,11 @@ class LoginViewModel extends BaseViewModel {
       return;
     }
     showToast("登录成功");
-    context?.pushReplacement(HomePage());
+    context.pushReplacementNamed('/home');
   }
 
   void onClickRegister() {
-    if (context != null) {
-      showDialog(context: context!, builder: (context) => RegisterPage());
-    }
+    showDialog(context: context, builder: (context) => RegisterPage());
     // context?.pushPage('register');
   }
 }

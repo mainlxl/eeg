@@ -1,6 +1,7 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:eeg/business/user/viewmodel/register_viewmodel.dart';
 import 'package:eeg/core/base/view_model_builder.dart';
+import 'package:fluent_ui/fluent_ui.dart' as fluent;
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -13,13 +14,13 @@ class RegisterPage extends BasePage {
       child: Container(
         decoration: BoxDecoration(
           color: Colors.white, // 背景颜色
-          borderRadius: BorderRadius.all(Radius.circular(20)), // 圆角半径
+          borderRadius: const BorderRadius.all(Radius.circular(20)), // 圆角半径
           boxShadow: [
             BoxShadow(
               color: Colors.black.withOpacity(0.2), // 阴影颜色
               spreadRadius: 2, // 阴影扩散半径
               blurRadius: 5, // 模糊半径
-              offset: Offset(0, 3), // 阴影偏移
+              offset: const Offset(0, 3), // 阴影偏移
             ),
           ],
         ),
@@ -83,14 +84,14 @@ class RegisterPage extends BasePage {
 
   // 注册按钮
   Widget _buildRegisterButton(RegisterViewModel vm) {
-    return ElevatedButton(
+    return fluent.FilledButton(
       onPressed: vm.onClickRegister,
-      style: ElevatedButton.styleFrom(
-        padding: const EdgeInsets.symmetric(vertical: 15.0, horizontal: 30.0),
-      ),
-      child: Text(
-        "注册".tr(),
-        style: const TextStyle(fontSize: 18),
+      child: fluent.Padding(
+        padding: const EdgeInsets.symmetric(vertical: 3.0, horizontal: 50.0),
+        child: Text(
+          "注   册".tr(),
+          style: const TextStyle(fontSize: 18),
+        ),
       ),
     );
   }

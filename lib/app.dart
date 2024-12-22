@@ -1,66 +1,55 @@
 import 'package:easy_localization/easy_localization.dart';
-import 'package:eeg/app_router.dart';
-import 'package:flutter/material.dart';
+import 'package:eeg/business/home/page/home_page.dart';
+import 'package:eeg/business/user/page/login_page.dart';
+import 'package:eeg/common/font_family.dart';
+import 'package:eeg/core/utils/login.dart';
+import 'package:fluent_ui/fluent_ui.dart';
 import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
+
+import 'core/base/module.dart';
+import 'module.dart';
 
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
+    /// Fluent_UI样式 https://bdlukaa.github.io/fluent_ui/#/inputs/buttons
+    initModule();
+    return FluentApp(
       locale: context.locale,
       localizationsDelegates: context.localizationDelegates,
       supportedLocales: context.supportedLocales,
-      onGenerateRoute: AppRouter.generateRoute,
+      onGenerateRoute: _generateRoute,
       navigatorObservers: [FlutterSmartDialog.observer],
       builder: FlutterSmartDialog.init(),
-      theme: ThemeData(
-        fontFamily: 'SiyuanLightFont',
+      themeMode: ThemeMode.light,
+      theme: FluentThemeData(
+        accentColor: Colors.blue,
+        fontFamily: mainFont,
         brightness: Brightness.light,
-        primaryColor: Colors.blueAccent,
-        scaffoldBackgroundColor: Colors.grey[100],
-        dialogBackgroundColor: Colors.white,
-        // 设置对话框的默认背景颜色
-        buttonTheme: ButtonThemeData(
-          buttonColor: Colors.blueAccent,
-          textTheme: ButtonTextTheme.primary,
-          shape:
-              RoundedRectangleBorder(borderRadius: BorderRadius.circular(8.0)),
-        ),
-        textTheme: const TextTheme(
-          bodyLarge: TextStyle(
-              fontSize: 16.0,
-              fontWeight: FontWeight.w400,
-              color: Colors.black87),
-          bodyMedium: TextStyle(
-              fontSize: 14.0,
-              fontWeight: FontWeight.w400,
-              color: Colors.black54),
-          headlineLarge: TextStyle(
-              fontSize: 32.0, fontWeight: FontWeight.bold, color: Colors.black),
-          headlineMedium: TextStyle(
-              fontSize: 24.0, fontWeight: FontWeight.bold, color: Colors.black),
-        ),
-        cardTheme: CardTheme(
-          color: Colors.white,
-          elevation: 2.0,
-          shape:
-              RoundedRectangleBorder(borderRadius: BorderRadius.circular(12.0)),
-        ),
-        inputDecorationTheme: InputDecorationTheme(
-          border: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(8.0),
-            borderSide: const BorderSide(color: Colors.grey),
-          ),
-          focusedBorder: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(8.0),
-            borderSide: const BorderSide(color: Colors.blueAccent),
-          ),
-          labelStyle: const TextStyle(color: Colors.black54),
-          hintStyle: const TextStyle(color: Colors.grey),
-        ),
       ),
     );
+  }
+
+  Route<dynamic> _generateRoute(RouteSettings settings) {
+    var name = settings.name;
+    if (name != null) {
+      if (name.startsWith('/')) {
+        name = name.substring(1);
+      }
+      if (name.isNotEmpty) {
+        RouteBuilder? routeBuilder = moduleRouteBuilders[name];
+        if (routeBuilder != null) {
+          return FluentPageRoute(
+              builder: (context) => routeBuilder(context, settings));
+        }
+      }
+    }
+    if (LoginUtills.isLogin()) {
+      return FluentPageRoute(builder: (_) => const HomePage());
+    } else {
+      return FluentPageRoute(builder: (_) => const LoginPage());
+    }
   }
 }

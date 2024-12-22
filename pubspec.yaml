@@ -15,7 +15,13 @@ dependencies:
   flutter_smart_dialog: ^4.9.8+5
   syncfusion_flutter_charts: ^28.1.33
   provider: ^6.1.2
+  media_kit: ^1.1.11
+  url_launcher: ^6.3.1
+  fluent_ui: ^4.9.2
   dio: ^5.7.0
+  window_manager: ^0.4.3
+  system_theme: ^3.1.2
+  flutter_acrylic: ^1.1.4
 
 dev_dependencies:
   flutter_test:
@@ -30,4 +36,5 @@ flutter:
         - asset: fonts/Siyuan-Light.otf
   assets:
     - images/background/
+    - images/icon/
     - locals/

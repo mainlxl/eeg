@@ -1,6 +1,10 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:eeg/business/user/viewmodel/login_view_model.dart';
+import 'package:eeg/common/app_colors.dart';
+import 'package:eeg/common/font_family.dart';
+import 'package:eeg/common/widget/title_bar.dart';
 import 'package:eeg/core/base/view_model_builder.dart';
+import 'package:fluent_ui/fluent_ui.dart' as fluent;
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -9,53 +13,60 @@ class LoginPage extends BasePage {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: Container(
-        padding: const EdgeInsets.all(30.0),
-        alignment: Alignment.center,
-        child: ViewModelBuilder<LoginViewModel>(
-          create: () => LoginViewModel(),
-          child: Consumer<LoginViewModel>(
-            builder:
-                (BuildContext context, LoginViewModel vm, Widget? child) {
-              return Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Image.asset(
-                    'images/icon/head1.png',
-                    width: 200,
-                  ),
-                  const Text(
-                    "上肢运动-认知协同康复训练及评估系统",
-                    style: TextStyle(
-                      fontSize: 28,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.blueAccent,
-                    ),
-                  ),
-                  const SizedBox(height: 30),
-                  _buildTextField(
-                    controller: vm.usernameInputController,
-                    label: "用户名/邮箱",
-                    keyboardType: TextInputType.phone,
-                    icon: Icons.phone,
-                  ),
-                  const SizedBox(height: 20),
-                  _buildTextField(
-                    controller: vm.passwordInputController,
-                    label: "密码".tr(),
-                    keyboardType: TextInputType.number,
-                    icon: Icons.lock,
-                  ),
-                  const SizedBox(height: 20),
-                  _buildLoginButton(vm),
-                  const SizedBox(height: 20),
-                  _buildRegisterButton(vm),
-                ],
-              );
-            },
+    return Container(
+      color: mainBgColor,
+      alignment: Alignment.center,
+      child: Column(
+        children: [
+          const TitleBar(),
+          Expanded(
+            child: ViewModelBuilder<LoginViewModel>(
+              create: () => LoginViewModel(),
+              child: Consumer<LoginViewModel>(
+                builder:
+                    (BuildContext context, LoginViewModel vm, Widget? child) {
+                  return Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Image.asset(
+                        'images/icon/head1.png',
+                        width: 200,
+                      ),
+                      const Text(
+                        "上肢运动-认知协同康复训练及评估系统",
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: TextStyle(
+                          fontSize: 28,
+                          fontWeight: FontWeight.w500,
+                          color: Colors.blueAccent,
+                        ),
+                      ),
+                      const SizedBox(height: 30),
+                      _buildTextField(
+                        controller: vm.usernameInputController,
+                        label: "用户名/邮箱",
+                        keyboardType: TextInputType.phone,
+                        icon: Icons.phone,
+                      ),
+                      const SizedBox(height: 20),
+                      _buildTextField(
+                        controller: vm.passwordInputController,
+                        label: "密码".tr(),
+                        keyboardType: TextInputType.number,
+                        icon: Icons.lock,
+                      ),
+                      const SizedBox(height: 20),
+                      _buildLoginButton(vm),
+                      const SizedBox(height: 20),
+                      _buildRegisterButton(vm),
+                    ],
+                  );
+                },
+              ),
+            ),
           ),
-        ),
+        ],
       ),
     );
   }
@@ -66,7 +77,7 @@ class LoginPage extends BasePage {
       onPressed: vm.onClickRegister,
       child: Text(
         "没有账号？点击注册".tr(), // 这里可以使用翻译
-        style: const TextStyle(color: Colors.blueAccent),
+        style: const TextStyle(color: Colors.blueAccent, fontFamily: mainFont),
       ),
     );
   }
@@ -99,14 +110,14 @@ class LoginPage extends BasePage {
   }
 
   Widget _buildLoginButton(LoginViewModel vm) {
-    return ElevatedButton(
+    return fluent.Button(
       onPressed: vm.onClickLogin,
-      style: ElevatedButton.styleFrom(
-        padding: const EdgeInsets.symmetric(vertical: 15.0, horizontal: 30.0),
-      ),
-      child: Text(
-        "登录".tr(),
-        style: const TextStyle(fontSize: 18),
+      child: Padding(
+        padding: const EdgeInsets.symmetric(vertical: 3.0, horizontal: 50.0),
+        child: Text(
+          "登      录".tr(),
+          style: const TextStyle(fontSize: 18),
+        ),
       ),
     );
   }

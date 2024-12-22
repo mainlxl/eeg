@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
 import 'package:provider/provider.dart';
+import 'package:window_manager/window_manager.dart';
 
 typedef CreateViewModel<T> = T Function();
 
@@ -16,7 +17,8 @@ class ViewModelBuilder<T extends BaseViewModel> extends StatefulWidget {
 }
 
 class _ViewModelBuilderState<T extends BaseViewModel>
-    extends State<ViewModelBuilder> with WidgetsBindingObserver {
+    extends State<ViewModelBuilder>
+    with WidgetsBindingObserver, WindowListener {
   late T _viewModel;
 
   _ViewModelBuilderState();
@@ -24,8 +26,10 @@ class _ViewModelBuilderState<T extends BaseViewModel>
   @override
   void initState() {
     WidgetsBinding.instance.addObserver(this); // 注册观察者
+    windowManager.addListener(this);
     _viewModel = widget.create() as T;
     _viewModel.init();
+    _viewModel._mounted = () => mounted;
     super.initState();
   }
 
@@ -40,6 +44,7 @@ class _ViewModelBuilderState<T extends BaseViewModel>
 
   @override
   void dispose() {
+    windowManager.removeListener(this);
     WidgetsBinding.instance.removeObserver(this); // 移除观察者
     if (!_viewModel.isDisposed) {
       _viewModel.dispose();
@@ -61,13 +66,32 @@ class _ViewModelBuilderState<T extends BaseViewModel>
         break;
     }
   }
+
+  @override
+  void onWindowClose() async {
+    bool isPreventClose = await windowManager.isPreventClose();
+    if (isPreventClose && mounted) {
+      if (Navigator.canPop(context)) {
+        Navigator.pop(context);
+      } else {
+        windowManager.destroy();
+      }
+    }
+  }
 }
+
+typedef Mounted = bool Function();
 
 abstract class BaseViewModel extends ChangeNotifier {
   bool _isDisposed = false;
 
   bool get isDisposed => _isDisposed;
-  BuildContext? context;
+  late BuildContext context;
+
+  late Mounted _mounted;
+
+  /// 判断page是否位于树中
+  bool get mounted => _mounted();
 
   void init() {}
 

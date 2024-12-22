@@ -108,20 +108,14 @@ class IdCardUtils {
     String lastStr = idCard.substring(idCard.length - 1);
     String firstStr = idCard.substring(0, 17);
     bool isDigits = RegExp(r"^\d{17}").hasMatch(firstStr);
-    if (!isDigits) {
-      return false;
+    if (isDigits) {
+      int resultSum = 0;
+      for (int i = 0; i < 17; i++) {
+        resultSum += int.parse(idCard[i]) * _idCardWeight[i];
+      }
+      int lastResult = resultSum % 11;
+      return _idCardCheck[lastResult] == lastStr;
     }
-
-    int resultSum = 0;
-    for (int i = 0; i < 17; i++) {
-      resultSum += int.parse(idCard[i]) * _idCardWeight[i];
-    }
-
-    int lastResult = resultSum % 11;
-    if (_idCardCheck[lastResult] == lastStr) {
-      return true;
-    }
-
     return false;
   }
 
@@ -161,6 +155,7 @@ class IdCardUtils {
     }
     return int.parse(idCard.substring(16, 17)) % 2 == 0 ? "女" : "男";
   }
+
   static String getGender(String idCard) {
     if (!idCardNumberCheck(idCard)) {
       return "未知";
