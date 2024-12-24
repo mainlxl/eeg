@@ -5,3 +5,10 @@
 # Xcode-related
 **/dgph
 **/xcuserdata/
+# 忽略 Pods 目录
+Pods/
+
+# 忽略 CocoaPods 生成的相关文件
+*.xcworkspace
+*.xcuserstate
+*.xcuserdata
