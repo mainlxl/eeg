@@ -6,28 +6,51 @@ version: 1.0.0+1
 environment:
   sdk: ^3.5.4
 
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^4.0.0
+  flutter_launcher_icons: ^0.14.2
+
+# 执行dart run flutter_launcher_icons替换图标
+flutter_launcher_icons:
+  android: "ic_launcher"
+  ios: true
+  image_path: "logo/logo.png"
+  min_sdk_android: 21
+  web:
+    generate: true
+    image_path: "logo/logo.png"
+    background_color: "#hexcode"
+    theme_color: "#hexcode"
+  windows:
+    generate: true
+    image_path: "logo/logo.png"
+    icon_size: 256
+
 dependencies:
   flutter:
     sdk: flutter
-  cupertino_icons: ^1.0.8
   shared_preferences: ^2.3.3
   easy_localization: ^3.0.7
   flutter_smart_dialog: ^4.9.8+5
-  syncfusion_flutter_charts: ^28.1.33
   provider: ^6.1.2
-  media_kit: ^1.1.11
   url_launcher: ^6.3.1
   fluent_ui: ^4.9.2
   dio: ^5.7.0
   window_manager: ^0.4.3
   system_theme: ^3.1.2
   flutter_acrylic: ^1.1.4
+  connectivity_plus: ^6.1.1
+  crypto: ^3.0.6
+  # 获取版本号
+  package_info_plus: ^8.1.2
+  # 绘图
+  graphic: ^2.5.0
+  syncfusion_flutter_charts: ^28.1.33
+  # 视频播放
+  media_kit: ^1.1.11
 
-dev_dependencies:
-  flutter_test:
-    sdk: flutter
-  flutter_lints: ^4.0.0
-  flutter_launcher_icons: ^0.14.2
 
 flutter:
   uses-material-design: true
@@ -36,11 +59,7 @@ flutter:
       fonts:
         - asset: fonts/Siyuan-Light.otf
   assets:
+    - assets/
     - images/background/
-    - images/icon/
+    - logo/logo.png
     - locals/
-
-flutter_icons:
-  android: true
-  ios: true
-  image_path: "logo/logo.png" # 你的图标路径

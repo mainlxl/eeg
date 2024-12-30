@@ -9,12 +9,12 @@ Future<void> showToast(String message,
     builder: (context) => Container(
       padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 12.0),
       decoration: BoxDecoration(
-        color: Colors.black87,
-        borderRadius: BorderRadius.circular(24.0),
+        color: Colors.black,
+        borderRadius: BorderRadius.circular(12.0),
         boxShadow: const [
           BoxShadow(
             color: Colors.black54,
-            blurRadius: 24.0,
+            blurRadius: 12.0,
             offset: Offset(0, 5),
           ),
         ],

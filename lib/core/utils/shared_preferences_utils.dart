@@ -7,7 +7,7 @@ class SharedPreferencesUtils {
     _prefs = await SharedPreferences.getInstance();
   }
 
-  static T? get<T>(String key, [T? defaultValue]) {
+  static T get<T>({required String key, required T defaultValue}) {
     if (T == String) {
       return _prefs!.getString(key) as T? ?? defaultValue;
     } else if (T == bool) {
@@ -19,11 +19,11 @@ class SharedPreferencesUtils {
     } else if (T == List<String>) {
       return _prefs!.getStringList(key) as T? ?? defaultValue;
     }
-    return null; // 如果不支持的类型
+    return defaultValue; // 如果不支持的类型
   }
 
   // 存储值
-  static Future<bool> put<T>(String key, T value) async {
+  static Future<bool> put<T>({required String key, required T value}) async {
     if (T == String) {
       return _prefs!.setString(key, value as String);
     } else if (T == int) {
@@ -60,12 +60,12 @@ extension SharedPreferencesStringExtensions on String {
     return SharedPreferencesUtils._prefs!.setString(key, this);
   }
 
-  T? getSPValue<T>([T? defaultValue]) {
-    return SharedPreferencesUtils.get(this, defaultValue);
+  T? getSPValue<T>({required T defaultValue}) {
+    return SharedPreferencesUtils.get(key: this, defaultValue: defaultValue);
   }
 
   Future<bool> putSPValue<T>({required T value}) {
-    return SharedPreferencesUtils.put(this, value);
+    return SharedPreferencesUtils.put(key: this, value: value);
   }
 }
 

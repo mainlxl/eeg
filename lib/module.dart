@@ -7,6 +7,7 @@ final Map<String, RouteBuilder> _routeBuilders = {};
 Map<String, RouteBuilder> get moduleRouteBuilders => _routeBuilders;
 
 void registerModule(BaseModule module) {
+  module.onAppCreate();
   var route = module.routeBuilders();
   if (route != null) {
     _routeBuilders.addAll(route);

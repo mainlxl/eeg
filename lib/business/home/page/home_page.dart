@@ -1,3 +1,4 @@
+import 'package:eeg/business/chart/page/chart_page.dart';
 import 'package:eeg/business/home/page/feature_page.dart';
 import 'package:eeg/business/home/viewmodel/home_viewmodel.dart';
 import 'package:eeg/common/widget/title_bar.dart';
@@ -17,13 +18,15 @@ class HomePage extends StatelessWidget {
           appBar: const NavigationAppBar(
             automaticallyImplyLeading: true,
             title: TitleBar(
-              child: Text(
-                '上肢运动-认知协同康复训练及评估系统',
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
-                style: TextStyle(
-                  fontSize: 28,
-                  fontWeight: FontWeight.bold,
+              child: Center(
+                child: Text(
+                  '上肢运动-认知协同康复训练及评估系统',
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: TextStyle(
+                    fontSize: 28,
+                    fontWeight: FontWeight.bold,
+                  ),
                 ),
               ),
             ),
@@ -37,12 +40,14 @@ class HomePage extends StatelessWidget {
               PaneItem(
                 icon: const Icon(FluentIcons.area_chart),
                 title: const Text('癫痫脑内电'),
-                body: const DataTablePage(),
+                body: EegLineChart(
+                  data: [],
+                ),
               ),
               PaneItem(
                 icon: const Icon(FluentIcons.charticulator_plot_curve),
                 title: const Text('生理性脑内电'),
-                body: const _NavigationBodyItem(),
+                body: const DataTablePage(),
               ),
               PaneItem(
                 icon: const Icon(FluentIcons.charticulator_linking_sequence),

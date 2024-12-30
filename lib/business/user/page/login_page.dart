@@ -14,7 +14,21 @@ class LoginPage extends BasePage {
   @override
   Widget build(BuildContext context) {
     return Container(
-      color: mainBgColor,
+      decoration: const BoxDecoration(
+        image: DecorationImage(
+          image: AssetImage('images/background/login.png'), // 请确保图片路径正确
+          opacity: 0.5,
+          fit: BoxFit.cover, // 图片填充方式
+        ),
+        gradient: LinearGradient(
+          colors: [
+            Color(0xffa1c6ff),
+            Color(0xffe3e7ff),
+          ],
+          begin: Alignment.topLeft, // 渐变开始位置
+          end: Alignment.bottomRight, // 渐变结束位置
+        ),
+      ),
       alignment: Alignment.center,
       child: Column(
         children: [
@@ -25,42 +39,46 @@ class LoginPage extends BasePage {
               child: Consumer<LoginViewModel>(
                 builder:
                     (BuildContext context, LoginViewModel vm, Widget? child) {
-                  return Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Image.asset(
-                        'images/icon/head1.png',
-                        width: 200,
-                      ),
-                      const Text(
-                        "上肢运动-认知协同康复训练及评估系统",
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                        style: TextStyle(
-                          fontSize: 28,
-                          fontWeight: FontWeight.w500,
-                          color: Colors.blueAccent,
+                  return fluent.Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 10.0),
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Image.asset(
+                          'logo/logo.png',
+                          width: 200,
                         ),
-                      ),
-                      const SizedBox(height: 30),
-                      _buildTextField(
-                        controller: vm.usernameInputController,
-                        label: "用户名/邮箱",
-                        keyboardType: TextInputType.phone,
-                        icon: Icons.phone,
-                      ),
-                      const SizedBox(height: 20),
-                      _buildTextField(
-                        controller: vm.passwordInputController,
-                        label: "密码".tr(),
-                        keyboardType: TextInputType.number,
-                        icon: Icons.lock,
-                      ),
-                      const SizedBox(height: 20),
-                      _buildLoginButton(vm),
-                      const SizedBox(height: 20),
-                      _buildRegisterButton(vm),
-                    ],
+                        const Text(
+                          "上肢运动\n认知协同康复训练及评估系统",
+                          maxLines: 2,
+                          textAlign: TextAlign.center,
+                          overflow: TextOverflow.ellipsis,
+                          style: TextStyle(
+                            fontSize: 28,
+                            fontWeight: FontWeight.w500,
+                            color: mainTextColor,
+                          ),
+                        ),
+                        const SizedBox(height: 30),
+                        _buildTextField(
+                          controller: vm.usernameInputController,
+                          label: "用户名/邮箱",
+                          keyboardType: TextInputType.phone,
+                          icon: Icons.phone,
+                        ),
+                        const SizedBox(height: 20),
+                        _buildTextField(
+                          controller: vm.passwordInputController,
+                          label: "密码".tr(),
+                          keyboardType: TextInputType.number,
+                          icon: Icons.lock,
+                        ),
+                        const SizedBox(height: 20),
+                        _buildLoginButton(vm),
+                        const SizedBox(height: 20),
+                        _buildRegisterButton(vm),
+                      ],
+                    ),
                   );
                 },
               ),

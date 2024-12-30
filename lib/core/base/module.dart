@@ -5,4 +5,7 @@ typedef RouteBuilder = Widget Function(
 
 abstract class BaseModule {
   Map<String, RouteBuilder>? routeBuilders();
+
+  @mustCallSuper
+  void onAppCreate() {}
 }

@@ -33,9 +33,8 @@ class TitleBar extends StatelessWidget {
           },
         ),
         ...actionBar(),
-        isWeb
-            ? Container()
-            : Positioned(
+        isDesktop
+            ? Positioned(
                 right: 0,
                 top: 0,
                 bottom: 0,
@@ -47,7 +46,8 @@ class TitleBar extends StatelessWidget {
                     backgroundColor: Colors.transparent,
                   ),
                 ),
-              ),
+              )
+            : Container(),
       ],
     );
   }

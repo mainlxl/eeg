@@ -1,5 +1,8 @@
 import 'package:eeg/core/base/view_model_builder.dart';
-import 'package:eeg/core/http/http_service.dart';
+import 'package:eeg/core/network/http_service.dart';
+import 'package:eeg/core/network/network_state.dart';
+import 'package:eeg/core/utils/crypto.dart';
+import 'package:eeg/core/utils/router_utils.dart';
 import 'package:eeg/core/utils/toast.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
@@ -48,7 +51,8 @@ class RegisterViewModel extends BaseViewModel {
       tag: register_info_dialog,
       builder: (context) {
         return AlertDialog(
-          title: const Text('确认注册信息'),
+          backgroundColor: Colors.white,
+          title: const Center(child: Text('确认注册信息')),
           content: SingleChildScrollView(
             child: ListBody(
               children: <Widget>[
@@ -97,14 +101,20 @@ class RegisterViewModel extends BaseViewModel {
   }
 
   void _rawRegister(String username, String password, String email) async {
-    showLoading("注册中...");
-    var post = await HttpService.post('/registe',
-        data: {"username": username, "email": email, "password": password});
-    dismissLoading();
-    if (post == null) {
-      '注册失败,请稍后再试或者联系管理员!!!'.toast;
-      return;
+    if (await checkConnectivityAndShowToast()) {
+      showLoading("注册中...");
+      var post = await HttpService.post('/api/v1/register', data: {
+        "username": username,
+        "email": email,
+        "password": password.md5
+      });
+      dismissLoading();
+      if (post == null) {
+        '注册失败,请稍后再试或者联系管理员!!!'.toast;
+        return;
+      }
+      '注册成功,请登录'.toast;
+      context.popPage();
     }
-    // context?.popPage();
   }
 }
