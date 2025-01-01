@@ -14,11 +14,10 @@ class UserInfo {
   }
 
   static bool isLogin() {
-    return SharedPreferencesUtils.get(key: "login_token", defaultValue: "")
-        .isNotEmpty;
+    return token.isNotEmpty;
   }
 
-  static String? _token;
+  static String? _token = '111111111111';
 
   static String get token {
     if (_token == null) {
@@ -31,7 +30,7 @@ class UserInfo {
     return _token ?? '';
   }
 
-  static String? _userId;
+  static String? _userId = '111111111111';
 
   static String get userId {
     if (_userId == null) {

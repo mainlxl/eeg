@@ -40,9 +40,7 @@ class HomePage extends StatelessWidget {
               PaneItem(
                 icon: const Icon(FluentIcons.area_chart),
                 title: const Text('癫痫脑内电'),
-                body: EegLineChart(
-                  data: [],
-                ),
+                body: EegLineChart(),
               ),
               PaneItem(
                 icon: const Icon(FluentIcons.charticulator_plot_curve),
@@ -52,7 +50,7 @@ class HomePage extends StatelessWidget {
               PaneItem(
                 icon: const Icon(FluentIcons.charticulator_linking_sequence),
                 title: const Text('睡眠脑电'),
-                body: const _NavigationBodyItem(),
+                body:  _NavigationBodyItem(),
               ),
               PaneItem(
                 icon: const Icon(FluentIcons.charticulator_linking_data),

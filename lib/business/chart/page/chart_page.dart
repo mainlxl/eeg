@@ -1,151 +1,229 @@
-import 'package:flutter/material.dart';
+import 'dart:math';
 
-class EegLineChart extends StatefulWidget {
-  final int totalPoints; // 总点数
-  final int totalLine; // 总行数
-  final int pointSpacing; // 数据点之间的间隔
-  List<List<double>> data = [[]];
+import 'package:eeg/business/chart/viewmodel/chart_line_view_model.dart';
+import 'package:eeg/business/chart/widget/chart_horizontal_axis_widget.dart';
+import 'package:eeg/business/chart/widget/chart_line_widget.dart';
+import 'package:eeg/core/base/view_model_builder.dart';
+import 'package:eeg/core/utils/config.dart';
+import 'package:fluent_ui/fluent_ui.dart';
+import 'package:flutter/gestures.dart';
+import 'package:provider/provider.dart';
 
+class EegLineChart extends StatelessWidget {
 // 构造函数
-  EegLineChart({
-    this.pointSpacing = 3,
-    required this.data,
-  })  : totalLine = data.length,
-        totalPoints = data.isNotEmpty ? data[0].length : 0; // 总点数
-
-  @override
-  _EegLineChartState createState() => _EegLineChartState();
-}
-
-class _EegLineChartState extends State<EegLineChart> {
-  final ScrollController _scrollController = ScrollController();
-  int scrollOffset = 0; // 当前滚动的偏移量
-
-  @override
-  void initState() {
-    super.initState();
-    _scrollController.addListener(() {
-      setState(() {
-        int maxOffset = (widget.totalPoints * widget.pointSpacing).toInt();
-        scrollOffset = _scrollController.offset.ceil().clamp(0, maxOffset);
-      });
-    });
-  }
-
-  /// 生成数据，并补齐范围内的数据
-  List<double> generateData(int line, int startIndex, int count) {
-    return widget.data[line].sublist(startIndex, count);
-  }
+  EegLineChart({super.key});
 
   @override
   Widget build(BuildContext context) {
-    double canvasWidth = (widget.totalPoints * widget.pointSpacing).toDouble();
-    return LayoutBuilder(builder: (context, constraints) {
-      var maxWidth = constraints.maxWidth;
-      var maxHeight = constraints.maxHeight;
-      int countByWidth = (maxWidth / widget.pointSpacing).ceil();
-      double lineHeight = maxHeight / widget.totalLine;
-      return SizedBox(
-        width: constraints.maxWidth,
-        height: constraints.maxHeight,
-        child: SingleChildScrollView(
-          physics: ClampingScrollPhysics(),
-          controller: _scrollController,
-          scrollDirection: Axis.horizontal,
-          child: SingleChildScrollView(
-            scrollDirection: Axis.vertical,
-            child: Column(
-              children: List.generate(
-                widget.totalLine,
-                (index) => CustomPaint(
-                  size: Size(canvasWidth, lineHeight),
-                  painter: LineChartPainter(
-                    visibleData: generateData(
-                      index,
-                      (scrollOffset / widget.pointSpacing).floor(),
-                      countByWidth,
-                    ),
-                    minData: 0,
-                    maxData: 100,
-                    scrollOffset: scrollOffset,
-                    pointSpacing: widget.pointSpacing,
-                    countByWidth: countByWidth,
-                    drawCoordinates: index == (widget.totalLine - 1),
+    return ViewModelBuilder(
+      create: () => ChartLineViewModel(),
+      child: Consumer<ChartLineViewModel>(builder: (ctx, vm, _) {
+        return LayoutBuilder(
+          builder: (context, constraints) {
+            var maxWidth = constraints.maxWidth;
+            var maxHeight = constraints.maxHeight;
+            int countByWidth = (maxWidth / vm.pointGap).ceil();
+            double lineHeight = vm.lineTargetHeight ??=
+                min(maxHeight / vm.totalLine, vm.lineHeightMin);
+            var canvasWidth = vm.canvasWidth;
+            return Column(
+              children: [
+                SizedBox(
+                  height: 30,
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceAround,
+                    children: _buildOption(context, vm),
                   ),
                 ),
-              ),
-            ),
-          ),
-        ),
+                SizedBox(
+                  width: maxWidth,
+                  height: maxHeight - 30,
+                  child: Scrollbar(
+                    controller: vm.scrollHorizontalController,
+                    thumbVisibility: true,
+                    child: SingleChildScrollView(
+                      controller: vm.scrollHorizontalController,
+                      scrollDirection: Axis.horizontal,
+                      child: _buildTargetCharWidget(
+                        maxWidth: vm.canvasWidth,
+                        viewModel: vm,
+                        width: maxWidth,
+                        child: SizedBox(
+                          width: vm.canvasWidth,
+                          height: maxHeight,
+                          child: Column(
+                            children: [
+                              Expanded(
+                                child: vm.channels == null
+                                    ? Container()
+                                    : ScrollConfiguration(
+                                        behavior: NoScrollBehavior(), //隐藏滑动条
+                                        child: ListView.builder(
+                                          controller:
+                                              vm.scrollVerticalController,
+                                          itemCount: vm.totalLine,
+                                          itemBuilder: (context, index) =>
+                                              CustomPaint(
+                                            size: Size(canvasWidth, lineHeight),
+                                            painter: ChannelLineChartPainter(
+                                              data: vm.channels!.data[index],
+                                              maxShowCount: countByWidth,
+                                              contentWidth: maxWidth,
+                                              scrollOffset: vm.scrollOffset,
+                                              isScroll: vm.isHorezentalScrell,
+                                              pointGap: vm.pointGap,
+                                            ),
+                                          ),
+                                        ),
+                                      ),
+                              ),
+                              CustomPaint(
+                                size: Size(canvasWidth, 40),
+                                painter: HorizontalAxisChartPainter(
+                                  maxShowCount: countByWidth,
+                                  scrollOffset:
+                                      vm.scrollHorizontalController.hasClients
+                                          ? vm.scrollHorizontalController.offset
+                                          : 0,
+                                  pointGap: vm.pointGap,
+                                ),
+                              )
+                            ],
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            );
+          },
+        );
+      }),
+    );
+  }
+
+  // 上一次鼠标的位置
+  Offset? _lastMousePosition;
+  VelocityTracker? _velocityTracker;
+
+  Widget _buildTargetCharWidget(
+      {required Widget child,
+      required ChartLineViewModel viewModel,
+      required double maxWidth,
+      required double width}) {
+    if (isWindows) {
+      var maxScrollPositionX = maxWidth - width;
+      return Listener(
+        // 鼠标移动事件
+        onPointerMove: (PointerMoveEvent event) {
+          _velocityTracker?.addPosition(event.timeStamp, event.position);
+          final currentPosition = event.position;
+          if (_lastMousePosition != null) {
+            var translateToX = (currentPosition.dx - _lastMousePosition!.dx);
+            var translateToY = (currentPosition.dy - _lastMousePosition!.dy);
+            translateToX =
+                viewModel.scrollHorizontalController.offset - translateToX;
+            if (translateToX > 0 && translateToX <= maxScrollPositionX) {
+              viewModel.forceHorezentalScrell = true;
+              viewModel.scrollHorizontalController.jumpTo(translateToX);
+            }
+            if (translateToY != 0) {
+              viewModel.forceHorezentalScrell = true;
+              viewModel.scrollVerticalController.jumpTo(
+                  viewModel.scrollVerticalController.offset - translateToY);
+            }
+          }
+          // 更新上一次的鼠标位置
+          _lastMousePosition = currentPosition;
+        },
+        // 鼠标按下时初始化位置
+        onPointerDown: (PointerDownEvent event) {
+          _lastMousePosition = event.position;
+          _velocityTracker = VelocityTracker.withKind(event.kind);
+        },
+        onPointerUp: (PointerUpEvent event) {
+          final velocity = _velocityTracker!.getVelocity();
+          final dxVelocityX = velocity.pixelsPerSecond.dx;
+          final dxVelocityY = velocity.pixelsPerSecond.dy;
+          var absX = dxVelocityX.abs();
+          var absY = dxVelocityY.abs();
+          if (absX > 300 && absX > absY) {
+            double targetOffset = viewModel.scrollHorizontalController.offset -
+                (dxVelocityX > 0 ? 1000 : -1000);
+            viewModel.scrollHorizontalController.animateTo(
+              targetOffset.clamp(0.0, maxScrollPositionX),
+              duration: const Duration(milliseconds: 500),
+              curve: Curves.easeOut,
+            );
+          }
+          if (absY > 300 && absY > absX) {
+            double targetOffset = viewModel.scrollVerticalController.offset -
+                (dxVelocityY > 0 ? 800 : -800);
+            viewModel.scrollVerticalController.animateTo(
+              targetOffset.clamp(0.0, maxScrollPositionX),
+              duration: const Duration(milliseconds: 500),
+              curve: Curves.easeOut,
+            );
+          }
+          _velocityTracker = null;
+          _lastMousePosition = null;
+          viewModel.forceHorezentalScrell = false;
+        },
+        child: child,
       );
-    });
+    }
+
+    return child;
+  }
+
+  Widget _dropDownButtonItems(
+      {required String leading,
+      required String title,
+      required List<MenuFlyoutItemBase> items}) {
+    return DropDownButton(
+      leading: Text(leading),
+      title: Text(title),
+      items: items,
+    );
+  }
+
+  List<Widget> _buildOption(BuildContext context, ChartLineViewModel vm) {
+    return [
+      // _dropDownButtonItems(
+      //   leading: '横坐标间隔',
+      //   title: '${vm.pointGap}',
+      //   items: List<MenuFlyoutItem>.generate(
+      //     10,
+      //     (index) {
+      //       var size = (index + 1) * 3;
+      //       return MenuFlyoutItem(
+      //         text: Text('${size}'),
+      //         onPressed: () => vm.onPointGapChange(size),
+      //       );
+      //     },
+      //   ),
+      // ),
+      Button(
+          onPressed: vm.onClickChangeWidth, child: Text('横坐标间隔${vm.pointGap}')),
+      Button(
+          onPressed: vm.onClickChangeHeight,
+          child: Text('单通道高度${vm.lineTargetHeight}')),
+    ];
   }
 }
 
-class LineChartPainter extends CustomPainter {
-  final List<double> visibleData;
-  final double maxData;
-  final double minData;
-  final int scrollOffset;
-  final int pointSpacing;
-  final int countByWidth;
-  final bool drawCoordinates;
-
-  final Paint linePaint = Paint()
-    ..color = Colors.blue
-    ..strokeWidth = 2.0;
-
-  final Paint pointPaint = Paint()
-    ..color = Colors.red
-    ..style = PaintingStyle.fill;
-
-  LineChartPainter({
-    required this.visibleData,
-    required this.maxData,
-    required this.minData,
-    required this.scrollOffset,
-    required this.pointSpacing,
-    required this.countByWidth,
-    this.drawCoordinates = false,
-  });
-
-  double mapYValueToPixel(double value, double height) {
-    double normalized = (value - minData) / (maxData - minData);
-    return height * (1 - normalized);
+// 自定义 ScrollBehavior 类
+class NoScrollBehavior extends ScrollBehavior {
+  @override
+  Widget buildScrollbar(
+      BuildContext context, Widget child, ScrollableDetails details) {
+    return child; // 返回子部件，不显示滑动条
   }
 
   @override
-  void paint(Canvas canvas, Size size) {
-    int startIndex = (scrollOffset / pointSpacing).floor();
-    for (int i = 0; i < visibleData.length - 1; i++) {
-      double x1 = (i * pointSpacing).toDouble();
-      double y1 = mapYValueToPixel(visibleData[i], size.height);
-      double x2 = ((i + 1) * pointSpacing).toDouble();
-      double y2 = mapYValueToPixel(visibleData[i + 1], size.height);
-
-      canvas.drawLine(Offset(x1, y1), Offset(x2, y2), linePaint);
-      canvas.drawCircle(Offset(x1, y1), 3.0, pointPaint);
-
-      if (drawCoordinates && (i % 20 == 0)) {
-        double y = size.height + 10;
-        canvas.drawCircle(Offset(x1, y), 3, pointPaint);
-
-        TextPainter textPainter = TextPainter(
-          text: TextSpan(
-            text: (visibleData[i]).toStringAsFixed(1),
-            style: TextStyle(color: Colors.black, fontSize: 10),
-          ),
-          textDirection: TextDirection.ltr,
-        );
-        textPainter.layout();
-        textPainter.paint(canvas, Offset(x1 - textPainter.width / 2, y + 5));
-      }
-    }
-  }
-
-  @override
-  bool shouldRepaint(covariant LineChartPainter oldDelegate) {
-    return oldDelegate.visibleData != visibleData ||
-        oldDelegate.scrollOffset != scrollOffset;
+  Widget buildOverscrollIndicator(
+      BuildContext context, Widget child, ScrollableDetails details) {
+    return child; // 返回子部件，不显示过度滚动指示器
   }
 }
