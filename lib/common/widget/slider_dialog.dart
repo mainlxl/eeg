@@ -46,10 +46,11 @@ class SliderDialog extends StatelessWidget {
       content: ChangeNotifierProvider(
         create: (context) => sliderProvider,
         child: Consumer<_SliderProvider>(builder: (ctx, vm, _) {
+          var value = sliderProvider._value.ceil();
           return IntrinsicHeight(
             child: Slider(
-              label: '${sliderProvider._value}',
-              value: sliderProvider._value,
+              label: value.toString(),
+              value: value.toDouble(),
               min: min,
               max: max,
               onChanged: (value) {

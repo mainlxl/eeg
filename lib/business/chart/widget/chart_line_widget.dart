@@ -4,7 +4,7 @@ import 'package:fluent_ui/fluent_ui.dart';
 
 class ChannelLineChartPainter extends CustomPainter {
   final ChannelItem data;
-  final int maxShowCount;
+  late final int maxShowCount;
   double scrollOffset = 0;
   bool isScroll = false;
   final int pointGap;
@@ -16,12 +16,13 @@ class ChannelLineChartPainter extends CustomPainter {
 
   ChannelLineChartPainter({
     required this.data,
-    required this.maxShowCount,
     required this.scrollOffset,
     this.isScroll = false,
     required this.pointGap,
     required this.contentWidth,
-  });
+  }) {
+    maxShowCount = (contentWidth / pointGap).ceil();
+  }
 
   double mapYValueToPixel(double value, double height) {
     double normalized = (value - data.min) / maxDifference;
@@ -33,7 +34,7 @@ class ChannelLineChartPainter extends CustomPainter {
     var channelData = data.data;
     var startIndex = (scrollOffset / pointGap).floor();
     var checkShowChannelName = (maxShowCount / 5).ceil();
-    for (int i = 0; i < maxShowCount - 1; i++) {
+    for (int i = 0; i < maxShowCount; i++) {
       var dataIndex = i + startIndex;
       var nextDataIndex = dataIndex + 1;
       if (startIndex < 0 ||

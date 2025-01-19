@@ -67,7 +67,6 @@ class EegLineChart extends StatelessWidget {
                                             size: Size(canvasWidth, lineHeight),
                                             painter: ChannelLineChartPainter(
                                               data: vm.channels!.data[index],
-                                              maxShowCount: countByWidth,
                                               contentWidth: maxWidth,
                                               scrollOffset: vm.scrollOffset,
                                               isScroll: vm.isHorezentalScrell,
@@ -80,12 +79,11 @@ class EegLineChart extends StatelessWidget {
                               CustomPaint(
                                 size: Size(canvasWidth, 40),
                                 painter: HorizontalAxisChartPainter(
-                                  maxShowCount: countByWidth,
+                                  contentWidth: maxWidth,
                                   scrollOffset:
                                       vm.scrollHorizontalController.hasClients
                                           ? vm.scrollHorizontalController.offset
                                           : 0,
-                                  pointGap: vm.pointGap,
                                 ),
                               )
                             ],
@@ -208,7 +206,7 @@ class EegLineChart extends StatelessWidget {
           onPressed: vm.onClickChangeWidth, child: Text('横坐标间隔${vm.pointGap}')),
       Button(
           onPressed: vm.onClickChangeHeight,
-          child: Text('单通道高度${vm.lineTargetHeight}')),
+          child: Text('单通道高度${vm.lineTargetHeight?.toStringAsFixed(0)}')),
     ];
   }
 }

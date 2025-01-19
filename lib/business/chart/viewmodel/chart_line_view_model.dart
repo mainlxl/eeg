@@ -16,7 +16,6 @@ class ChartLineViewModel extends BaseViewModel {
 
   bool _forceHorezentalScrell = false;
 
-  // Setter
   set forceHorezentalScrell(bool value) {
     if (value != _forceHorezentalScrell) {
       _forceHorezentalScrell = value;
@@ -93,7 +92,7 @@ class ChartLineViewModel extends BaseViewModel {
         value: lineTargetHeight!,
         title: '请滑动选择通道[高度]',
         min: 10,
-        max: 3000,
+        max: 1000,
         onChanged: (size) {
           lineTargetHeight = size;
           notifyListeners();
@@ -112,13 +111,13 @@ class ChartLineViewModel extends BaseViewModel {
     SliderDialog(
         value: pointGap.toDouble(),
         title: '请滑动选择通道[横坐标间隔]',
-        min: 2,
+        min: 1,
         max: 150,
         onChanged: (size) {
           pointGap = size.ceil();
           notifyListeners();
         })
-      ..addSelectValueAction([2, 3, 5, 10, 30])
+      ..addSelectValueAction([1, 2, 3, 5, 10, 30])
       ..show(context);
   }
 }
