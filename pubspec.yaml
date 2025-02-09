@@ -50,6 +50,7 @@ dependencies:
   syncfusion_flutter_charts: ^28.1.33
   # 视频播放
   media_kit: ^1.1.11
+  event_bus: ^2.0.1
 
 
 flutter:

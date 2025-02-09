@@ -1,10 +1,13 @@
+import 'package:eeg/app.dart';
 import 'package:eeg/business/patient/mode/patient_info_mode.dart';
+import 'package:eeg/business/patient/viewmodel/patient_list_view_model.dart';
+import 'package:eeg/common/app_colors.dart';
 import 'package:eeg/core/base/view_model_builder.dart';
 import 'package:eeg/core/network/http_service.dart';
 import 'package:eeg/core/utils/id_card_check_utils.dart';
 import 'package:eeg/core/utils/router_utils.dart';
 import 'package:eeg/core/utils/toast.dart';
-import 'package:fluent_ui/fluent_ui.dart';
+import 'package:flutter/material.dart';
 
 class AddPatientViewModel extends BaseViewModel {
   late final TextEditingController nameController;
@@ -31,7 +34,7 @@ class AddPatientViewModel extends BaseViewModel {
         TextEditingController(text: patient?.medicalHistory);
   }
 
-  void updatePatient() async {
+  void onClickUpdatePatient() async {
     var patient = _patient;
     if (patient != null && formKey.currentState!.validate()) {
       showLoading();
@@ -66,7 +69,7 @@ class AddPatientViewModel extends BaseViewModel {
     }
   }
 
-  void addPatient() async {
+  void onClickAddPatient() async {
     if (formKey.currentState!.validate()) {
       showLoading();
       var idCard = idCardController.text;
@@ -85,10 +88,75 @@ class AddPatientViewModel extends BaseViewModel {
         nameController.clear();
         idCardController.clear();
         medicalHistoryController.clear();
-        Navigator.pop(context);
+        eventBus.fire(PatientListRefreshEvent());
+        Navigator.pop(context, PagePopType.refreshData);
       }
     } else {
       '添加失败'.showToast();
     }
+  }
+
+  void onClickDeletePatient() async {
+    var patient = _patient;
+    if (patient != null) {
+      // 展示对话框如果用户确认删除
+      if (await confirmDeleteDialog(patient)) {
+        showLoading();
+        ResponseData? post =
+            await HttpService.post('/api/v1/patients/delete/${patient.id}');
+        hideLoading();
+        if (post?.status == 0) {
+          '病人信息已删除'.showToast();
+          context.popPage(PagePopType.deleteData);
+        } else {
+          '删除失败'.showToast();
+        }
+      }
+    } else {
+      '删除失败'.showToast();
+    }
+  }
+
+  Future<bool> confirmDeleteDialog(Patient patient) async {
+    return await showDialog<bool>(
+          context: context,
+          builder: (BuildContext context) {
+            return AlertDialog(
+              title: const Text('确认删除患者信息'),
+              content: RichText(
+                text: TextSpan(
+                  style: const TextStyle(color: textColor), // 默认颜色
+                  children: [
+                    const TextSpan(
+                      text: '确定要删除患者',
+                    ),
+                    TextSpan(
+                      text: patient.name,
+                      style: TextStyle(color: Colors.red), // 红色
+                    ),
+                    const TextSpan(
+                      text: '信息吗？',
+                    ),
+                  ],
+                ),
+              ),
+              actions: <Widget>[
+                TextButton(
+                  onPressed: () {
+                    Navigator.of(context).pop(false); // 取消
+                  },
+                  child: const Text('取消'),
+                ),
+                TextButton(
+                  onPressed: () {
+                    Navigator.of(context).pop(true); // 确认
+                  },
+                  child: const Text('确认'),
+                ),
+              ],
+            );
+          },
+        ) ??
+        false;
   }
 }

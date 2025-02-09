@@ -12,10 +12,12 @@ class PatientDetailViewModel extends BaseViewModel {
     // 这里可以添加更新信息的逻辑，例如导航到更新页面
     var result =
         await context.pushNamed('/patient/add_or_edit', arguments: patient);
-    if (result != null && result is Patient) {
+    if (result is Patient) {
       patient = result;
       _needPopResultData = true;
       notifyListeners();
+    } else if (result == PagePopType.deleteData) {
+      context.maybePopPage(PagePopType.deleteData);
     }
   }
 

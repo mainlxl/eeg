@@ -1,4 +1,6 @@
+import 'package:eeg/app.dart';
 import 'package:eeg/business/patient/page/add_or_patient_page.dart';
+import 'package:eeg/business/patient/viewmodel/patient_list_view_model.dart';
 import 'package:eeg/business/user/user_info.dart';
 import 'package:eeg/core/base/view_model_builder.dart';
 import 'package:eeg/core/network/http_service.dart';

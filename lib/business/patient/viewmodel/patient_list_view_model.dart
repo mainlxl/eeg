@@ -1,3 +1,4 @@
+import 'package:eeg/app.dart';
 import 'package:eeg/business/patient/mode/patient_info_mode.dart';
 import 'package:eeg/business/user/user_info.dart';
 import 'package:eeg/core/base/view_model_builder.dart';
@@ -13,6 +14,9 @@ class PatientListViewModel extends BaseViewModel {
   void init() {
     super.init();
     loadData();
+    addSubscription(eventBus.on<PatientListRefreshEvent>().listen((event) {
+      loadData();
+    }));
   }
 
   Future<void> loadData() async {
@@ -32,8 +36,8 @@ class PatientListViewModel extends BaseViewModel {
   void onClickPatientItem(Patient patient) async {
     var result = await context.pushNamed('/patient/detail', arguments: patient);
     var patients = _patients;
-    if (patients != null) {
-      if (result != null && result is Patient) {
+    if (patients != null && result != null) {
+      if (result is Patient) {
         for (var i = 0; i < _patients!.length; i++) {
           if (_patients![i].id == patient.id) {
             _patients![i] = patient;
@@ -41,7 +45,14 @@ class PatientListViewModel extends BaseViewModel {
             break;
           }
         }
+      } else if (result == PagePopType.deleteData) {
+        patients.remove(patient);
+        notifyListeners();
+      } else if (result == PagePopType.refreshData) {
+        loadData();
       }
     }
   }
 }
+
+class PatientListRefreshEvent {}

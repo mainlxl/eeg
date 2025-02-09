@@ -3,6 +3,7 @@ import 'package:eeg/business/home/page/home_page.dart';
 import 'package:eeg/business/user/page/login_page.dart';
 import 'package:eeg/business/user/user_info.dart';
 import 'package:eeg/common/font_family.dart';
+import 'package:event_bus/event_bus.dart';
 import 'package:fluent_ui/fluent_ui.dart';
 import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
 
@@ -14,6 +15,8 @@ final GlobalKey<NavigatorState> _navigatorKey = GlobalKey<NavigatorState>();
 NavigatorState? get getAppNavigatorState => _navigatorKey.currentState;
 
 BuildContext? get getAppContext => _navigatorKey.currentContext;
+
+final eventBus = EventBus();
 
 class MyApp extends StatelessWidget {
   const MyApp({super.key});

@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
 import 'package:provider/provider.dart';
@@ -82,8 +84,11 @@ class _ViewModelBuilderState<T extends BaseViewModel>
 
 typedef Mounted = bool Function();
 
+enum PagePopType { refreshData, deleteData }
+
 abstract class BaseViewModel extends ChangeNotifier {
   bool _isDisposed = false;
+  List<StreamSubscription> _subscriptions = [];
 
   bool get isDisposed => _isDisposed;
   late BuildContext context;
@@ -99,11 +104,19 @@ abstract class BaseViewModel extends ChangeNotifier {
 
   void onPagePause() {}
 
+  void addSubscription(StreamSubscription subscription) {
+    _subscriptions.add(subscription);
+  }
+
   @mustCallSuper
   @override
   void dispose() {
     _isDisposed = true;
     super.dispose();
+    for (var subscription in _subscriptions) {
+      subscription.cancel();
+    }
+    _subscriptions.clear();
   }
 
   Future<void> showLoading([String msg = '加载中...']) {

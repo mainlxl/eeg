@@ -149,16 +149,49 @@ class AddPatientPage extends StatelessWidget {
                   controller: vm.medicalHistoryController,
                 ),
                 const SizedBox(height: 20.0),
-                fluent.Button(
-                  onPressed: vm.isEdit ? vm.updatePatient : vm.addPatient,
-                  child: Padding(
-                    padding: const EdgeInsets.symmetric(
-                        vertical: 3.0, horizontal: 50.0),
-                    child: Text(
-                      "提   交".tr(),
-                      style: const TextStyle(fontSize: 18),
+                Row(
+                  mainAxisAlignment: vm.isEdit
+                      ? MainAxisAlignment.spaceAround
+                      : MainAxisAlignment.center,
+                  children: [
+                    fluent.FilledButton(
+                      onPressed: vm.isEdit ? vm.onClickUpdatePatient : vm.onClickAddPatient,
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(
+                            vertical: 3.0, horizontal: 50.0),
+                        child: Text(
+                          "提   交".tr(),
+                          style: const TextStyle(fontSize: 18),
+                        ),
+                      ),
                     ),
-                  ),
+                    Visibility(
+                      visible: vm.isEdit,
+                      child: fluent.FilledButton(
+                        onPressed: vm.onClickDeletePatient,
+                        style: () {
+                          return fluent.ButtonStyle(
+                            backgroundColor:
+                                WidgetStateProperty.resolveWith((states) {
+                              if (states.isHovered) {
+                                return fluent.Colors.red.withOpacity(0.8);
+                              } else {
+                                return fluent.Colors.red;
+                              }
+                            }),
+                          );
+                        }(),
+                        child: Padding(
+                          padding: const EdgeInsets.symmetric(
+                              vertical: 3.0, horizontal: 50.0),
+                          child: Text(
+                            "删   除".tr(),
+                            style: const TextStyle(fontSize: 18),
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
                 )
               ],
             ),
