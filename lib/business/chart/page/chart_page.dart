@@ -4,7 +4,6 @@ import 'package:eeg/business/chart/viewmodel/chart_line_view_model.dart';
 import 'package:eeg/business/chart/widget/chart_horizontal_axis_widget.dart';
 import 'package:eeg/business/chart/widget/chart_line_widget.dart';
 import 'package:eeg/core/base/view_model_builder.dart';
-import 'package:eeg/core/utils/config.dart';
 import 'package:fluent_ui/fluent_ui.dart';
 import 'package:flutter/gestures.dart';
 import 'package:provider/provider.dart';
@@ -43,6 +42,7 @@ class EegLineChart extends StatelessWidget {
                     thumbVisibility: true,
                     child: SingleChildScrollView(
                       controller: vm.scrollHorizontalController,
+                      physics: ClampingScrollPhysics(), // 去掉弹性效果
                       scrollDirection: Axis.horizontal,
                       child: _buildTargetCharWidget(
                         maxWidth: vm.canvasWidth,
@@ -61,6 +61,8 @@ class EegLineChart extends StatelessWidget {
                                         child: ListView.builder(
                                           controller:
                                               vm.scrollVerticalController,
+                                          physics:
+                                              ClampingScrollPhysics(), // 去掉弹性效果
                                           itemCount: vm.totalLine,
                                           itemBuilder: (context, index) =>
                                               CustomPaint(
@@ -110,69 +112,65 @@ class EegLineChart extends StatelessWidget {
       required ChartLineViewModel viewModel,
       required double maxWidth,
       required double width}) {
-    if (isWindows) {
-      var maxScrollPositionX = maxWidth - width;
-      return Listener(
-        // 鼠标移动事件
-        onPointerMove: (PointerMoveEvent event) {
-          _velocityTracker?.addPosition(event.timeStamp, event.position);
-          final currentPosition = event.position;
-          if (_lastMousePosition != null) {
-            var translateToX = (currentPosition.dx - _lastMousePosition!.dx);
-            var translateToY = (currentPosition.dy - _lastMousePosition!.dy);
-            translateToX =
-                viewModel.scrollHorizontalController.offset - translateToX;
-            if (translateToX > 0 && translateToX <= maxScrollPositionX) {
-              viewModel.forceHorezentalScrell = true;
-              viewModel.scrollHorizontalController.jumpTo(translateToX);
-            }
-            if (translateToY != 0) {
-              viewModel.forceHorezentalScrell = true;
-              viewModel.scrollVerticalController.jumpTo(
-                  viewModel.scrollVerticalController.offset - translateToY);
-            }
+    var maxScrollPositionX = maxWidth - width;
+    return Listener(
+      // 鼠标移动事件
+      onPointerMove: (PointerMoveEvent event) {
+        _velocityTracker?.addPosition(event.timeStamp, event.position);
+        final currentPosition = event.position;
+        if (_lastMousePosition != null) {
+          var translateToX = (currentPosition.dx - _lastMousePosition!.dx);
+          var translateToY = (currentPosition.dy - _lastMousePosition!.dy);
+          translateToX =
+              viewModel.scrollHorizontalController.offset - translateToX;
+          if (translateToX > 0 && translateToX <= maxScrollPositionX) {
+            viewModel.forceHorezentalScrell = true;
+            viewModel.scrollHorizontalController.jumpTo(translateToX);
           }
-          // 更新上一次的鼠标位置
-          _lastMousePosition = currentPosition;
-        },
-        // 鼠标按下时初始化位置
-        onPointerDown: (PointerDownEvent event) {
-          _lastMousePosition = event.position;
-          _velocityTracker = VelocityTracker.withKind(event.kind);
-        },
-        onPointerUp: (PointerUpEvent event) {
-          final velocity = _velocityTracker!.getVelocity();
-          final dxVelocityX = velocity.pixelsPerSecond.dx;
-          final dxVelocityY = velocity.pixelsPerSecond.dy;
-          var absX = dxVelocityX.abs();
-          var absY = dxVelocityY.abs();
-          if (absX > 300 && absX > absY) {
-            double targetOffset = viewModel.scrollHorizontalController.offset -
-                (dxVelocityX > 0 ? 1000 : -1000);
-            viewModel.scrollHorizontalController.animateTo(
-              targetOffset.clamp(0.0, maxScrollPositionX),
-              duration: const Duration(milliseconds: 500),
-              curve: Curves.easeOut,
-            );
+          if (translateToY != 0) {
+            viewModel.forceHorezentalScrell = true;
+            viewModel.scrollVerticalController.jumpTo(
+                viewModel.scrollVerticalController.offset - translateToY);
           }
-          if (absY > 300 && absY > absX) {
-            double targetOffset = viewModel.scrollVerticalController.offset -
-                (dxVelocityY > 0 ? 800 : -800);
-            viewModel.scrollVerticalController.animateTo(
-              targetOffset.clamp(0.0, maxScrollPositionX),
-              duration: const Duration(milliseconds: 500),
-              curve: Curves.easeOut,
-            );
-          }
-          _velocityTracker = null;
-          _lastMousePosition = null;
-          viewModel.forceHorezentalScrell = false;
-        },
-        child: child,
-      );
-    }
-
-    return child;
+        }
+        // 更新上一次的鼠标位置
+        _lastMousePosition = currentPosition;
+      },
+      // 鼠标按下时初始化位置
+      onPointerDown: (PointerDownEvent event) {
+        _lastMousePosition = event.position;
+        _velocityTracker = VelocityTracker.withKind(event.kind);
+      },
+      onPointerUp: (PointerUpEvent event) {
+        final velocity = _velocityTracker!.getVelocity();
+        final dxVelocityX = velocity.pixelsPerSecond.dx;
+        final dxVelocityY = velocity.pixelsPerSecond.dy;
+        var absX = dxVelocityX.abs();
+        var absY = dxVelocityY.abs();
+        if (absX > 300 && absX > absY) {
+          double targetOffset = viewModel.scrollHorizontalController.offset -
+              (dxVelocityX > 0 ? 1000 : -1000);
+          viewModel.scrollHorizontalController.animateTo(
+            targetOffset.clamp(0.0, maxScrollPositionX),
+            duration: const Duration(milliseconds: 500),
+            curve: Curves.easeOut,
+          );
+        }
+        if (absY > 300 && absY > absX) {
+          double targetOffset = viewModel.scrollVerticalController.offset -
+              (dxVelocityY > 0 ? 800 : -800);
+          viewModel.scrollVerticalController.animateTo(
+            targetOffset.clamp(0.0, maxScrollPositionX),
+            duration: const Duration(milliseconds: 500),
+            curve: Curves.easeOut,
+          );
+        }
+        _velocityTracker = null;
+        _lastMousePosition = null;
+        viewModel.forceHorezentalScrell = false;
+      },
+      child: child,
+    );
   }
 
   Widget _dropDownButtonItems(

@@ -15,7 +15,7 @@ class LoginViewModel extends BaseViewModel {
     var username = usernameInputController.text;
     var password = passwordInputController.text;
     if (username.isEmpty) {
-      showToast("用户名/邮箱不能为空");
+      showToast("用户名/邮箱不x能为空");
       return;
     } else if (password.isEmpty) {
       showToast("密码不能为空");
@@ -24,7 +24,7 @@ class LoginViewModel extends BaseViewModel {
     showLoading("登录中...");
     var post = await HttpService.post('/api/v1/login',
         data: {"username": username, "password": password.md5});
-    dismissLoading();
+    hideLoading();
     var responseData = post?.data as Map<String, dynamic>?;
     if (responseData != null) {
       if (await UserInfo.checkAndSaveLoginInfo(responseData)) {

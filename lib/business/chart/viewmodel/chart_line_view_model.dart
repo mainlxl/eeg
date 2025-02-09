@@ -67,7 +67,7 @@ class ChartLineViewModel extends BaseViewModel {
             .data
             .length;
     this.channels = channelsData;
-    dismissLoading();
+    hideLoading();
     notifyListeners();
   }
 

@@ -22,7 +22,7 @@ class HttpService {
       };
     }
     _dio.options.headers['User-Agent'] = 'eeg/1.0.0';
-    _dio.options.baseUrl = 'http://192.168.1.12:8080';
+    _dio.options.baseUrl = 'http://f-blog.96kg.cn:8080';
     _dio.options.connectTimeout = const Duration(seconds: 5);
     _dio.options.receiveTimeout = const Duration(seconds: 10);
     _dio.interceptors.add(
@@ -77,53 +77,44 @@ class HttpService {
     }
   }
 
-  static void _requestWithCallbackAndToast(
-      ResponseData? response, OnResponseNext onNext) {
-    if (response != null) {
-      if (response.status != 0) {
-        if (response.message != null) {
-          response.message!.showToast();
-          return;
-        }
-      } else {
-        onNext.call(response);
-      }
-    }
-    onNext.call(null);
-  }
-
   static Future<ResponseData?> get(String path,
-      {Map<String, dynamic>? queryParameters}) async {
+      {Map<String, dynamic>? queryParameters,
+      bool needStateMessage = true}) async {
     var response = await _instance._get(path, queryParameters: queryParameters);
     if (response != null) {
       var json = response.data;
       if (json != null) {
-        return ResponseData.fromJson(json);
+        return _tryToastByStateAndMessage(
+            ResponseData.fromJson(json), needStateMessage);
       }
     }
     return null;
   }
 
-  static void getRequestWithCallbackAndToast(String path,
-      {dynamic queryParameters, required OnResponseNext onNext}) async {
-    _requestWithCallbackAndToast(
-        await get(path, queryParameters: queryParameters), onNext);
-  }
-
-  static Future<ResponseData?> post(String path, {dynamic data}) async {
+  static Future<ResponseData?> post(String path,
+      {dynamic data, bool needStateMessage = true}) async {
     var response = await _instance._post(path, data: data);
     if (response != null) {
       var json = response.data;
       if (json != null) {
-        return ResponseData.fromJson(json);
+        return _tryToastByStateAndMessage(
+            ResponseData.fromJson(json), needStateMessage);
       }
     }
     return null;
   }
 
-  static void postRequestWithCallbackAndToast(String path,
-      {dynamic data, required OnResponseNext onNext}) async {
-    _requestWithCallbackAndToast(await post(path, data: data), onNext);
+  static ResponseData _tryToastByStateAndMessage(ResponseData responseData,
+      [bool needStateMessage = true]) {
+    if (needStateMessage) {
+      if (responseData.status != 0) {
+        // 错误码是2，显示提示信息 有云端控制
+        if (responseData.status == 2 && responseData.message != null) {
+          responseData.message!.showToast();
+        }
+      }
+    }
+    return responseData;
   }
 }
 

@@ -7,79 +7,65 @@ class DataTablePage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('患者列表'),
-        actions: [
-          IconButton(
-            icon: Icon(Icons.settings),
-            onPressed: () {
-              // 设置按钮逻辑（可根据需求实现）
-            },
-          ),
-        ],
-      ),
-      body: ViewModelBuilder<DataTableViewModel>(
-        create: () => DataTableViewModel(),
-        child: Consumer<DataTableViewModel>(
-          builder: (context, vm, _) => Padding(
-            padding: const EdgeInsets.all(16.0),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                TextField(
-                  decoration: InputDecoration(
-                    labelText: '搜索',
-                    suffixIcon: Icon(Icons.search),
-                    contentPadding:
-                        EdgeInsets.symmetric(vertical: 12.0), // 优化输入框高度
-                  ),
-                  onChanged: (value) {
-                    vm.onSearchChanged(value);
-                  },
+    return ViewModelBuilder<DataTableViewModel>(
+      create: () => DataTableViewModel(),
+      child: Consumer<DataTableViewModel>(
+        builder: (context, vm, _) => Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              TextField(
+                decoration: InputDecoration(
+                  labelText: '搜索',
+                  suffixIcon: Icon(Icons.search),
+                  contentPadding:
+                      EdgeInsets.symmetric(vertical: 12.0), // 优化输入框高度
                 ),
-                SizedBox(height: 8), // 调整搜索框和表格之间的间距
-                Expanded(
-                  child: SingleChildScrollView(
-                    // 添加滚动功能
-                    child: DataTable(
-                      columnSpacing: 16.0, // 列之间的间距
-                      columns: [
-                        DataColumn(label: Text('姓名')),
-                        DataColumn(label: Text('ID')),
-                        DataColumn(label: Text('年龄')),
-                        DataColumn(label: Text('性别')),
-                        DataColumn(label: Text('操作')),
-                      ],
-                      rows: vm.filteredPatients.map((patient) {
-                        int index = vm.filteredPatients.indexOf(patient);
-                        return DataRow(cells: [
-                          DataCell(Text(patient['姓名'])),
-                          DataCell(Text(patient['ID'])),
-                          DataCell(Text(patient['年龄'].toString())),
-                          DataCell(Text(patient['性别'])),
-                          DataCell(Row(
-                            mainAxisAlignment:
-                                MainAxisAlignment.spaceEvenly, // 对齐按钮
-                            children: [
-                              IconButton(
-                                icon: Icon(Icons.edit),
-                                onPressed: () =>
-                                    vm.onEditPatient(context, index),
-                              ),
-                              IconButton(
-                                icon: Icon(Icons.delete),
-                                onPressed: () => vm.onDeletePatient(index),
-                              ),
-                            ],
-                          )),
-                        ]);
-                      }).toList(),
-                    ),
+                onChanged: (value) {
+                  vm.onSearchChanged(value);
+                },
+              ),
+              SizedBox(height: 8), // 调整搜索框和表格之间的间距
+              Expanded(
+                child: SingleChildScrollView(
+                  // 添加滚动功能
+                  child: DataTable(
+                    columnSpacing: 16.0, // 列之间的间距
+                    columns: [
+                      DataColumn(label: Text('姓名')),
+                      DataColumn(label: Text('ID')),
+                      DataColumn(label: Text('年龄')),
+                      DataColumn(label: Text('性别')),
+                      DataColumn(label: Text('操作')),
+                    ],
+                    rows: vm.filteredPatients.map((patient) {
+                      int index = vm.filteredPatients.indexOf(patient);
+                      return DataRow(cells: [
+                        DataCell(Text(patient['姓名'])),
+                        DataCell(Text(patient['ID'])),
+                        DataCell(Text(patient['年龄'].toString())),
+                        DataCell(Text(patient['性别'])),
+                        DataCell(Row(
+                          mainAxisAlignment:
+                              MainAxisAlignment.spaceEvenly, // 对齐按钮
+                          children: [
+                            IconButton(
+                              icon: Icon(Icons.edit),
+                              onPressed: () => vm.onEditPatient(context, index),
+                            ),
+                            IconButton(
+                              icon: Icon(Icons.delete),
+                              onPressed: () => vm.onDeletePatient(index),
+                            ),
+                          ],
+                        )),
+                      ]);
+                    }).toList(),
                   ),
                 ),
-              ],
-            ),
+              ),
+            ],
           ),
         ),
       ),

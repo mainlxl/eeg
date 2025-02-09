@@ -50,7 +50,7 @@ class MyApp extends StatelessWidget {
       if (name.isNotEmpty) {
         RouteBuilder? routeBuilder = moduleRouteBuilders[name];
         if (routeBuilder != null) {
-          return FluentPageRoute(
+          return FluentPageRoute<dynamic>(
               builder: (context) => routeBuilder(context, settings));
         }
       }

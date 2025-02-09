@@ -56,7 +56,7 @@ class LoginPage extends BasePage {
                           style: TextStyle(
                             fontSize: 28,
                             fontWeight: FontWeight.w500,
-                            color: mainTextColor,
+                            color: textColor,
                           ),
                         ),
                         const SizedBox(height: 30),
@@ -68,6 +68,7 @@ class LoginPage extends BasePage {
                         ),
                         const SizedBox(height: 20),
                         _buildTextField(
+                          obscureText: true,
                           controller: vm.passwordInputController,
                           label: "密码".tr(),
                           keyboardType: TextInputType.number,
@@ -105,10 +106,12 @@ class LoginPage extends BasePage {
     required String label,
     required TextInputType keyboardType,
     required IconData icon,
+    bool obscureText = false,
   }) {
     return ConstrainedBox(
       constraints: const BoxConstraints(maxWidth: 400),
       child: TextField(
+        obscureText: obscureText,
         controller: controller,
         decoration: InputDecoration(
           labelText: label,

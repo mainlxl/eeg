@@ -108,7 +108,7 @@ class RegisterViewModel extends BaseViewModel {
         "email": email,
         "password": password.md5
       });
-      dismissLoading();
+      hideLoading();
       if (post == null) {
         '注册失败,请稍后再试或者联系管理员!!!'.toast;
         return;

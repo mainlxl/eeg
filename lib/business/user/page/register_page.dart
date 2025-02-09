@@ -60,6 +60,7 @@ class RegisterPage extends BasePage {
                       ),
                       const SizedBox(height: 20),
                       _buildTextField(
+                        obscureText: true,
                         controller: vm.passwordInputController,
                         label: "密码".tr(),
                         keyboardType: TextInputType.text,
@@ -67,6 +68,7 @@ class RegisterPage extends BasePage {
                       ),
                       const SizedBox(height: 20),
                       _buildTextField(
+                        obscureText: true,
                         controller: vm.passwordInputCheckController,
                         label: "确认密码".tr(),
                         keyboardType: TextInputType.text,
@@ -105,10 +107,12 @@ class RegisterPage extends BasePage {
     required String label,
     required TextInputType keyboardType,
     required IconData icon,
+    bool obscureText = false,
   }) {
     return ConstrainedBox(
       constraints: const BoxConstraints(maxWidth: 400),
       child: TextField(
+        obscureText: obscureText,
         controller: controller,
         decoration: InputDecoration(
           labelText: label,

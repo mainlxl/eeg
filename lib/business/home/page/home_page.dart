@@ -1,6 +1,8 @@
 import 'package:eeg/business/chart/page/chart_page.dart';
 import 'package:eeg/business/home/page/feature_page.dart';
 import 'package:eeg/business/home/viewmodel/home_viewmodel.dart';
+import 'package:eeg/business/patient/page/add_or_patient_page.dart';
+import 'package:eeg/business/patient/page/patient_list_page.dart';
 import 'package:eeg/common/widget/title_bar.dart';
 import 'package:eeg/core/base/view_model_builder.dart';
 import 'package:fluent_ui/fluent_ui.dart';
@@ -42,32 +44,37 @@ class HomePage extends StatelessWidget {
                 title: const Text('癫痫脑内电'),
                 body: EegLineChart(),
               ),
-              PaneItem(
-                icon: const Icon(FluentIcons.charticulator_plot_curve),
-                title: const Text('生理性脑内电'),
-                body: const DataTablePage(),
-              ),
-              PaneItem(
-                icon: const Icon(FluentIcons.charticulator_linking_sequence),
-                title: const Text('睡眠脑电'),
-                body:  _NavigationBodyItem(),
-              ),
-              PaneItem(
-                icon: const Icon(FluentIcons.charticulator_linking_data),
-                title: const Text('任务态脑电'),
-                body: const _NavigationBodyItem(),
-              ),
+              // PaneItem(
+              //   icon: const Icon(FluentIcons.charticulator_plot_curve),
+              //   title: const Text('生理性脑内电'),
+              //   body: const DataTablePage(),
+              // ),
+              // PaneItem(
+              //   icon: const Icon(FluentIcons.charticulator_linking_sequence),
+              //   title: const Text('睡眠脑电'),
+              //   body: _NavigationBodyItem(),
+              // ),
+              // PaneItem(
+              //   icon: const Icon(FluentIcons.charticulator_linking_data),
+              //   title: const Text('任务态脑电'),
+              //   body: const _NavigationBodyItem(),
+              // ),
+              // PaneItem(
+              //   icon: const Icon(FluentIcons.line_chart),
+              //   title: const Text('产权与约定'),
+              //   body: const _NavigationBodyItem(),
+              // ),
               PaneItem(
                 icon: const Icon(FluentIcons.line_chart),
-                title: const Text('产权与约定'),
-                body: const _NavigationBodyItem(),
+                title: const Text('所有病人'),
+                body: PatientListPage(),
               ),
             ],
             footerItems: [
               PaneItemAction(
                 icon: const Icon(FluentIcons.account_management),
-                title: const Text('账户管理'),
-                onTap: vm.onClickSetting,
+                title: const Text('添加病人'),
+                onTap: vm.onClickAddPatient,
               ),
               PaneItemAction(
                 icon: const Icon(FluentIcons.block_contact),

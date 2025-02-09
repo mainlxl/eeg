@@ -69,12 +69,12 @@ class _ViewModelBuilderState<T extends BaseViewModel>
 
   @override
   void onWindowClose() async {
-    bool isPreventClose = await windowManager.isPreventClose();
-    if (isPreventClose && mounted) {
-      if (Navigator.canPop(context)) {
-        Navigator.pop(context);
-      } else {
-        windowManager.destroy();
+    if (ModalRoute.of(context)?.isCurrent == true) {
+      bool isPreventClose = await windowManager.isPreventClose();
+      if (isPreventClose && mounted) {
+        if (!_viewModel.onClickClose()) {
+          windowManager.destroy();
+        }
       }
     }
   }
@@ -110,8 +110,16 @@ abstract class BaseViewModel extends ChangeNotifier {
     return SmartDialog.showLoading(msg: msg, clickMaskDismiss: false);
   }
 
-  Future<void> dismissLoading() {
+  Future<void> hideLoading() {
     return SmartDialog.dismiss(status: SmartStatus.loading);
+  }
+
+  bool onClickClose() {
+    if (Navigator.canPop(context)) {
+      Navigator.pop(context);
+      return true;
+    }
+    return false;
   }
 }
 

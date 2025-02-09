@@ -32,6 +32,11 @@ class RouterUtils {
   static void popPage<T extends Object?>(BuildContext context, [T? result]) {
     return Navigator.pop(context, result);
   }
+
+  static Future<bool> maybePop<T extends Object?>(BuildContext context,
+      [T? result]) {
+    return Navigator.maybePop(context, result);
+  }
 }
 
 extension AppRouterStateExtensions on State {
@@ -43,6 +48,10 @@ extension AppRouterStateExtensions on State {
 extension AppRouterBuildContextExtensions on BuildContext {
   void popPage<T extends Object?>([T? result]) {
     return RouterUtils.popPage(this, result);
+  }
+
+  Future<bool> maybePopPage<T extends Object?>([T? result]) {
+    return RouterUtils.maybePop(this, result);
   }
 
   Future<T?> pushNamed<T extends Object?>(

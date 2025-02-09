@@ -11,7 +11,7 @@ class ChannelLineChartPainter extends CustomPainter {
   final double contentWidth;
   late final maxDifference = (data.max - data.min);
   final Paint linePaint = Paint()
-    ..color = mainTextColor.withOpacity(0.5)
+    ..color = textColor.withOpacity(0.5)
     ..strokeWidth = 1.0;
 
   ChannelLineChartPainter({
@@ -68,7 +68,7 @@ class ChannelLineChartPainter extends CustomPainter {
         text: TextSpan(
           text: channelName,
           style: TextStyle(
-              color: isStart ? mainTextColor : mainSubtitleColor, fontSize: 11),
+              color: isStart ? textColor : subtitleColor, fontSize: 11),
         ),
         textDirection: TextDirection.ltr,
       );

@@ -1,6 +1,7 @@
 import 'dart:ui';
 
-const mainBgColor = Color(0xffc7edcc);
-const mainTextColor = Color(0xff202357);
-const mainSubtitleColor = Color(0xff8a96ae);
-const mainIconColor = Color(0xff1976d2);
+const bgColor = Color(0xfff3f3f3);
+const eyeColor = Color(0xffc7edcc);
+const textColor = Color(0xff202357);
+const subtitleColor = Color(0xff8a96ae);
+const iconColor = Color(0xff5972ff);

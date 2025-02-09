@@ -151,14 +151,14 @@ class IdCardUtils {
   // 获取性别
   static String getSex(String idCard) {
     if (!idCardNumberCheck(idCard)) {
-      return "未知";
+      return "-";
     }
     return int.parse(idCard.substring(16, 17)) % 2 == 0 ? "女" : "男";
   }
 
   static String getGender(String idCard) {
     if (!idCardNumberCheck(idCard)) {
-      return "未知";
+      return "-";
     }
     return int.parse(idCard.substring(16, 17)) % 2 == 0 ? "female" : "male";
   }
@@ -166,7 +166,7 @@ class IdCardUtils {
   // 根据年份获取生肖
   String getZodiac(String idCard) {
     if (!idCardNumberCheck(idCard)) {
-      return "未知";
+      return "-";
     }
     // 出生日期
     String birthDate = idCard.substring(6, 14);

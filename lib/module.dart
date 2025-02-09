@@ -1,4 +1,5 @@
 import 'package:eeg/business/home/home_module.dart';
+import 'package:eeg/business/patient/patient_module.dart';
 import 'package:eeg/business/user/user_module.dart';
 import 'package:eeg/core/base/module.dart';
 
@@ -18,4 +19,5 @@ void registerModule(BaseModule module) {
 void initModule() {
   registerModule(HomeModule());
   registerModule(UserModule());
+  registerModule(PatientModule());
 }
