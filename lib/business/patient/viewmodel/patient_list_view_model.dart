@@ -21,10 +21,10 @@ class PatientListViewModel extends BaseViewModel {
 
   Future<void> loadData() async {
     showLoading();
-    ResponseData? response =
+    ResponseData response =
         await HttpService.get('/api/v1/patients/by-user/${UserInfo.userId}');
-    if (response?.status == 0) {
-      var dataList = (response?.data as List<dynamic>?) ?? [];
+    if (response.status == 0) {
+      var dataList = (response.data as List<dynamic>?) ?? [];
       _patients = dataList
           .map((item) => Patient.fromJson(item as Map<String, dynamic>))
           .toList();

@@ -47,12 +47,12 @@ class AddPatientViewModel extends BaseViewModel {
         "phone_number": phoneController.text.trim(),
         "identity_info": idCard,
       };
-      ResponseData? post = await HttpService.post(
+      ResponseData post = await HttpService.post(
           '/api/v1/patients/update/${patient.id}',
           data: newData);
       hideLoading();
-      if (post?.status == 0) {
-        '病人信息已更新'.showToast();
+      if (post.status == 0) {
+        '用户信息已更新'.showToast();
         nameController.clear();
         idCardController.clear();
         medicalHistoryController.clear();
@@ -73,7 +73,7 @@ class AddPatientViewModel extends BaseViewModel {
     if (formKey.currentState!.validate()) {
       showLoading();
       var idCard = idCardController.text;
-      ResponseData? post = await HttpService.post('/api/v1/patients', data: {
+      ResponseData post = await HttpService.post('/api/v1/patients', data: {
         "name": nameController.text.trim(),
         "age": IdCardUtils.getAge(idCard),
         "gender": IdCardUtils.getGender(idCard),
@@ -83,8 +83,8 @@ class AddPatientViewModel extends BaseViewModel {
         "identity_info": idCard,
       });
       hideLoading();
-      if (post?.status == 0) {
-        '病人信息已添加'.showToast();
+      if (post.status == 0) {
+        '用户信息已添加'.showToast();
         nameController.clear();
         idCardController.clear();
         medicalHistoryController.clear();
@@ -102,11 +102,11 @@ class AddPatientViewModel extends BaseViewModel {
       // 展示对话框如果用户确认删除
       if (await confirmDeleteDialog(patient)) {
         showLoading();
-        ResponseData? post =
+        ResponseData post =
             await HttpService.post('/api/v1/patients/delete/${patient.id}');
         hideLoading();
-        if (post?.status == 0) {
-          '病人信息已删除'.showToast();
+        if (post.status == 0) {
+          '用户信息已删除'.showToast();
           context.popPage(PagePopType.deleteData);
         } else {
           '删除失败'.showToast();

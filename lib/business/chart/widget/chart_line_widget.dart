@@ -3,7 +3,7 @@ import 'package:eeg/common/app_colors.dart';
 import 'package:fluent_ui/fluent_ui.dart';
 
 class ChannelLineChartPainter extends CustomPainter {
-  final ChannelItem data;
+  final Channel data;
   late final int maxShowCount;
   double scrollOffset = 0;
   bool isScroll = false;

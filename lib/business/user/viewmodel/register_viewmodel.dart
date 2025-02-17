@@ -109,8 +109,8 @@ class RegisterViewModel extends BaseViewModel {
         "password": password.md5
       });
       hideLoading();
-      if (post == null) {
-        '注册失败,请稍后再试或者联系管理员!!!'.toast;
+      if (post.status == -1) {
+        '注册失败,请减产网络后再试或者联系管理员!!!'.toast;
         return;
       }
       '注册成功,请登录'.toast;

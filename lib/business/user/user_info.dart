@@ -48,6 +48,8 @@ class UserInfo {
     var user = info['user'] as Map<String, dynamic>?;
     var userId = (user?['id'] as int?) ?? -1;
     if (token != null && user != null && userId != -1 && token.isNotEmpty) {
+      _userId = userId.toString();
+      _token = token;
       var tokenPut =
           await SharedPreferencesUtils.put(key: "login_token", value: token);
       var userIdPut =
@@ -58,6 +60,9 @@ class UserInfo {
   }
 
   static Future<bool> _cleanLoginInfo() {
+    _userId = null;
+    _token = null;
+    SharedPreferencesUtils.remove(key: "login_user_id");
     return SharedPreferencesUtils.remove(key: "login_token");
   }
 }

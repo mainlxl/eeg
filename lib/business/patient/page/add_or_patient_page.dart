@@ -42,7 +42,7 @@ class AddPatientPage extends StatelessWidget {
                   children: [
                     const SizedBox(width: 40),
                     Text(
-                      vm.isEdit ? '编辑患者 ${vm.name} 信息' : '添加病人',
+                      vm.isEdit ? '编辑患者 ${vm.name} 信息' : '用户信息',
                       style: const TextStyle(
                           fontSize: 24, fontWeight: FontWeight.bold),
                     ),
@@ -70,7 +70,7 @@ class AddPatientPage extends StatelessWidget {
                         controller: vm.nameController,
                         validator: (value) {
                           if (value == null || value.isEmpty) {
-                            return '请输入病人姓名';
+                            return '请输入用户姓名';
                           }
                           return null;
                         },

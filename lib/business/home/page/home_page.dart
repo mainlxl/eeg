@@ -1,7 +1,4 @@
-import 'package:eeg/business/chart/page/chart_page.dart';
-import 'package:eeg/business/home/page/feature_page.dart';
 import 'package:eeg/business/home/viewmodel/home_viewmodel.dart';
-import 'package:eeg/business/patient/page/add_or_patient_page.dart';
 import 'package:eeg/business/patient/page/patient_list_page.dart';
 import 'package:eeg/common/widget/title_bar.dart';
 import 'package:eeg/core/base/view_model_builder.dart';
@@ -40,40 +37,15 @@ class HomePage extends StatelessWidget {
             displayMode: vm.displayMode,
             items: [
               PaneItem(
-                icon: const Icon(FluentIcons.area_chart),
-                title: const Text('癫痫脑内电'),
-                body: EegLineChart(),
-              ),
-              // PaneItem(
-              //   icon: const Icon(FluentIcons.charticulator_plot_curve),
-              //   title: const Text('生理性脑内电'),
-              //   body: const DataTablePage(),
-              // ),
-              // PaneItem(
-              //   icon: const Icon(FluentIcons.charticulator_linking_sequence),
-              //   title: const Text('睡眠脑电'),
-              //   body: _NavigationBodyItem(),
-              // ),
-              // PaneItem(
-              //   icon: const Icon(FluentIcons.charticulator_linking_data),
-              //   title: const Text('任务态脑电'),
-              //   body: const _NavigationBodyItem(),
-              // ),
-              // PaneItem(
-              //   icon: const Icon(FluentIcons.line_chart),
-              //   title: const Text('产权与约定'),
-              //   body: const _NavigationBodyItem(),
-              // ),
-              PaneItem(
                 icon: const Icon(FluentIcons.line_chart),
-                title: const Text('所有病人'),
+                title: const Text('所有用户'),
                 body: PatientListPage(),
               ),
             ],
             footerItems: [
               PaneItemAction(
                 icon: const Icon(FluentIcons.account_management),
-                title: const Text('添加病人'),
+                title: const Text('添加用户'),
                 onTap: vm.onClickAddPatient,
               ),
               PaneItemAction(
@@ -91,21 +63,5 @@ class HomePage extends StatelessWidget {
         ),
       ),
     );
-  }
-}
-
-class _NavigationBodyItem extends StatelessWidget {
-  final String? header;
-  final Widget? content;
-
-  const _NavigationBodyItem({this.header, this.content});
-
-  @override
-  Widget build(BuildContext context) {
-    return content != null
-        ? content!
-        : Container(
-            child: Text('111'),
-          );
   }
 }

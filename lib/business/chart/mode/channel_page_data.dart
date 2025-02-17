@@ -1,5 +1,5 @@
 class Channels {
-  List<ChannelItem> data;
+  List<Channel> data;
   int? page;
 
   Channels({this.page, required this.data});
@@ -8,13 +8,13 @@ class Channels {
         page: json["page"],
         data: json["data"] == null
             ? []
-            : List<ChannelItem>.from(
-                json["data"]!.map((item) => ChannelItem.fromJson(item))),
+            : List<Channel>.from(
+                json["data"]!.map((item) => Channel.fromJson(item))),
       );
 }
 
-class ChannelItem {
-  ChannelItem({
+class Channel {
+  Channel({
     required this.channel,
     required this.channelName,
     required this.data,
@@ -22,14 +22,14 @@ class ChannelItem {
     required this.min,
   });
 
-  int? channel;
+  int channel;
   String? channelName;
   List<double> data;
   double max;
   double min;
 
-  factory ChannelItem.fromJson(Map<String, dynamic> json) => ChannelItem(
-        channel: json["channel"],
+  factory Channel.fromJson(Map<String, dynamic> json) => Channel(
+        channel: json["channel"] ?? 0,
         channelName: json["channel_name"],
         data: json["data"] == null
             ? []
@@ -41,7 +41,7 @@ class ChannelItem {
   Map<String, dynamic> toJson() => {
         "channel": channel,
         "channel_name": channelName,
-        "data": data == null ? [] : List<dynamic>.from(data!.map((x) => x)),
+        "data": data,
         "max": max,
         "min": min,
       };

@@ -61,8 +61,7 @@ extension AppRouterBuildContextExtensions on BuildContext {
     return RouterUtils.pushNamed<T>(this, pageName, arguments: arguments);
   }
 
-  Future<T?> push<T extends Object?>(
-      BuildContext context, WidgetBuilder builder) {
+  Future<T?> push<T extends Object?>(WidgetBuilder builder) {
     return RouterUtils.push<T>(this, builder);
   }
 

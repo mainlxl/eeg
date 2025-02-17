@@ -71,6 +71,7 @@ class SliderDialog extends StatelessWidget {
   show(BuildContext context) {
     showDialog(
       context: context,
+      barrierDismissible: true,
       builder: (ctx) => this,
     );
   }

@@ -1,3 +1,4 @@
+import 'package:eeg/business/chart/mode/channels_meta_data.dart';
 import 'package:eeg/business/patient/mode/patient_info_mode.dart';
 import 'package:eeg/business/patient/viewmodel/patient_detail_view_model.dart';
 import 'package:eeg/core/base/view_model_builder.dart';
@@ -59,11 +60,57 @@ class PatientDetailPage extends StatelessWidget {
                       Text('删除时间: ${patient.deletedAt}'),
                     ],
                   ),
+                if (vm.chartList.isNotEmpty)
+                  Expanded(child: _renderChartList(vm)),
               ],
             ),
           ),
         ),
       ),
+    );
+  }
+
+  Widget _renderChartList(PatientDetailViewModel vm) {
+    return ListView.builder(
+      itemCount: vm.chartList.length,
+      itemBuilder: (context, index) {
+        ChannelMeta channelMeta = vm.chartList[index];
+        return GestureDetector(
+          onTap: () => vm.onClickDataItem(channelMeta),
+          child: Card(
+            margin: const EdgeInsets.symmetric(vertical: 10, horizontal: 15),
+            elevation: 5,
+            child: Padding(
+              padding: const EdgeInsets.all(15),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    'ID: ${channelMeta.data_id}',
+                    style: const TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  const SizedBox(height: 5),
+                  Text(
+                    'Type: ${channelMeta.data_type}',
+                    style: const TextStyle(
+                      fontSize: 16,
+                      color: Colors.blueAccent,
+                    ),
+                  ),
+                  const SizedBox(height: 5),
+                  Text(
+                    'Description: ${channelMeta.description ?? "No description"}',
+                    style: const TextStyle(fontSize: 14),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        );
+      },
     );
   }
 }

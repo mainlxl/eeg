@@ -29,23 +29,23 @@ class HorizontalAxisChartPainter extends CustomPainter {
     for (int i = 0; i < maxShowCount; i++) {
       final double x = (i * pointGap) + scrollOffset;
       canvas.drawCircle(Offset(x, offset.dy), 3, pointPaint);
-      TextPainter textPainter = TextPainter(
-        text: TextSpan(
-          text: (x).toStringAsFixed(1),
-          style: const TextStyle(color: Colors.black, fontSize: 10),
-        ),
-        textDirection: TextDirection.ltr,
-      );
-      textPainter.layout();
-      textPainter.paint(
-          canvas,
-          Offset(
-              i == 0
-                  ? x + 2
-                  : (i == maxShowCount - 1
-                      ? x - textPainter.width - 2
-                      : x - textPainter.width / 2),
-              offset.dy + 5));
+      // TextPainter textPainter = TextPainter(
+      //   text: TextSpan(
+      //     text: (x).toStringAsFixed(1),
+      //     style: const TextStyle(color: Colors.black, fontSize: 10),
+      //   ),
+      //   textDirection: TextDirection.ltr,
+      // );
+      // textPainter.layout();
+      // textPainter.paint(
+      //     canvas,
+      //     Offset(
+      //         i == 0
+      //             ? x + 2
+      //             : (i == maxShowCount - 1
+      //                 ? x - textPainter.width - 2
+      //                 : x - textPainter.width / 2),
+      //         offset.dy + 5));
     }
   }
 

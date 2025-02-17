@@ -22,7 +22,7 @@ class HttpService {
       };
     }
     _dio.options.headers['User-Agent'] = 'eeg/1.0.0';
-    _dio.options.baseUrl = 'http://f-blog.96kg.cn:8080';
+    _dio.options.baseUrl = 'http://eeg.96kg.cn:8888';
     _dio.options.connectTimeout = const Duration(seconds: 5);
     _dio.options.receiveTimeout = const Duration(seconds: 10);
     _dio.interceptors.add(
@@ -77,7 +77,7 @@ class HttpService {
     }
   }
 
-  static Future<ResponseData?> get(String path,
+  static Future<ResponseData> get(String path,
       {Map<String, dynamic>? queryParameters,
       bool needStateMessage = true}) async {
     var response = await _instance._get(path, queryParameters: queryParameters);
@@ -88,10 +88,10 @@ class HttpService {
             ResponseData.fromJson(json), needStateMessage);
       }
     }
-    return null;
+    return ResponseData(status: -1);
   }
 
-  static Future<ResponseData?> post(String path,
+  static Future<ResponseData> post(String path,
       {dynamic data, bool needStateMessage = true}) async {
     var response = await _instance._post(path, data: data);
     if (response != null) {
@@ -101,7 +101,7 @@ class HttpService {
             ResponseData.fromJson(json), needStateMessage);
       }
     }
-    return null;
+    return ResponseData(status: -1);
   }
 
   static ResponseData _tryToastByStateAndMessage(ResponseData responseData,
@@ -124,6 +124,8 @@ class ResponseData {
   final int? status;
   final String? message;
   final dynamic data;
+
+  bool get ok => status == 0;
 
   ResponseData({this.status, this.message, this.data});
 

@@ -39,7 +39,7 @@ class HomeViewModel extends BaseViewModel {
     UserInfo.cleanTaskAndPushLoginPage();
   }
 
-  /// 添加病人
+  /// 添加用户
   void onClickAddPatient() async {
     showDialog(context: context, builder: (context) => const AddPatientPage());
   }
