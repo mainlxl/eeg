@@ -1,4 +1,5 @@
 import 'dart:convert';
+
 import 'package:crypto/crypto.dart' as crypto;
 
 extension StringCryptoExtension on String {

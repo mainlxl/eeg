@@ -128,11 +128,7 @@ abstract class BaseViewModel extends ChangeNotifier {
   }
 
   bool onClickClose() {
-    if (Navigator.canPop(context)) {
-      Navigator.pop(context);
-      return true;
-    }
-    return false;
+    return true;
   }
 }
 

@@ -7,8 +7,11 @@ import 'package:eeg/core/utils/router_utils.dart';
 
 class PatientListViewModel extends BaseViewModel {
   List<Patient>? _patients;
+  List<Patient>? _searchResults;
 
-  List<Patient> get patients => _patients ?? [];
+  List<Patient> get patients => _searchResults ?? _patients ?? [];
+
+  String query = '';
 
   @override
   void init() {
@@ -50,6 +53,24 @@ class PatientListViewModel extends BaseViewModel {
         notifyListeners();
       } else if (result == PagePopType.refreshData) {
         loadData();
+      }
+    }
+  }
+
+  void onSearchChanged(String query) {
+    this.query = query;
+    var patients = _patients;
+    if (patients != null) {
+      final searchResult = patients
+          .where((patient) =>
+              patient.name.toString().toLowerCase().contains(query) ||
+              patient.gender.toString().toLowerCase().contains(query) ||
+              patient.phoneNumber.toString().toLowerCase().contains(query) ||
+              patient.age.toString().toLowerCase().contains(query))
+          .toList();
+      if (searchResult.isNotEmpty) {
+        _searchResults = searchResult;
+        notifyListeners();
       }
     }
   }

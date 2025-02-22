@@ -14,7 +14,6 @@ class EegLineChart extends StatelessWidget {
   ChannelMeta channelMeta;
   String title;
 
-// 构造函数
   EegLineChart({super.key, required this.title, required this.channelMeta});
 
   @override
@@ -22,6 +21,7 @@ class EegLineChart extends StatelessWidget {
     return ViewModelBuilder(
       create: () => ChartLineViewModel(channelMeta),
       child: Scaffold(
+        backgroundColor: Colors.white,
         appBar: AppBar(
           title: Text(title),
           actions: [

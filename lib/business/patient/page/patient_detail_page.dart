@@ -16,6 +16,7 @@ class PatientDetailPage extends StatelessWidget {
       create: () => PatientDetailViewModel(this.patient),
       child: Consumer<PatientDetailViewModel>(
         builder: (context, vm, _) => Scaffold(
+          backgroundColor: Colors.white,
           appBar: AppBar(
             leading: BackButton(onPressed: vm.popPage),
             title: Text('${patient.name} 的详情'),

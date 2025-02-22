@@ -5,7 +5,6 @@ import 'package:eeg/common/app_colors.dart';
 import 'package:eeg/core/base/view_model_builder.dart';
 import 'package:eeg/core/utils/id_card_check_utils.dart';
 import 'package:eeg/core/utils/phone_utils.dart';
-import 'package:fluent_ui/fluent_ui.dart' as fluent;
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -101,7 +100,7 @@ class AddPatientPage extends StatelessWidget {
                   ],
                 ),
                 const SizedBox(height: 20.0),
-                fluent.Row(
+                Row(
                   children: [
                     Expanded(
                       child: _buildItem(
@@ -154,8 +153,10 @@ class AddPatientPage extends StatelessWidget {
                       ? MainAxisAlignment.spaceAround
                       : MainAxisAlignment.center,
                   children: [
-                    fluent.FilledButton(
-                      onPressed: vm.isEdit ? vm.onClickUpdatePatient : vm.onClickAddPatient,
+                    FilledButton(
+                      onPressed: vm.isEdit
+                          ? vm.onClickUpdatePatient
+                          : vm.onClickAddPatient,
                       child: Padding(
                         padding: const EdgeInsets.symmetric(
                             vertical: 3.0, horizontal: 50.0),
@@ -167,16 +168,16 @@ class AddPatientPage extends StatelessWidget {
                     ),
                     Visibility(
                       visible: vm.isEdit,
-                      child: fluent.FilledButton(
+                      child: FilledButton(
                         onPressed: vm.onClickDeletePatient,
                         style: () {
-                          return fluent.ButtonStyle(
+                          return ButtonStyle(
                             backgroundColor:
                                 WidgetStateProperty.resolveWith((states) {
-                              if (states.isHovered) {
-                                return fluent.Colors.red.withOpacity(0.8);
+                              if (states == WidgetState.hovered) {
+                                return Colors.red.withOpacity(0.8);
                               } else {
-                                return fluent.Colors.red;
+                                return Colors.red;
                               }
                             }),
                           );

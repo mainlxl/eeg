@@ -16,8 +16,10 @@ class HttpService {
     if (!isWeb) {
       (_dio.httpClientAdapter as IOHttpClientAdapter).createHttpClient = () {
         HttpClient client = HttpClient();
-        client.findProxy = _findProxy;
-        client.badCertificateCallback = _badCertificateCallback; // 忽略自签名证书
+        if (_proxy != null) {
+          client.findProxy = _findProxy;
+          client.badCertificateCallback = _badCertificateCallback;
+        }
         return client;
       };
     }

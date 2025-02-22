@@ -4,8 +4,12 @@ import 'package:eeg/core/base/view_model_builder.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
-class PatientListPage extends StatelessWidget {
-  const PatientListPage({super.key});
+typedef PatientCallback = void Function(Patient);
+
+class PatientListSelectPage extends StatelessWidget {
+  PatientCallback onSelect;
+
+  PatientListSelectPage({super.key, required this.onSelect});
 
   @override
   Widget build(BuildContext context) {
@@ -43,7 +47,7 @@ class PatientListPage extends StatelessWidget {
                         '年龄: ${patient.age} 性别: ${patient.gender}',
                       ),
                       isThreeLine: false,
-                      onTap: () => vm.onClickPatientItem(patient),
+                      onTap: () => onSelect(patient),
                     ),
                   );
                 },
