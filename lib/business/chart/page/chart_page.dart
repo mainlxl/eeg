@@ -9,6 +9,7 @@ import 'package:fluent_ui/fluent_ui.dart' as fluent;
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:window_manager/window_manager.dart';
 
 class EegLineChart extends StatelessWidget {
   ChannelMeta channelMeta;
@@ -23,7 +24,9 @@ class EegLineChart extends StatelessWidget {
       child: Scaffold(
         backgroundColor: Colors.white,
         appBar: AppBar(
-          title: Text(title),
+          title: DragToMoveArea(
+              child:
+                  fluent.SizedBox(width: double.infinity, child: Text(title))),
           actions: [
             Builder(builder: (context) {
               return IconButton(
@@ -240,5 +243,33 @@ class NoScrollBehavior extends ScrollBehavior {
   Widget buildOverscrollIndicator(
       BuildContext context, Widget child, ScrollableDetails details) {
     return child; // 返回子部件，不显示过度滚动指示器
+  }
+}
+
+class DragToMoveArea extends StatelessWidget {
+  const DragToMoveArea({
+    super.key,
+    required this.child,
+  });
+
+  final Widget child;
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      behavior: HitTestBehavior.opaque,
+      onPanStart: (details) {
+        windowManager.startDragging();
+      },
+      onDoubleTap: () async {
+        bool isMaximized = await windowManager.isMaximized();
+        if (!isMaximized) {
+          windowManager.maximize();
+        } else {
+          windowManager.unmaximize();
+        }
+      },
+      child: child,
+    );
   }
 }
