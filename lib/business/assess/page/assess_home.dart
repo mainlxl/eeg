@@ -4,6 +4,7 @@ import 'package:eeg/business/patient/page/patient_list_select_page.dart';
 import 'package:eeg/core/base/view_model_builder.dart';
 import 'package:fluent_ui/fluent_ui.dart';
 import 'package:flutter/material.dart' as material;
+import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import 'assess_select_mode.dart';
@@ -18,7 +19,23 @@ class AssessHomePage extends StatelessWidget {
     return ViewModelBuilder(
       create: () => AssessHomeViewModel(patient),
       child: Consumer<AssessHomeViewModel>(
-        builder: (ctx, vm, _) => _renderBody(ctx, vm),
+        builder: (ctx, vm, _) => Scaffold(
+          body: _renderBody(ctx, vm),
+          floatingActionButton: FloatingActionButton(
+            onPressed: () {
+              // 在这里添加按钮的点击事件
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(content: Text('加号按钮被点击')),
+              );
+            },
+            shape: RoundedRectangleBorder(
+              // 设置为矩形形状
+              borderRadius: BorderRadius.circular(50), // 设置圆角
+            ),
+            tooltip: '添加用户',
+            child: const Icon(Icons.add),
+          ),
+        ),
       ),
     );
   }
@@ -26,21 +43,7 @@ class AssessHomePage extends StatelessWidget {
   Widget _renderBody(BuildContext ctx, AssessHomeViewModel vm) {
     var patient = vm.patient;
     if (patient == null) {
-      return Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          const Text(
-            "请选择用户进行评估:",
-            style: TextStyle(fontSize: 30, fontWeight: FontWeight.bold),
-          ),
-          Expanded(
-            child: Container(
-              margin: const EdgeInsets.symmetric(horizontal: 50),
-              child: PatientListSelectPage(onSelect: vm.onSelectPatient),
-            ),
-          ),
-        ],
-      );
+      return PatientListSelectPage(onSelect: vm.onSelectPatient);
     }
     return NavigationView(
       pane: NavigationPane(

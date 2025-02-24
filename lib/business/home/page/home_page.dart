@@ -13,6 +13,7 @@ class HomePage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    return AssessHomePage();
     return DragToMoveArea(
       child: Container(
         color: const Color(0xFFF5F5F5),
