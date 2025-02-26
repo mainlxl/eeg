@@ -120,8 +120,11 @@ abstract class BaseViewModel extends ChangeNotifier {
   }
 
   Future<void> showLoading([String msg = '加载中...']) {
-    return SmartDialog.showLoading(msg: msg, clickMaskDismiss: false);
+    return SmartDialog.showLoading( msg: msg, clickMaskDismiss: false);
   }
+
+  bool isShowLoading() =>
+      SmartDialog.checkExist(dialogTypes: const {SmartAllDialogType.loading});
 
   Future<void> hideLoading() {
     return SmartDialog.dismiss(status: SmartStatus.loading);
