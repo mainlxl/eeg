@@ -46,6 +46,21 @@ class Patient {
     );
   }
 
+  Map<String, dynamic> toJson() {
+    return {
+      'UpdatedAt': DateTime.now().toIso8601String(),
+      'DeletedAt': deletedAt,
+      'name': name,
+      'age': age,
+      'gender': gender,
+      'medical_history': medicalHistory,
+      'usage_needs': usageNeeds,
+      'phone_number': phoneNumber,
+      'identity_info': identityInfo,
+      'user_id': userId,
+    };
+  }
+
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||

@@ -6,7 +6,6 @@ import 'package:eeg/business/user/page/register_page.dart';
 import 'package:eeg/business/user/user_info.dart';
 import 'package:eeg/core/base/module.dart';
 import 'package:eeg/core/network/http_service.dart';
-import 'package:eeg/core/utils/config.dart';
 import 'package:eeg/core/utils/toast.dart';
 
 class UserModule extends BaseModule {
@@ -46,9 +45,6 @@ class UserModule extends BaseModule {
 
   //服务器返回未登录时
   void onServerUnauthorized(String path) {
-    if (isDebug) {
-      return;
-    }
     if (!path.endsWith('/login')) {
       '登录已过期'.showToast();
       UserInfo.cleanTaskAndPushLoginPage();

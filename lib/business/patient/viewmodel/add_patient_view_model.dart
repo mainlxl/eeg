@@ -62,6 +62,7 @@ class AddPatientViewModel extends BaseViewModel {
         patient.medicalHistory = newData['medical_history'] as String;
         patient.phoneNumber = newData['phone_number'] as String;
         patient.identityInfo = newData['identity_info'] as String;
+        eventBus.fire(PatientListRefreshEvent(patient.name));
         context.popPage(patient);
       }
     } else {
@@ -88,7 +89,7 @@ class AddPatientViewModel extends BaseViewModel {
         nameController.clear();
         idCardController.clear();
         medicalHistoryController.clear();
-        eventBus.fire(PatientListRefreshEvent());
+        eventBus.fire(PatientListRefreshEvent(nameController.text.trim()));
         Navigator.pop(context, PagePopType.refreshData);
       }
     } else {
@@ -107,7 +108,7 @@ class AddPatientViewModel extends BaseViewModel {
         hideLoading();
         if (post.status == 0) {
           '用户信息已删除'.showToast();
-          context.popPage(PagePopType.deleteData);
+          Navigator.pop(context, PagePopType.deleteData);
         } else {
           '删除失败'.showToast();
         }

@@ -1,4 +1,5 @@
 import 'package:easy_localization/easy_localization.dart';
+import 'package:eeg/business/chart/page/chart_page.dart';
 import 'package:eeg/business/user/viewmodel/login_view_model.dart';
 import 'package:eeg/common/app_colors.dart';
 import 'package:eeg/common/font_family.dart';
@@ -13,79 +14,81 @@ class LoginPage extends BasePage {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      decoration: const BoxDecoration(
-        image: DecorationImage(
-          image: AssetImage('images/background/login.png'), // 请确保图片路径正确
-          opacity: 0.5,
-          fit: BoxFit.cover, // 图片填充方式
+    return DragToMoveArea(
+      child: Container(
+        decoration: const BoxDecoration(
+          image: DecorationImage(
+            image: AssetImage('images/background/login.png'), // 请确保图片路径正确
+            opacity: 0.5,
+            fit: BoxFit.cover, // 图片填充方式
+          ),
+          gradient: LinearGradient(
+            colors: [
+              Color(0xffa1c6ff),
+              Color(0xffe3e7ff),
+            ],
+            begin: Alignment.topLeft, // 渐变开始位置
+            end: Alignment.bottomRight, // 渐变结束位置
+          ),
         ),
-        gradient: LinearGradient(
-          colors: [
-            Color(0xffa1c6ff),
-            Color(0xffe3e7ff),
-          ],
-          begin: Alignment.topLeft, // 渐变开始位置
-          end: Alignment.bottomRight, // 渐变结束位置
-        ),
-      ),
-      alignment: Alignment.center,
-      child: Column(
-        children: [
-          const TitleBar(),
-          Expanded(
-            child: ViewModelBuilder<LoginViewModel>(
-              create: () => LoginViewModel(),
-              child: Consumer<LoginViewModel>(
-                builder:
-                    (BuildContext context, LoginViewModel vm, Widget? child) {
-                  return fluent.Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 10.0),
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Image.asset(
-                          'logo/logo.png',
-                          width: 200,
-                        ),
-                        const Text(
-                          "上肢运动\n认知协同康复训练及评估系统",
-                          maxLines: 2,
-                          textAlign: TextAlign.center,
-                          overflow: TextOverflow.ellipsis,
-                          style: TextStyle(
-                            fontSize: 28,
-                            fontWeight: FontWeight.w500,
-                            color: textColor,
+        alignment: Alignment.center,
+        child: Column(
+          children: [
+            const TitleBar(),
+            Expanded(
+              child: ViewModelBuilder<LoginViewModel>(
+                create: () => LoginViewModel(),
+                child: Consumer<LoginViewModel>(
+                  builder:
+                      (BuildContext context, LoginViewModel vm, Widget? child) {
+                    return fluent.Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 10.0),
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Image.asset(
+                            'logo/logo.png',
+                            width: 200,
                           ),
-                        ),
-                        const SizedBox(height: 30),
-                        _buildTextField(
-                          controller: vm.usernameInputController,
-                          label: "用户名/邮箱",
-                          keyboardType: TextInputType.phone,
-                          icon: Icons.phone,
-                        ),
-                        const SizedBox(height: 20),
-                        _buildTextField(
-                          obscureText: true,
-                          controller: vm.passwordInputController,
-                          label: "密码".tr(),
-                          keyboardType: TextInputType.number,
-                          icon: Icons.lock,
-                        ),
-                        const SizedBox(height: 20),
-                        _buildLoginButton(vm),
-                        const SizedBox(height: 20),
-                        _buildRegisterButton(vm),
-                      ],
-                    ),
-                  );
-                },
+                          const Text(
+                            "上肢运动\n认知协同康复训练及评估系统",
+                            maxLines: 2,
+                            textAlign: TextAlign.center,
+                            overflow: TextOverflow.ellipsis,
+                            style: TextStyle(
+                              fontSize: 28,
+                              fontWeight: FontWeight.w500,
+                              color: textColor,
+                            ),
+                          ),
+                          const SizedBox(height: 30),
+                          _buildTextField(
+                            controller: vm.usernameInputController,
+                            label: "用户名/邮箱",
+                            keyboardType: TextInputType.phone,
+                            icon: Icons.phone,
+                          ),
+                          const SizedBox(height: 20),
+                          _buildTextField(
+                            obscureText: true,
+                            controller: vm.passwordInputController,
+                            label: "密码".tr(),
+                            keyboardType: TextInputType.number,
+                            icon: Icons.lock,
+                          ),
+                          const SizedBox(height: 20),
+                          _buildLoginButton(vm),
+                          const SizedBox(height: 20),
+                          _buildRegisterButton(vm),
+                        ],
+                      ),
+                    );
+                  },
+                ),
               ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }

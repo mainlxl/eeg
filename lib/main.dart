@@ -32,7 +32,7 @@ main() async {
     windowManager.waitUntilReadyToShow(
         const WindowOptions(
           minimumSize: Size(1280, 720),
-          center: true,
+          center: !isDebug,
           backgroundColor: Colors.transparent,
           skipTaskbar: false,
           titleBarStyle: TitleBarStyle.hidden,

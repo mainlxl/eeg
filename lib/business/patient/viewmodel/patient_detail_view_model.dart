@@ -1,16 +1,21 @@
 import 'package:eeg/business/chart/mode/channels_meta_data.dart';
 import 'package:eeg/business/chart/page/chart_page.dart';
 import 'package:eeg/business/patient/mode/patient_info_mode.dart';
+import 'package:eeg/business/patient/page/add_or_patient_page.dart';
+import 'package:eeg/common/widget/loading_status_page.dart';
 import 'package:eeg/core/base/view_model_builder.dart';
 import 'package:eeg/core/network/http_service.dart';
 import 'package:eeg/core/utils/router_utils.dart';
+import 'package:flutter/material.dart';
 
-class PatientDetailViewModel extends BaseViewModel {
+class PatientDetailViewModel extends LoadingPageStatusViewModel {
   Patient patient;
   bool _needPopResultData = false;
   List<ChannelMeta> chartList = [];
+  bool isExpanded = false;
+  final VoidCallback? onClosePage;
 
-  PatientDetailViewModel(this.patient);
+  PatientDetailViewModel(this.patient, {this.onClosePage});
 
   @override
   void init() {
@@ -18,15 +23,20 @@ class PatientDetailViewModel extends BaseViewModel {
   }
 
   onClickUpdate() async {
-    // 这里可以添加更新信息的逻辑，例如导航到更新页面
-    var result =
-        await context.pushNamed('/patient/add_or_edit', arguments: patient);
+    var result = await showDialog(
+      context: context,
+      builder: (context) => Container(
+        margin: const EdgeInsets.all(15),
+        child: AddPatientPage(patient: patient),
+      ),
+    );
     if (result is Patient) {
       patient = result;
       _needPopResultData = true;
       notifyListeners();
     } else if (result == PagePopType.deleteData) {
       context.maybePopPage(PagePopType.deleteData);
+      onClosePage?.call();
     }
   }
 
@@ -39,6 +49,7 @@ class PatientDetailViewModel extends BaseViewModel {
   }
 
   void loadData() async {
+    setPageStatus(PageStatus.loading);
     var post = await HttpService.post('/api/v1/eeg-data/list', data: {
       "patient_id": patient.id,
       "required_type": ['EEG', 'IR', 'EMG', 'IMU']
@@ -47,7 +58,10 @@ class PatientDetailViewModel extends BaseViewModel {
       var jsonList = post.data as List<dynamic>;
       var listFromJson = ChannelMeta.listFromJson(jsonList);
       chartList = listFromJson;
-      notifyListeners();
+      setPageStatus(
+          chartList.isNotEmpty ? PageStatus.loading_success : PageStatus.empty);
+    } else {
+      setPageStatus(PageStatus.error);
     }
   }
 
@@ -56,5 +70,10 @@ class PatientDetailViewModel extends BaseViewModel {
         title:
             '${patient.name}:${channelMeta.data_type}:${channelMeta.data_id}',
         channelMeta: channelMeta));
+  }
+
+  void onExpandableChange(bool isExpanded) {
+    this.isExpanded = isExpanded;
+    notifyListeners();
   }
 }

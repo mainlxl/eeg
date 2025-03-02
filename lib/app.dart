@@ -4,7 +4,8 @@ import 'package:eeg/business/user/page/login_page.dart';
 import 'package:eeg/business/user/user_info.dart';
 import 'package:eeg/common/font_family.dart';
 import 'package:event_bus/event_bus.dart';
-import 'package:fluent_ui/fluent_ui.dart';
+import 'package:fluent_ui/fluent_ui.dart' as fluent;
+import 'package:flutter/material.dart';
 import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
 
 import 'core/base/module.dart';
@@ -25,7 +26,7 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     /// Fluent_UI样式 https://bdlukaa.github.io/fluent_ui/#/inputs/buttons
     initModule();
-    return FluentApp(
+    return fluent.FluentApp(
       debugShowCheckedModeBanner: false,
       // 关闭右上角的DEBUG标识
       navigatorKey: _navigatorKey,
@@ -36,8 +37,8 @@ class MyApp extends StatelessWidget {
       navigatorObservers: [FlutterSmartDialog.observer],
       builder: FlutterSmartDialog.init(),
       themeMode: ThemeMode.light,
-      theme: FluentThemeData(
-        accentColor: Colors.blue,
+      theme: fluent.FluentThemeData(
+        accentColor: fluent.Colors.blue,
         fontFamily: mainFont,
         brightness: Brightness.light,
       ),
@@ -53,15 +54,15 @@ class MyApp extends StatelessWidget {
       if (name.isNotEmpty) {
         RouteBuilder? routeBuilder = moduleRouteBuilders[name];
         if (routeBuilder != null) {
-          return FluentPageRoute<dynamic>(
+          return fluent.FluentPageRoute<dynamic>(
               builder: (context) => routeBuilder(context, settings));
         }
       }
     }
     if (UserInfo.isLogin()) {
-      return FluentPageRoute(builder: (_) => const HomePage());
+      return fluent.FluentPageRoute(builder: (_) => const HomePage());
     } else {
-      return FluentPageRoute(builder: (_) => const LoginPage());
+      return fluent.FluentPageRoute(builder: (_) => const LoginPage());
     }
   }
 }

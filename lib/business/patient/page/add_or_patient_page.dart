@@ -140,12 +140,14 @@ class AddPatientPage extends StatelessWidget {
                 //   },
                 // ),
                 const SizedBox(height: 20.0),
-                _buildItem(
-                  labelText: '过往病史',
-                  hintText: '请输入过往病史',
-                  minLines: 10,
-                  keyboardType: TextInputType.text,
-                  controller: vm.medicalHistoryController,
+                Expanded(
+                  child: _buildItem(
+                    labelText: '过往病史',
+                    hintText: '请输入过往病史',
+                    minLines: 10,
+                    keyboardType: TextInputType.multiline,
+                    controller: vm.medicalHistoryController,
+                  ),
                 ),
                 const SizedBox(height: 20.0),
                 Row(
