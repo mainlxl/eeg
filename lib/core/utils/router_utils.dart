@@ -50,6 +50,10 @@ extension AppRouterBuildContextExtensions on BuildContext {
     return RouterUtils.popPage(this, result);
   }
 
+  void pop<T extends Object?>([T? result]) {
+    return RouterUtils.popPage(this, result);
+  }
+
   Future<bool> maybePopPage<T extends Object?>([T? result]) {
     return RouterUtils.maybePop(this, result);
   }

@@ -186,37 +186,12 @@ class PatientDetailPage extends StatelessWidget {
             onPressed: vm.onClickUpdate,
             child: const Text('编辑用户信息'),
           ),
+          TextButton(
+            onPressed: vm.onClickShowAssessDialog,
+            child: const Text('开始评估'),
+          ),
         ],
       )
     ];
   }
-
-// PopupMenuButton<String>(
-// initialValue: '语文',
-// child: Text('学科'),
-// itemBuilder: (context) {
-// return <PopupMenuEntry<String>>[
-// CheckedPopupMenuItem<String>(
-// value: '语文',
-// child: Text('语文'),
-// ),
-// PopupMenuItem<String>(
-// value: '数学',
-// child: Text('数学'),
-// ),
-// PopupMenuItem<String>(
-// value: '英语',
-// child: Text('英语'),
-// ),
-// PopupMenuItem<String>(
-// value: '生物',
-// child: Text('生物'),
-// ),
-// PopupMenuItem<String>(
-// value: '化学',
-// child: Text('化学'),
-// ),
-// ];
-// },
-// ),
 }

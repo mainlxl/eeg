@@ -17,10 +17,10 @@ class PatientListSelectPage extends StatelessWidget {
     return Scaffold(
       floatingActionButton: FloatingActionButton(
         onPressed: () => showDialog(
-            context: context,
-            builder: (context) => Container(
-                margin: const EdgeInsets.all(15),
-                child: const AddPatientPage())),
+          context: context,
+          builder: (context) => Container(
+              margin: const EdgeInsets.all(15), child: const AddPatientPage()),
+        ),
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(50)),
         tooltip: '添加用户',
         child: const Icon(Icons.add),

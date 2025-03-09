@@ -1,3 +1,4 @@
+import 'package:eeg/business/assess/page/assess_select_page.dart';
 import 'package:eeg/business/chart/mode/channels_meta_data.dart';
 import 'package:eeg/business/chart/page/chart_page.dart';
 import 'package:eeg/business/patient/mode/patient_info_mode.dart';
@@ -7,6 +8,7 @@ import 'package:eeg/core/base/view_model_builder.dart';
 import 'package:eeg/core/network/http_service.dart';
 import 'package:eeg/core/utils/router_utils.dart';
 import 'package:flutter/material.dart';
+import 'package:shadcn_ui/shadcn_ui.dart';
 
 class PatientDetailViewModel extends LoadingPageStatusViewModel {
   Patient patient;
@@ -48,6 +50,10 @@ class PatientDetailViewModel extends LoadingPageStatusViewModel {
     }
   }
 
+  void onClickRetryeLoadingData() {
+    loadData();
+  }
+
   void loadData() async {
     setPageStatus(PageStatus.loading);
     var post = await HttpService.post('/api/v1/eeg-data/list', data: {
@@ -75,5 +81,14 @@ class PatientDetailViewModel extends LoadingPageStatusViewModel {
   void onExpandableChange(bool isExpanded) {
     this.isExpanded = isExpanded;
     notifyListeners();
+  }
+
+  void onClickShowAssessDialog() async {
+    showShadSheet(
+      barrierColor: Colors.black45,
+      side: ShadSheetSide.bottom,
+      context: context,
+      builder: (context) => AssessSelectPage(patient: patient),
+    );
   }
 }

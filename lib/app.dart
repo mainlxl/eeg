@@ -7,8 +7,10 @@ import 'package:event_bus/event_bus.dart';
 import 'package:fluent_ui/fluent_ui.dart' as fluent;
 import 'package:flutter/material.dart';
 import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
+import 'package:shadcn_ui/shadcn_ui.dart';
 
 import 'core/base/module.dart';
+import 'core/utils/size.dart';
 import 'module.dart';
 
 final GlobalKey<NavigatorState> _navigatorKey = GlobalKey<NavigatorState>();
@@ -26,21 +28,31 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     /// Fluent_UI样式 https://bdlukaa.github.io/fluent_ui/#/inputs/buttons
     initModule();
-    return fluent.FluentApp(
-      debugShowCheckedModeBanner: false,
-      // 关闭右上角的DEBUG标识
-      navigatorKey: _navigatorKey,
-      locale: context.locale,
-      localizationsDelegates: context.localizationDelegates,
-      supportedLocales: context.supportedLocales,
-      onGenerateRoute: _generateRoute,
-      navigatorObservers: [FlutterSmartDialog.observer],
-      builder: FlutterSmartDialog.init(),
-      themeMode: ThemeMode.light,
-      theme: fluent.FluentThemeData(
-        accentColor: fluent.Colors.blue,
-        fontFamily: mainFont,
-        brightness: Brightness.light,
+    SizeUtils.init();
+    return ShadApp.custom(
+      // theme: ShadThemeData(
+      //   colorScheme: const ShadSlateColorScheme.light(),
+      //   brightness: Brightness.light,
+      //   sheetTheme: ShadSheetTheme(
+      //
+      //   ),
+      // ),
+      appBuilder: (context, theme) => fluent.FluentApp(
+        debugShowCheckedModeBanner: false,
+        // 关闭右上角的DEBUG标识
+        navigatorKey: _navigatorKey,
+        locale: context.locale,
+        localizationsDelegates: context.localizationDelegates,
+        supportedLocales: context.supportedLocales,
+        onGenerateRoute: _generateRoute,
+        navigatorObservers: [FlutterSmartDialog.observer],
+        builder: FlutterSmartDialog.init(),
+        themeMode: ThemeMode.light,
+        theme: fluent.FluentThemeData(
+          accentColor: fluent.Colors.blue,
+          fontFamily: mainFont,
+          brightness: Brightness.light,
+        ),
       ),
     );
   }
