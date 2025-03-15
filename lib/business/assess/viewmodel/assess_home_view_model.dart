@@ -29,6 +29,8 @@ class AssessHomeViewModel extends BaseViewModel {
     addSubscription(eventBus
         .on<PatientListRefreshEvent>()
         .listen((event) => _updatePatientName(event.name)));
+    _initAssessHomeManager();
+
     //设置移动端强制横屏
     await SystemChrome.setPreferredOrientations([
       DeviceOrientation.landscapeLeft,
@@ -74,6 +76,52 @@ class AssessHomeViewModel extends BaseViewModel {
         value: old.value,
       );
       notifyListeners();
+    }
+  }
+
+  void _initAssessHomeManager() {
+    assessHomePageManager = AssessHomePageManager();
+    assessHomePageManager._notifyListeners = notifyListeners;
+    assessHomePageManager.viewModel = this;
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+    assessHomePageManager = AssessHomePageManager();
+  }
+}
+
+typedef AssessHomePageBuilder = Widget Function(Patient? patient);
+
+late final AssessHomePageManager assessHomePageManager;
+
+class AssessHomePageManager {
+  late AssessHomeViewModel viewModel;
+  late Function _notifyListeners;
+
+  AssessHomePageManager();
+
+  void addNextPage(
+      {required String title, required AssessHomePageBuilder builder}) {
+    viewModel.items.add(
+      fluent.BreadcrumbItem(
+        label: viewModel._buildTitle(title),
+        value: builder.call(viewModel.patient),
+      ),
+    );
+    _notifyListeners.call();
+  }
+
+  void notifyListeners() {
+    _notifyListeners.call();
+  }
+
+  void removeLastPage() {
+    if (viewModel.items.length > 1) {
+      //保护确保至少有一个页面
+      viewModel.items.removeLast();
+      _notifyListeners.call();
     }
   }
 }

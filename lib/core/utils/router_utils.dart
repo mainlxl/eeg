@@ -15,10 +15,10 @@ class RouterUtils {
   }
 
   static Future<T?> pushReplacement<T extends Object?, TO extends Object?>(
-      BuildContext context, Widget pageWidget,
+      BuildContext context, WidgetBuilder pageBuild,
       {TO? result}) {
     return Navigator.pushReplacement(
-        context, FluentPageRoute(builder: (context) => pageWidget),
+        context, FluentPageRoute(builder: pageBuild),
         result: result);
   }
 
@@ -78,8 +78,8 @@ extension AppRouterBuildContextExtensions on BuildContext {
   }
 
   Future<T?> pushReplacement<T extends Object?, TO extends Object?>(
-      Widget pageWidget,
+      WidgetBuilder builder,
       {TO? result}) {
-    return RouterUtils.pushReplacement(this, pageWidget, result: result);
+    return RouterUtils.pushReplacement(this, builder, result: result);
   }
 }

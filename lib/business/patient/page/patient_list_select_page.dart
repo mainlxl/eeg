@@ -1,9 +1,9 @@
 import 'package:eeg/business/patient/mode/patient_info_mode.dart';
+import 'package:eeg/business/patient/page/add_or_patient_page.dart';
 import 'package:eeg/business/patient/viewmodel/patient_list_view_model.dart';
+import 'package:eeg/common/app_colors.dart';
 import 'package:eeg/common/widget/loading_status_page.dart';
 import 'package:flutter/material.dart';
-
-import 'add_or_patient_page.dart' show AddPatientPage;
 
 typedef PatientCallback = void Function(Patient);
 
@@ -14,20 +14,26 @@ class PatientListSelectPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      floatingActionButton: FloatingActionButton(
-        onPressed: () => showDialog(
-          context: context,
-          builder: (context) => Container(
-              margin: const EdgeInsets.all(15), child: const AddPatientPage()),
-        ),
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(50)),
-        tooltip: '添加用户',
-        child: const Icon(Icons.add),
-      ),
-      body: LoadingPageStatusWidget<PatientListViewModel>(
-          createOrGetViewMode: () => PatientListViewModel(),
-          buildPageContent: (ctx, vm) => Column(
+    return LoadingPageStatusWidget<PatientListViewModel>(
+        createOrGetViewMode: () => PatientListViewModel(),
+        buildPageContent: (ctx, vm) => Scaffold(
+              backgroundColor: bgColor,
+              floatingActionButton: Visibility(
+                visible: vm.pageStatus == PageStatus.loading_success,
+                child: FloatingActionButton(
+                  onPressed: () => showDialog(
+                    context: context,
+                    builder: (context) => Container(
+                        margin: const EdgeInsets.all(15),
+                        child: const AddPatientPage()),
+                  ),
+                  shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(50)),
+                  tooltip: '添加用户',
+                  child: const Icon(Icons.add),
+                ),
+              ),
+              body: Column(
                 children: [
                   TextField(
                     decoration: const InputDecoration(
@@ -66,8 +72,9 @@ class PatientListSelectPage extends StatelessWidget {
                     ),
                   ),
                 ],
-              )),
-    );
+              ),
+            ));
+    ;
   }
 
   String avatarName(Patient patient) =>

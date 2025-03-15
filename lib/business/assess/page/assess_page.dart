@@ -55,15 +55,6 @@ class AssessPage extends StatelessWidget {
       bottomItems: [
         if (vm.enableUploadData)
           PanePageItem(
-            iconWidget: const Icon(Icons.transfer_within_a_station_outlined),
-            title: '重新评估',
-            onClick: () {
-              vm.onClickRetryAssess();
-              return true;
-            },
-          ),
-        if (vm.enableUploadData)
-          PanePageItem(
             iconWidget: const Icon(Icons.upload_file),
             title: '上传评估数据',
             onClick: () {
@@ -71,6 +62,14 @@ class AssessPage extends StatelessWidget {
               return true;
             },
           ),
+        PanePageItem(
+          iconWidget: const Icon(Icons.transfer_within_a_station_outlined),
+          title: '重新评估',
+          onClick: () {
+            vm.onClickRetryAssess();
+            return true;
+          },
+        ),
         PanePageItem(
           iconWidget: const Icon(Icons.cancel_presentation),
           title: '退出评估',

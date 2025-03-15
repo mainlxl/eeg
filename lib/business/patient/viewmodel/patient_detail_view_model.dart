@@ -1,4 +1,5 @@
 import 'package:eeg/business/assess/page/assess_select_page.dart';
+import 'package:eeg/business/assess/viewmodel/assess_home_view_model.dart';
 import 'package:eeg/business/chart/mode/channels_meta_data.dart';
 import 'package:eeg/business/chart/page/chart_page.dart';
 import 'package:eeg/business/patient/mode/patient_info_mode.dart';
@@ -8,11 +9,11 @@ import 'package:eeg/core/base/view_model_builder.dart';
 import 'package:eeg/core/network/http_service.dart';
 import 'package:eeg/core/utils/router_utils.dart';
 import 'package:flutter/material.dart';
-import 'package:shadcn_ui/shadcn_ui.dart';
 
 class PatientDetailViewModel extends LoadingPageStatusViewModel {
   Patient patient;
   bool _needPopResultData = false;
+  @deprecated
   List<ChannelMeta> chartList = [];
   bool isExpanded = false;
   final VoidCallback? onClosePage;
@@ -21,7 +22,7 @@ class PatientDetailViewModel extends LoadingPageStatusViewModel {
 
   @override
   void init() {
-    loadData();
+    loadPatientEvaluateList();
   }
 
   onClickUpdate() async {
@@ -51,10 +52,10 @@ class PatientDetailViewModel extends LoadingPageStatusViewModel {
   }
 
   void onClickRetryeLoadingData() {
-    loadData();
+    loadPatientEvaluateList();
   }
 
-  void loadData() async {
+  void loadPatientEvaluateList() async {
     setPageStatus(PageStatus.loading);
     var post = await HttpService.post('/api/v1/eeg-data/list', data: {
       "patient_id": patient.id,
@@ -84,11 +85,26 @@ class PatientDetailViewModel extends LoadingPageStatusViewModel {
   }
 
   void onClickShowAssessDialog() async {
-    showShadSheet(
-      barrierColor: Colors.black45,
-      side: ShadSheetSide.bottom,
-      context: context,
-      builder: (context) => AssessSelectPage(patient: patient),
-    );
+    assessHomePageManager.addNextPage(
+        title: '选择评估部位',
+        builder: (patient) => AssessSelectPage(patient: patient!));
+  }
+
+  @deprecated
+  void loadDataEegDataList() async {
+    setPageStatus(PageStatus.loading);
+    var post = await HttpService.post('/api/v1/eeg-data/list', data: {
+      "patient_id": patient.id,
+      "required_type": ['EEG', 'IR', 'EMG', 'IMU']
+    });
+    if (post.status == 0 && post.data != null) {
+      var jsonList = post.data as List<dynamic>;
+      var listFromJson = ChannelMeta.listFromJson(jsonList);
+      chartList = listFromJson;
+      setPageStatus(
+          chartList.isNotEmpty ? PageStatus.loading_success : PageStatus.empty);
+    } else {
+      setPageStatus(PageStatus.error);
+    }
   }
 }

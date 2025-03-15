@@ -1,5 +1,6 @@
 import 'package:eeg/business/assess/mode/assess_data.dart';
 import 'package:eeg/business/assess/page/assess_page.dart';
+import 'package:eeg/business/assess/viewmodel/assess_home_view_model.dart';
 import 'package:eeg/business/patient/mode/patient_info_mode.dart';
 import 'package:eeg/common/widget/loading_status_page.dart';
 import 'package:eeg/core/network/http_service.dart';
@@ -7,6 +8,7 @@ import 'package:eeg/core/utils/router_utils.dart';
 import 'package:eeg/core/utils/toast.dart';
 import 'package:shadcn_ui/shadcn_ui.dart';
 
+/// 评测模式选择页
 class AssessSelectViewModel extends LoadingPageStatusViewModel {
   Patient patient;
 
@@ -72,12 +74,15 @@ class AssessSelectViewModel extends LoadingPageStatusViewModel {
         showToast('评测数据异常');
         return;
       }
-      context.pushReplacement(AssessPage(
-        patient: patient,
-        selectedCategory: selectedCategory!,
-        selectedSubCategory: selectedSubCategory!,
-        assessInspectionPoint: selectedInspectionPoint!,
-      ));
+      assessHomePageManager.removeLastPage();
+      context.push(
+        (ctx) => AssessPage(
+          patient: patient,
+          selectedCategory: selectedCategory!,
+          selectedSubCategory: selectedSubCategory!,
+          assessInspectionPoint: selectedInspectionPoint!,
+        ),
+      );
     } else {
       showToast('请先选择评测部位');
     }

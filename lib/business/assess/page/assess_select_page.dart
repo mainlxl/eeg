@@ -31,7 +31,6 @@ class AssessSelectPage extends StatelessWidget {
                   BorderRadius.vertical(top: const Radius.circular(15.0)),
               color: bgColor,
             ),
-            margin: EdgeInsets.only(top: SizeUtils.screenHeight * 0.25),
             child: _buildLoadingStatusWidget(theme),
           ),
         ),
