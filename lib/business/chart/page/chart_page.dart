@@ -5,14 +5,13 @@ import 'package:eeg/business/chart/viewmodel/chart_line_view_model.dart';
 import 'package:eeg/business/chart/widget/chart_line_widget.dart';
 import 'package:eeg/common/widget/loading_status_page.dart';
 import 'package:fluent_ui/fluent_ui.dart' as fluent;
-import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
 import 'package:window_manager/window_manager.dart';
 
 class EegLineChart extends StatelessWidget {
-  ChannelMeta channelMeta;
-  String title;
+  final ChannelMeta channelMeta;
+  final String title;
 
   EegLineChart({super.key, required this.title, required this.channelMeta});
 
@@ -47,7 +46,7 @@ class EegLineChart extends StatelessWidget {
                           scrollDirection: Axis.horizontal,
                           child: _buildTargetCharWidget(
                             maxWidth: vm.canvasWidth,
-                            viewModel: vm,
+                            vm: vm,
                             width: maxWidth,
                             child: SizedBox(
                               width: vm.canvasWidth,
@@ -141,72 +140,16 @@ Tips:
     );
   }
 
-  // 上一次鼠标的位置
-  Offset? _lastMousePosition;
-  VelocityTracker? _velocityTracker;
-
   Widget _buildTargetCharWidget(
       {required Widget child,
-      required ChartLineViewModel viewModel,
+      required ChartLineViewModel vm,
       required double maxWidth,
       required double width}) {
     var maxScrollPositionX = maxWidth - width;
     return Listener(
-      // 鼠标移动事件
-      onPointerMove: (PointerMoveEvent event) {
-        _velocityTracker?.addPosition(event.timeStamp, event.position);
-        final currentPosition = event.position;
-        if (_lastMousePosition != null) {
-          var translateToX = (currentPosition.dx - _lastMousePosition!.dx);
-          var translateToY = (currentPosition.dy - _lastMousePosition!.dy);
-          translateToX =
-              viewModel.scrollHorizontalController.offset - translateToX;
-          if (translateToX > 0 && translateToX <= maxScrollPositionX) {
-            viewModel.forceHorezentalScrell = true;
-            viewModel.scrollHorizontalController.jumpTo(translateToX);
-          }
-          if (translateToY != 0) {
-            viewModel.forceHorezentalScrell = true;
-            viewModel.scrollVerticalController.jumpTo(
-                viewModel.scrollVerticalController.offset - translateToY);
-          }
-        }
-        // 更新上一次的鼠标位置
-        _lastMousePosition = currentPosition;
-      },
-      // 鼠标按下时初始化位置
-      onPointerDown: (PointerDownEvent event) {
-        _lastMousePosition = event.position;
-        _velocityTracker = VelocityTracker.withKind(event.kind);
-      },
-      onPointerUp: (PointerUpEvent event) {
-        final velocity = _velocityTracker!.getVelocity();
-        final dxVelocityX = velocity.pixelsPerSecond.dx;
-        final dxVelocityY = velocity.pixelsPerSecond.dy;
-        var absX = dxVelocityX.abs();
-        var absY = dxVelocityY.abs();
-        if (absX > 300 && absX > absY) {
-          double targetOffset = viewModel.scrollHorizontalController.offset -
-              (dxVelocityX > 0 ? 1000 : -1000);
-          viewModel.scrollHorizontalController.animateTo(
-            targetOffset.clamp(0.0, maxScrollPositionX),
-            duration: const Duration(milliseconds: 500),
-            curve: Curves.easeOut,
-          );
-        }
-        if (absY > 300 && absY > absX) {
-          double targetOffset = viewModel.scrollVerticalController.offset -
-              (dxVelocityY > 0 ? 800 : -800);
-          viewModel.scrollVerticalController.animateTo(
-            targetOffset.clamp(0.0, maxScrollPositionX),
-            duration: const Duration(milliseconds: 500),
-            curve: Curves.easeOut,
-          );
-        }
-        _velocityTracker = null;
-        _lastMousePosition = null;
-        viewModel.forceHorezentalScrell = false;
-      },
+      onPointerMove: (event) => vm.onPointerMove(event, maxScrollPositionX),
+      onPointerDown: vm.onPointerDown,
+      onPointerUp: (event) => vm.onPointerUp(event, maxScrollPositionX),
       child: child,
     );
   }

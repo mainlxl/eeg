@@ -9,32 +9,13 @@ import 'package:eeg/common/widget/loading_status_page.dart';
 import 'package:eeg/common/widget/slider_dialog.dart';
 import 'package:eeg/core/network/http_service.dart';
 import 'package:eeg/core/utils/toast.dart';
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
 class ChartLineViewModel extends LoadingPageStatusViewModel {
   final ScrollController scrollHorizontalController = ScrollController();
   final ScrollController scrollVerticalController = ScrollController();
-
-  get scrollOffset => scrollHorizontalController.hasClients
-      ? scrollHorizontalController.offset
-      : 0;
-
-  bool _forceHorezentalScrell = false;
-
-  set forceHorezentalScrell(bool value) {
-    if (value != _forceHorezentalScrell) {
-      _forceHorezentalScrell = value;
-      notifyListeners();
-    }
-  }
-
-  bool get isHorezentalScrell =>
-      _forceHorezentalScrell ||
-      (scrollHorizontalController.hasClients
-          ? scrollHorizontalController.position.isScrollingNotifier.value
-          : false);
-
   int totalPoints = 0;
   int totalLine = 0;
   double? lineTargetHeight;
@@ -49,7 +30,6 @@ class ChartLineViewModel extends LoadingPageStatusViewModel {
   bool get _hasMore => _dataSecond < channelMeta.second;
 
   int get _nextPage => (_dataSecond / _page_size).toInt() + 1;
-
   bool _isLoadingMore = false;
 
   ChartLineViewModel(this.channelMeta);
@@ -64,14 +44,12 @@ class ChartLineViewModel extends LoadingPageStatusViewModel {
   }
 
   @override
-  void onClickRetryeLoadingData() {
-    initData();
-  }
+  void onClickRetryeLoadingData() => initData();
 
   /// page_size 页数据大小 10为10秒数据
   void initData() async {
     setPageStatus(PageStatus.loading);
-    var response = await _rawloadData(
+    var response = await _rawLoadData(
         page_size: min(channelMeta.second - _dataSecond, _page_size), page: 1);
     if (response.ok) {
       if (response.data != null) {
@@ -99,7 +77,7 @@ class ChartLineViewModel extends LoadingPageStatusViewModel {
     }
   }
 
-  Future<ResponseData> _rawloadData(
+  Future<ResponseData> _rawLoadData(
       {required int page, required int page_size}) async {
     return HttpService.post('/api/v1/eeg-data', data: {
       "data_id": channelMeta.data_id,
@@ -172,8 +150,8 @@ class ChartLineViewModel extends LoadingPageStatusViewModel {
   }
 
   void onScrollHorizontal() {
-    final position = scrollHorizontalController.position;
-    // 当滚动到距离底部 200 像素时触发加载
+    // final position = scrollHorizontalController.position;
+    // // 当滚动到距离底部 200 像素时触发加载
 
     if (scrollHorizontalController.hasClients) {
       var position = scrollHorizontalController.position;
@@ -189,10 +167,9 @@ class ChartLineViewModel extends LoadingPageStatusViewModel {
 
   void _loadMoreData() async {
     showLoading();
-    var rawloadData =
-        await _rawloadData(page_size: _page_size, page: _nextPage);
-    if (rawloadData != null && rawloadData.data.isNotEmpty) {
-      this.channels = mergeChannels(this.channels, rawloadData.data);
+    var response = await _rawLoadData(page_size: _page_size, page: _nextPage);
+    if (response.data.isNotEmpty) {
+      channels = mergeChannels(channels, response.data);
       totalLine = channels.length;
       totalPoints = channels.isEmpty
           ? 0
@@ -245,5 +222,86 @@ class ChartLineViewModel extends LoadingPageStatusViewModel {
 
   void onClickOneKeyAlgorithm() {
     '一键应用算法'.toast;
+  }
+
+//---------------------------------------------------------------------------
+
+  // 上一次鼠标的位置
+  Offset? lastMousePosition;
+  VelocityTracker? velocityTracker;
+
+  get scrollOffset => scrollHorizontalController.hasClients
+      ? scrollHorizontalController.offset
+      : 0;
+
+  bool _forceHorezentalScrell = false;
+
+  set forceHorezentalScrell(bool value) {
+    if (value != _forceHorezentalScrell) {
+      _forceHorezentalScrell = value;
+      notifyListeners();
+    }
+  }
+
+  bool get isHorezentalScrell =>
+      _forceHorezentalScrell ||
+      (scrollHorizontalController.hasClients
+          ? scrollHorizontalController.position.isScrollingNotifier.value
+          : false);
+
+  void onPointerDown(PointerDownEvent event) {
+    lastMousePosition = event.position;
+    velocityTracker = VelocityTracker.withKind(event.kind);
+  }
+
+  // 鼠标移动事件
+  void onPointerMove(PointerMoveEvent event, double maxScrollPositionX) {
+    velocityTracker?.addPosition(event.timeStamp, event.position);
+    final currentPosition = event.position;
+    if (lastMousePosition != null) {
+      var translateToX = (currentPosition.dx - lastMousePosition!.dx);
+      var translateToY = (currentPosition.dy - lastMousePosition!.dy);
+      translateToX = scrollHorizontalController.offset - translateToX;
+      if (translateToX > 0 && translateToX <= maxScrollPositionX) {
+        forceHorezentalScrell = true;
+        scrollHorizontalController.jumpTo(translateToX);
+      }
+      if (translateToY != 0) {
+        forceHorezentalScrell = true;
+        scrollVerticalController
+            .jumpTo(scrollVerticalController.offset - translateToY);
+      }
+    }
+    // 更新上一次的鼠标位置
+    lastMousePosition = currentPosition;
+  }
+
+  void onPointerUp(PointerUpEvent event, double maxScrollPositionX) {
+    final velocity = velocityTracker!.getVelocity();
+    final dxVelocityX = velocity.pixelsPerSecond.dx;
+    final dxVelocityY = velocity.pixelsPerSecond.dy;
+    var absX = dxVelocityX.abs();
+    var absY = dxVelocityY.abs();
+    if (absX > 300 && absX > absY) {
+      double targetOffset =
+          scrollHorizontalController.offset - (dxVelocityX > 0 ? 1000 : -1000);
+      scrollHorizontalController.animateTo(
+        targetOffset.clamp(0.0, maxScrollPositionX),
+        duration: const Duration(milliseconds: 500),
+        curve: Curves.easeOut,
+      );
+    }
+    if (absY > 300 && absY > absX) {
+      double targetOffset =
+          scrollVerticalController.offset - (dxVelocityY > 0 ? 800 : -800);
+      scrollVerticalController.animateTo(
+        targetOffset.clamp(0.0, maxScrollPositionX),
+        duration: const Duration(milliseconds: 500),
+        curve: Curves.easeOut,
+      );
+    }
+    velocityTracker = null;
+    lastMousePosition = null;
+    forceHorezentalScrell = false;
   }
 }
