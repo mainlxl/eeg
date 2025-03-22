@@ -8,10 +8,10 @@ class ChannelMeta {
   String get channelJoin => channels?.join(',') ?? '';
 
   ChannelMeta({
-    this.data_id,
-    this.data_type,
+    required this.data_id,
+    required this.data_type,
     this.description,
-    this.channels,
+    required this.channels,
     this.second = 0,
   }) {
     // 数据验证: 可以根据需要添加字段的检验逻辑

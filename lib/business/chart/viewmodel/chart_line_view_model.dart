@@ -5,18 +5,14 @@ import 'package:eeg/business/chart/mode/channel_page_data.dart';
 import 'package:eeg/business/chart/mode/channels_meta_data.dart';
 import 'package:eeg/business/chart/widget/algorithm_dialog.dart';
 import 'package:eeg/business/chart/widget/channel_filter_dialog.dart';
+import 'package:eeg/common/widget/loading_status_page.dart';
 import 'package:eeg/common/widget/slider_dialog.dart';
-import 'package:eeg/core/base/view_model_builder.dart';
 import 'package:eeg/core/network/http_service.dart';
 import 'package:eeg/core/utils/toast.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
 
-class ChartLineViewModel extends BaseViewModel {
-  bool loading = true;
-
-  bool get pageError => !loading && channels == null;
+class ChartLineViewModel extends LoadingPageStatusViewModel {
   final ScrollController scrollHorizontalController = ScrollController();
   final ScrollController scrollVerticalController = ScrollController();
 
@@ -67,32 +63,45 @@ class ChartLineViewModel extends BaseViewModel {
     initData();
   }
 
+  @override
+  void onClickRetryeLoadingData() {
+    initData();
+  }
+
   /// page_size 页数据大小 10为10秒数据
-  Future<void> initData() async {
-    var rawloadData = await _rawloadData(
+  void initData() async {
+    setPageStatus(PageStatus.loading);
+    var response = await _rawloadData(
         page_size: min(channelMeta.second - _dataSecond, _page_size), page: 1);
-    if (rawloadData != null && rawloadData.data.isNotEmpty) {
-      this.channels = rawloadData.data;
-      totalLine = channels.length;
-      totalPoints = channels.isEmpty
-          ? 0
-          : channels
-              .reduce((curr, next) =>
-                  curr.data.length > next.data.length ? curr : next)
-              .data
-              .length;
-      _dataSecond = _page_size;
-      this.loading = false;
-      notifyListeners();
+    if (response.ok) {
+      if (response.data != null) {
+        Channels channelsData = Channels.fromJson(response.data!);
+        channels = channelsData.data;
+        if (channels.isEmpty) {
+          setPageStatus(PageStatus.empty);
+          return;
+        }
+        totalLine = channels.length;
+        totalPoints = channels.isEmpty
+            ? 0
+            : channels
+                .reduce((curr, next) =>
+                    curr.data.length > next.data.length ? curr : next)
+                .data
+                .length;
+        _dataSecond = _page_size;
+        setPageStatus(PageStatus.loading_success);
+      } else {
+        setPageStatus(PageStatus.empty);
+      }
     } else {
-      this.loading = false;
-      notifyListeners();
+      setPageStatus(PageStatus.error);
     }
   }
 
-  Future<Channels?> _rawloadData(
+  Future<ResponseData> _rawloadData(
       {required int page, required int page_size}) async {
-    var response = await HttpService.post('/api/v1/eeg-data', data: {
+    return HttpService.post('/api/v1/eeg-data', data: {
       "data_id": channelMeta.data_id,
       "page": page,
       "drop_rate": 1,
@@ -100,37 +109,7 @@ class ChartLineViewModel extends BaseViewModel {
       "data_type": channelMeta.data_type,
       "channels": channelMeta.channelJoin
     });
-    if (response.ok && response.data != null) {
-      Channels channelsData = Channels.fromJson(response.data!);
-      return channelsData;
-    }
-    return null;
   }
-
-  // Future<void> _loadFileFromAssets() async {
-  //   showLoading();
-  //   notifyListeners();
-  //   var resData = await loadFileFromAssets();
-  //   final status = resData['status'] as int? ?? -1;
-  //   var chanelPageData = resData['data'] as Map<String, dynamic>?;
-  //   Channels channelsData = Channels.fromJson(chanelPageData!);
-  //   var channels = channelsData.data;
-  //   channels[2].data[500] = 500;
-  //   for (int i = 0; i < 128; i++) {
-  //     channels.add(channels[i % 3]);
-  //   }
-  //   totalLine = channels.length;
-  //   totalPoints = channels.isEmpty
-  //       ? 0
-  //       : channels
-  //           .reduce((curr, next) =>
-  //               curr.data.length > next.data.length ? curr : next)
-  //           .data
-  //           .length;
-  //   this.channels = channelsData;
-  //   hideLoading();
-  //   notifyListeners();
-  // }
 
   @override
   void dispose() {
@@ -190,19 +169,6 @@ class ChartLineViewModel extends BaseViewModel {
         })
       ..addSelectValueAction([1, 2, 3, 5, 10, 30])
       ..show(context);
-  }
-
-  void onClickHelp() {
-    SmartDialog.showToast('''
-类型: ${channelMeta.data_type}
-数据id: ${channelMeta.data_id}
-通道: ${channelMeta.channels}
-
-Tips:       
-      1.鼠标横向滚动查看: 按住[shift]+键拨动滚轮
-      2.支持按住拖动
-        ''',
-        displayTime: const Duration(seconds: 3), alignment: Alignment.center);
   }
 
   void onScrollHorizontal() {

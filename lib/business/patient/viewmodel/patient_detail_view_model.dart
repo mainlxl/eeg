@@ -1,4 +1,6 @@
+import 'package:eeg/business/assess/mode/assess_evaluation.dart';
 import 'package:eeg/business/assess/page/assess_select_page.dart';
+import 'package:eeg/business/assess/page/assess_upload_page.dart';
 import 'package:eeg/business/assess/viewmodel/assess_home_view_model.dart';
 import 'package:eeg/business/chart/mode/channels_meta_data.dart';
 import 'package:eeg/business/chart/page/chart_page.dart';
@@ -8,13 +10,14 @@ import 'package:eeg/common/widget/loading_status_page.dart';
 import 'package:eeg/core/base/view_model_builder.dart';
 import 'package:eeg/core/network/http_service.dart';
 import 'package:eeg/core/utils/router_utils.dart';
+import 'package:eeg/core/utils/toast.dart';
 import 'package:flutter/material.dart';
+import 'package:shadcn_ui/shadcn_ui.dart';
 
 class PatientDetailViewModel extends LoadingPageStatusViewModel {
   Patient patient;
   bool _needPopResultData = false;
-  @deprecated
-  List<ChannelMeta> chartList = [];
+  List<Evaluation> evaluationtList = [];
   bool isExpanded = false;
   final VoidCallback? onClosePage;
 
@@ -51,32 +54,42 @@ class PatientDetailViewModel extends LoadingPageStatusViewModel {
     }
   }
 
+  @override
   void onClickRetryeLoadingData() {
     loadPatientEvaluateList();
   }
 
   void loadPatientEvaluateList() async {
     setPageStatus(PageStatus.loading);
-    var post = await HttpService.post('/api/v1/eeg-data/list', data: {
-      "patient_id": patient.id,
-      "required_type": ['EEG', 'IR', 'EMG', 'IMU']
-    });
+    var post = await HttpService.post(
+      '/api/v1/patients/evaluate/GetPatientEvaluateList',
+      data: {"patient_id": patient.id},
+    );
     if (post.status == 0 && post.data != null) {
       var jsonList = post.data as List<dynamic>;
-      var listFromJson = ChannelMeta.listFromJson(jsonList);
-      chartList = listFromJson;
-      setPageStatus(
-          chartList.isNotEmpty ? PageStatus.loading_success : PageStatus.empty);
+      var listFromJson = Evaluation.listFromJson(jsonList);
+      evaluationtList = listFromJson;
+      setPageStatus(evaluationtList.isNotEmpty
+          ? PageStatus.loading_success
+          : PageStatus.empty);
     } else {
       setPageStatus(PageStatus.error);
     }
   }
 
-  void onClickDataItem(ChannelMeta channelMeta) {
-    context.push((ctx) => EegLineChart(
-        title:
-            '${patient.name}:${channelMeta.data_type}:${channelMeta.data_id}',
-        channelMeta: channelMeta));
+  // @deprecated
+  // void onClickDataItem(ChannelMeta channelMeta) {
+  //   context.push((ctx) => EegLineChart(
+  //       title:
+  //           '${patient.name}:${channelMeta.data_type}:${channelMeta.data_id}',
+  //       channelMeta: channelMeta));
+  // }
+  void onClickDataItem(Evaluation channelMeta) {
+    ///TODO
+    // context.push((ctx) => EegLineChart(
+    //     title:
+    //         '${patient.name}:${channelMeta.data_type}:${channelMeta.data_id}',
+    //     channelMeta: channelMeta));
   }
 
   void onExpandableChange(bool isExpanded) {
@@ -87,24 +100,54 @@ class PatientDetailViewModel extends LoadingPageStatusViewModel {
   void onClickShowAssessDialog() async {
     assessHomePageManager.addNextPage(
         title: '选择评估部位',
-        builder: (patient) => AssessSelectPage(patient: patient!));
+        builder: (patient) => AssessSelectPage(patient: this.patient));
   }
 
-  @deprecated
-  void loadDataEegDataList() async {
-    setPageStatus(PageStatus.loading);
-    var post = await HttpService.post('/api/v1/eeg-data/list', data: {
-      "patient_id": patient.id,
-      "required_type": ['EEG', 'IR', 'EMG', 'IMU']
-    });
+  void onItemClick(Evaluation item) {
+    item.evaluateType.toast;
+  }
+
+  /// 点击上传数据
+  void onClickItemUpload(Evaluation item) async {
+    await showShadDialog<bool?>(
+      context: context,
+      builder: (context) => AssessUploadPage(
+        patientId: patient.id,
+        patientEvaluationId: item.patientEvaluationId,
+        inputHasUploaded: item.metaInfo?.uploadedName,
+      ),
+    );
+    var post = await HttpService.post(
+      '/api/v1/patients/evaluate/GetPatientEvaluate',
+      data: {"patient_evaluation_id": item.patientEvaluationId},
+    );
     if (post.status == 0 && post.data != null) {
-      var jsonList = post.data as List<dynamic>;
-      var listFromJson = ChannelMeta.listFromJson(jsonList);
-      chartList = listFromJson;
-      setPageStatus(
-          chartList.isNotEmpty ? PageStatus.loading_success : PageStatus.empty);
-    } else {
-      setPageStatus(PageStatus.error);
+      var data = Evaluation.fromJson(post.data);
+      var indexOf = evaluationtList.indexOf(item);
+      if (indexOf >= 0 && evaluationtList[indexOf] != data) {
+        evaluationtList[indexOf] = data;
+        notifyListeners();
+      }
     }
+  }
+
+  /// 点击分析
+  void onClickItemAnalyse(Evaluation item) {}
+
+  /// 点击下载报告
+  void onClickItemReportDownload(Evaluation item) {}
+
+  /// 点击预览报告
+  void onClickItemReportPreview(Evaluation item) {}
+
+  /// 点击分析
+  void onClickItemAnalyze(Evaluation item, MetaItemInfo emgData) {
+    context.push((ctx) => EegLineChart(
+        title: '${patient.name}:${emgData.dataType}:${emgData.dataId}',
+        channelMeta: ChannelMeta(
+          data_id: emgData.dataId,
+          data_type: emgData.dataType,
+          channels: emgData.channels,
+        )));
   }
 }

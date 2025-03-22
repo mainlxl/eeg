@@ -7,8 +7,16 @@ import 'package:eeg/core/network/http_service.dart';
 import 'package:eeg/core/utils/crypto.dart';
 import 'package:eeg/core/utils/router_utils.dart';
 import 'package:eeg/core/utils/toast.dart';
+import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:shadcn_ui/shadcn_ui.dart';
+
+class UploadRecording {
+  String name;
+  bool upload = false;
+
+  UploadRecording(this.name);
+}
 
 class AssessUploadViewModel extends BaseViewModel {
   final int patientId;
@@ -20,9 +28,24 @@ class AssessUploadViewModel extends BaseViewModel {
   String? dataSha256;
   int? dataSize;
 
-  AssessUploadViewModel(this.patientId, this.patientEvaluationId);
+  late List<UploadRecording> uploadRecording = [
+    UploadRecording('EEG'),
+    UploadRecording('IR'),
+    UploadRecording('EMG'),
+    UploadRecording('IMU'),
+  ];
+
+  AssessUploadViewModel(this.patientId, this.patientEvaluationId,
+      List<String>? inputHasUploaded) {
+    if (inputHasUploaded != null && inputHasUploaded.isNotEmpty) {
+      for (var e in uploadRecording) {
+        e.upload = inputHasUploaded.contains(e.name);
+      }
+    }
+  }
 
   ShadSelectController<String> fileTypeControl = ShadSelectController();
+  ShadSelectController<String> dataTypeControl = ShadSelectController();
 
   Future<void> onUploadChange(List<File> files) async {
     if (files.isNotEmpty) {
@@ -94,8 +117,54 @@ class AssessUploadViewModel extends BaseViewModel {
       );
       // 处理响应
       if (res.ok) {
-        '上传成功'.toast;
-        context.popPage();
+        final nextContinue = await showShadDialog(
+          context: context,
+          builder: (context) => ShadDialog.alert(
+            title: Text('${dataType}上传成功'),
+            description: Padding(
+              padding: EdgeInsets.only(bottom: 8),
+              child: Text(
+                "还可以上传数据: ${uploadRecording.where((e) => !e.upload).map((e) => e.name).join(' , ')}",
+              ),
+            ),
+            actions: [
+              ShadButton.destructive(
+                child: const Text('结束上传'),
+                onPressed: () => Navigator.of(context).pop(false),
+              ),
+              ShadButton(
+                onPressed: () async {
+                  context.popPage(true);
+                },
+                gradient: LinearGradient(colors: [
+                  Colors.cyan,
+                  Colors.indigo,
+                ]),
+                shadows: [
+                  BoxShadow(
+                    color: Colors.blue.withOpacity(.4),
+                    spreadRadius: 4,
+                    blurRadius: 10,
+                    offset: const Offset(0, 2),
+                  ),
+                ],
+                child: const Text('继续上传'),
+              )
+            ],
+          ),
+        );
+        if (!nextContinue) {
+          context.popPage(true);
+        } else {
+          selectedFile = null;
+          sampleRate = null;
+          dataType = null;
+          dataSha256 = null;
+          dataSize = null;
+          fileTypeControl.value = [];
+          dataTypeControl.value = [];
+          notifyListeners();
+        }
       }
     } on TimeoutException {
       '请求超时，请检查网络'.toast;

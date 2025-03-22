@@ -36,7 +36,6 @@ dependencies:
   flutter_smart_dialog: ^4.9.8+5
   provider: ^6.1.2
   url_launcher: ^6.3.1
-  fluent_ui: ^4.9.2
   dio: ^5.7.0
   window_manager: ^0.4.3
   system_theme: ^3.1.2
@@ -46,14 +45,13 @@ dependencies:
   # 获取版本号
   package_info_plus: ^8.1.2
   # 绘图
-  graphic: ^2.5.0
-  syncfusion_flutter_charts: ^28.1.33
   event_bus: ^2.0.1
-  http: ^1.3.0
   # https://pub.dev/packages/isolate_easy_pool
   isolate_easy_pool: ^0.0.8
   # https://github.com/flutterchina/flukit
   #  flukit: ^3.0.1
+  # https://bdlukaa.github.io/fluent_ui/
+  fluent_ui: ^4.9.2
   #https://flutter-shadcn-ui.mariuti.com/
   shadcn_ui: ^0.22.5
   # 视频播放
@@ -61,6 +59,7 @@ dependencies:
   media_kit_video: ^1.2.5
   media_kit_libs_video: ^1.0.5
   file_picker: ^9.0.2
+  data_table_2: ^2.6.0
 
 flutter:
   uses-material-design: true

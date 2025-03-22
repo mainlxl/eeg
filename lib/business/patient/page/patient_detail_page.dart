@@ -1,3 +1,4 @@
+import 'package:data_table_2/data_table_2.dart';
 import 'package:eeg/business/chart/page/chart_page.dart';
 import 'package:eeg/business/patient/mode/patient_info_mode.dart';
 import 'package:eeg/business/patient/viewmodel/patient_detail_view_model.dart';
@@ -6,7 +7,6 @@ import 'package:eeg/common/widget/expandable_text.dart';
 import 'package:eeg/common/widget/loading_status_page.dart';
 import 'package:eeg/core/base/view_model_builder.dart';
 import 'package:eeg/core/utils/date_format.dart';
-import 'package:flutter/material.dart' as material;
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -16,7 +16,7 @@ class PatientDetailPage extends StatelessWidget {
   final VoidCallback? onClosePage;
 
   const PatientDetailPage(
-      {required this.patient, this.embed = false, this.onClosePage});
+      {super.key, required this.patient, this.embed = false, this.onClosePage});
 
   @override
   Widget build(BuildContext context) {
@@ -96,7 +96,7 @@ class PatientDetailPage extends StatelessWidget {
   Size calculateTextSize(String text, TextStyle style) {
     final TextPainter textPainter = TextPainter(
       text: TextSpan(text: text, style: style),
-      textDirection: material.TextDirection.ltr,
+      textDirection: TextDirection.ltr,
     );
 
     textPainter.layout();
@@ -139,41 +139,123 @@ class PatientDetailPage extends StatelessWidget {
     var loadingPageStatusWidget = LoadingPageStatusWidget(
       createOrGetViewMode: () => vm,
       needViewModelBuild: false,
-      buildPageContent: (ctx, vm) => ListView.separated(
-        physics: const NeverScrollableScrollPhysics(),
-        itemCount: vm.chartList.length,
-        shrinkWrap: true,
-        separatorBuilder: (_, __) => const Divider(height: 1),
-        itemBuilder: (context, index) {
-          final channelMeta = vm.chartList[index];
-          return ListTile(
-            dense: true,
-            leading: const Icon(Icons.insert_chart, size: 24),
-            title: Text(
-              'ID: ${channelMeta.data_id}',
-              style: const TextStyle(fontWeight: FontWeight.w500),
-            ),
-            subtitle: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text('类型: ${channelMeta.data_type}'),
-                Text(channelMeta.description ?? '暂无描述'),
+      buildPageContent: (ctx, vm) {
+        return DataTable2(
+          columns: _tableTitleRow(),
+          rows: vm.evaluationtList.map((item) {
+            var clickStyle = const TextStyle(color: iconColor);
+            return DataRow(
+              onLongPress: () {},
+              cells: [
+                DataCell(Text(
+                  item.createdAt.yyyy_MM_dd_n_HH_mm_ss,
+                  textAlign: TextAlign.center,
+                )),
+                DataCell(Text('数据1')),
+                DataCell(Text(
+                  '${item.evaluateType} - ${item.evaluateClassification}',
+                  textAlign: TextAlign.center,
+                )),
+                DataCell(Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    if (item.metaInfo == null ||
+                        item.metaInfo?.needUpload == true)
+                      GestureDetector(
+                        onTap: () => vm.onClickItemUpload(item),
+                        child: Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                          child: Text('上传', style: clickStyle),
+                        ),
+                      ),
+                    if (item.metaInfo?.irData.hasDate == true)
+                      GestureDetector(
+                        onTap: () =>
+                            vm.onClickItemAnalyze(item, item.metaInfo!.irData),
+                        child: Text('${item.metaInfo?.irData.dataType}',
+                            style: clickStyle),
+                      ),
+                    if (item.metaInfo?.eegData.hasDate == true)
+                      GestureDetector(
+                        onTap: () =>
+                            vm.onClickItemAnalyze(item, item.metaInfo!.eegData),
+                        child: Text('${item.metaInfo?.eegData.dataType}',
+                            style: clickStyle),
+                      ),
+                    if (item.metaInfo?.emgData.hasDate == true)
+                      GestureDetector(
+                        onTap: () =>
+                            vm.onClickItemAnalyze(item, item.metaInfo!.emgData),
+                        child: Text('${item.metaInfo?.emgData.dataType}',
+                            style: clickStyle),
+                      ),
+                    if (item.metaInfo?.imuData.hasDate == true)
+                      GestureDetector(
+                        onTap: () =>
+                            vm.onClickItemAnalyze(item, item.metaInfo!.imuData),
+                        child: Text('${item.metaInfo?.imuData.dataType}',
+                            style: clickStyle),
+                      ),
+                  ],
+                )),
+                DataCell(item.hasFeatureData()
+                    ? Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          GestureDetector(
+                            onTap: () => vm.onClickItemReportPreview(item),
+                            child: Text('预览', style: clickStyle),
+                          ),
+                          SizedBox(width: 8),
+                          GestureDetector(
+                            onTap: () => vm.onClickItemReportDownload(item),
+                            child: Text('下载', style: clickStyle),
+                          ),
+                        ],
+                      )
+                    : Text('无')),
               ],
-            ),
-            trailing: const Icon(Icons.chevron_right),
-            onTap: () => vm.onClickDataItem(channelMeta),
-          );
-        },
-      ),
+            );
+          }).toList(),
+        );
+      },
     );
     return [
-      Text('数据列表',
-          style: TextStyle(
-              fontSize: 20, color: textColor, fontWeight: FontWeight.w500)),
+      Padding(
+        padding: const EdgeInsets.only(left: 15),
+        child: Text('数据列表',
+            style: TextStyle(
+                fontSize: 20, color: textColor, fontWeight: FontWeight.w500)),
+      ),
       const SizedBox(height: 4),
       vm.isExpanded
           ? loadingPageStatusWidget
           : Expanded(child: loadingPageStatusWidget)
+    ];
+  }
+
+  List<DataColumn> _tableTitleRow() {
+    final titleStyle = const TextStyle(fontWeight: FontWeight.bold);
+    return [
+      DataColumn(
+          columnWidth: FixedColumnWidth(140),
+          label: Text('   评估时间   ',
+              style: titleStyle, textAlign: TextAlign.center)),
+      DataColumn(
+        columnWidth: FixedColumnWidth(130),
+        label: Text('评估类型', style: titleStyle, textAlign: TextAlign.center),
+      ),
+      DataColumn(
+        columnWidth: FixedColumnWidth(160),
+        label: Text('评估 - 部位', style: titleStyle, textAlign: TextAlign.center),
+      ),
+      DataColumn(
+        columnWidth: FixedColumnWidth(140),
+        label: Text('评估数据', style: titleStyle, textAlign: TextAlign.center),
+      ),
+      DataColumn(
+        label: Text('评估报告', style: titleStyle, textAlign: TextAlign.center),
+      ),
     ];
   }
 

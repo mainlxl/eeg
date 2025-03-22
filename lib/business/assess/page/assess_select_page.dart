@@ -6,7 +6,6 @@ import 'package:eeg/common/app_colors.dart';
 import 'package:eeg/common/widget/enable_widget.dart';
 import 'package:eeg/common/widget/loading_status_page.dart';
 import 'package:eeg/core/utils/router_utils.dart';
-import 'package:eeg/core/utils/size.dart';
 import 'package:flutter/material.dart';
 import 'package:shadcn_ui/shadcn_ui.dart';
 

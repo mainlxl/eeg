@@ -12,15 +12,20 @@ import 'package:shadcn_ui/shadcn_ui.dart';
 class AssessUploadPage extends StatelessWidget {
   final int patientId;
   final int patientEvaluationId;
+  final List<String>? inputHasUploaded;
 
   const AssessUploadPage(
-      {super.key, required this.patientId, required this.patientEvaluationId});
+      {super.key,
+      required this.patientId,
+      required this.patientEvaluationId,
+      this.inputHasUploaded});
 
   @override
   Widget build(BuildContext context) {
     return DragToMoveArea(
       child: ViewModelBuilder<AssessUploadViewModel>(
-        create: () => AssessUploadViewModel(patientId, patientEvaluationId),
+        create: () => AssessUploadViewModel(
+            patientId, patientEvaluationId, inputHasUploaded),
         child: Consumer<AssessUploadViewModel>(
           builder: (context, vm, _) => _buildUploadInterface(context, vm),
         ),
@@ -39,9 +44,10 @@ class AssessUploadPage extends StatelessWidget {
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
           Align(
-            alignment: Alignment.centerRight,
-            child: SizedBox(
+            alignment: Alignment.topRight,
+            child: Container(
               width: 40,
+              margin: const EdgeInsets.all(10),
               child: IconButton(
                 icon: const Icon(Icons.close),
                 onPressed: () {
@@ -50,11 +56,17 @@ class AssessUploadPage extends StatelessWidget {
               ),
             ),
           ),
+          Spacer(),
+          _uploadSuccessTip(context, vm),
           _buildFileUploadArea(context, vm),
           const SizedBox(height: 20),
           _buildParameterInputs(context, vm),
           const SizedBox(height: 20),
           _buildUploadButton(vm),
+          Spacer(),
+          SizedBox(
+            height: 40,
+          )
         ],
       ),
     );
@@ -153,14 +165,13 @@ class AssessUploadPage extends StatelessWidget {
         ),
         ShadSelect<String>(
           placeholder: const Text('选择数据类型'),
-          options: [
-            ShadOption(value: "EEG", child: Text('EEG')),
-            ShadOption(value: "IR", child: Text('IR')),
-            ShadOption(value: "EMG", child: Text('EMG')),
-            ShadOption(value: "IMU", child: Text('IMU')),
-          ],
+          options: vm.uploadRecording
+              .where((e) => !e.upload)
+              .map((e) => ShadOption(value: e.name, child: Text(e.name)))
+              .toList(),
           selectedOptionBuilder: (context, value) => Text(value),
           onChanged: vm.setDataType,
+          controller: vm.dataTypeControl,
         ),
         const SizedBox(width: 16),
         SizedBox(
@@ -184,6 +195,16 @@ class AssessUploadPage extends StatelessWidget {
       onPressed: vm.uploadData,
       leading: const Icon(Icons.cloud_upload),
       child: Text('开始上传'),
+    );
+  }
+
+  Widget _uploadSuccessTip(BuildContext context, AssessUploadViewModel vm) {
+    return Visibility(
+      visible: vm.uploadRecording.any((e) => e.upload),
+      child: Text(
+        "已上传过数据: ${vm.uploadRecording.where((e) => e.upload).map((e) => e.name).join(' , ')}",
+        style: TextStyle(color: Colors.green),
+      ),
     );
   }
 }

@@ -3,12 +3,11 @@ import 'dart:math';
 import 'package:eeg/business/chart/mode/channels_meta_data.dart';
 import 'package:eeg/business/chart/viewmodel/chart_line_view_model.dart';
 import 'package:eeg/business/chart/widget/chart_line_widget.dart';
-import 'package:eeg/common/widget/status_page_widget.dart';
-import 'package:eeg/core/base/view_model_builder.dart';
+import 'package:eeg/common/widget/loading_status_page.dart';
 import 'package:fluent_ui/fluent_ui.dart' as fluent;
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
+import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
 import 'package:window_manager/window_manager.dart';
 
 class EegLineChart extends StatelessWidget {
@@ -19,29 +18,13 @@ class EegLineChart extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ViewModelBuilder(
-      create: () => ChartLineViewModel(channelMeta),
-      child: Scaffold(
-        backgroundColor: Colors.white,
-        appBar: AppBar(
-          title: DragToMoveArea(
-              child:
-                  fluent.SizedBox(width: double.infinity, child: Text(title))),
-          actions: [
-            Builder(builder: (context) {
-              return IconButton(
-                icon: const Icon(Icons.info), // 使用帮助图标
-                onPressed: Provider.of<ChartLineViewModel>(context).onClickHelp,
-              );
-            })
-          ],
-        ),
-        body: Consumer<ChartLineViewModel>(builder: (ctx, vm, _) {
-          return StatusPageWidget(
-            loading: vm.loading,
-            isErrorOrEmpty: vm.pageError,
-            retryCall: vm.initData,
-            child: LayoutBuilder(
+    return Scaffold(
+      backgroundColor: Colors.white,
+      appBar: _buildAppBar(),
+      body: LoadingPageStatusWidget(
+          createOrGetViewMode: () => ChartLineViewModel(channelMeta),
+          buildPageContent: (ctx, vm) {
+            return LayoutBuilder(
               builder: (context, constraints) {
                 var maxWidth = constraints.maxWidth;
                 var maxHeight = constraints.maxHeight;
@@ -127,10 +110,34 @@ class EegLineChart extends StatelessWidget {
                   ],
                 );
               },
-            ),
+            );
+          }),
+    );
+  }
+
+  AppBar _buildAppBar() {
+    return AppBar(
+      title: DragToMoveArea(
+          child: fluent.SizedBox(width: double.infinity, child: Text(title))),
+      actions: [
+        Builder(builder: (context) {
+          return IconButton(
+            icon: const Icon(Icons.info), // 使用帮助图标
+            onPressed: () {
+              SmartDialog.showToast('''
+类型: ${channelMeta.data_type}
+数据id: ${channelMeta.data_id}
+通道: ${channelMeta.channels}
+Tips:       
+    1.鼠标横向滚动查看: 按住[shift]+键拨动滚轮
+    2.支持按住拖动
+      ''',
+                  displayTime: const Duration(seconds: 3),
+                  alignment: Alignment.center);
+            },
           );
-        }),
-      ),
+        })
+      ],
     );
   }
 
