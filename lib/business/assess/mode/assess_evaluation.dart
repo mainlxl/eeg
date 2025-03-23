@@ -2,39 +2,34 @@ import 'dart:convert';
 
 class Evaluation {
   int id;
-  String createdAt;
-  String updatedAt;
-  String? deletedAt;
   int patientEvaluationId;
   int patientId;
   String evaluationDate;
+  String evaluateLevel;
   String evaluateType;
   String evaluateClassification;
   EvaluationMetaInfo? metaInfo;
-  String? metaInfoJson;
-  String featureData;
+  FeatureData? featureData;
 
   bool hasMetaInfo() {
     return metaInfo != null;
   }
 
   bool hasFeatureData() {
-    return featureData.isNotEmpty && metaInfo != '{}';
+    return featureData != null;
   }
 
   // 构造函数，字段可以为空时给出默认值
   Evaluation({
     required this.id,
-    required this.createdAt,
-    required this.updatedAt,
-    this.deletedAt,
     required this.patientEvaluationId,
     required this.patientId,
+    required this.evaluateLevel,
     required this.evaluationDate,
     required this.evaluateType,
     required this.evaluateClassification,
     this.metaInfo, // 默认空 JSON 字符串
-    this.featureData = '{}', // 默认空 JSON 字符串
+    this.featureData, // 默认空 JSON 字符串
   });
 
   static List<Evaluation> listFromJson(List<dynamic> jsonList) {
@@ -43,21 +38,22 @@ class Evaluation {
 
   factory Evaluation.fromJson(Map<String, dynamic> json) {
     return Evaluation(
-        id: json['ID'] ?? 0,
-        createdAt: json['CreatedAt'] ?? '',
-        updatedAt: json['UpdatedAt'] ?? '',
-        deletedAt: json['DeletedAt'],
-        patientEvaluationId: json['patient_evaluation_id'] ?? 0,
-        patientId: json['patient_id'] ?? 0,
-        evaluationDate: json['evaluation_date'] ?? '',
-        evaluateType: json['evaluate_type'] ?? '',
-        evaluateClassification: json['evaluate_classification'] ?? '',
-        metaInfo: json['meta_info'] == null || json['meta_info'] == '{}'
-            ? null
-            : json['meta_info'].runtimeType == String
-                ? EvaluationMetaInfo.fromJsonStr(json['meta_info'])
-                : EvaluationMetaInfo.fromJson(json['meta_info']),
-        featureData: json['feature_data'] ?? '{}');
+      id: json['ID'] ?? 0,
+      patientEvaluationId: json['patient_evaluation_id'] ?? 0,
+      evaluateLevel: json['evaluate_level'] ?? '',
+      patientId: json['patient_id'] ?? 0,
+      evaluationDate: json['evaluation_date'] ?? '',
+      evaluateType: json['evaluate_type'] ?? '',
+      evaluateClassification: json['evaluate_classification'] ?? '',
+      metaInfo: json['meta_info'] == null || json['meta_info'] == '{}'
+          ? null
+          : json['meta_info'].runtimeType == String
+              ? EvaluationMetaInfo.fromJsonStr(json['meta_info'])
+              : EvaluationMetaInfo.fromJson(json['meta_info']),
+      featureData: json['feature_data'] != null
+          ? FeatureData.fromJson(json['feature_data'])
+          : null,
+    );
   }
 
   @override
@@ -69,6 +65,29 @@ class Evaluation {
 
   @override
   int get hashCode => patientEvaluationId.hashCode;
+}
+
+class FeatureData {
+  final dynamic eegDataFeatureItems;
+  final dynamic irDataFeatureItems;
+  final dynamic emgDataFeatureItems;
+  final dynamic imuDataFeatureItems;
+
+  FeatureData({
+    required this.eegDataFeatureItems,
+    required this.irDataFeatureItems,
+    required this.emgDataFeatureItems,
+    required this.imuDataFeatureItems,
+  });
+
+  factory FeatureData.fromJson(Map<String, dynamic> json) {
+    return FeatureData(
+      eegDataFeatureItems: json['eeg_data_feature_items'],
+      irDataFeatureItems: json['ir_data_feature_items'],
+      emgDataFeatureItems: json['emg_data_feature_items'],
+      imuDataFeatureItems: json['imu_data_feature_items'],
+    );
+  }
 }
 
 class EvaluationMetaInfo {

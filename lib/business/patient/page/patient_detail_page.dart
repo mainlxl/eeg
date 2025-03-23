@@ -148,10 +148,10 @@ class PatientDetailPage extends StatelessWidget {
               onLongPress: () {},
               cells: [
                 DataCell(Text(
-                  item.createdAt.yyyy_MM_dd_n_HH_mm_ss,
+                  item.evaluationDate.yyyy_MM_dd_n_HH_mm_ss,
                   textAlign: TextAlign.center,
                 )),
-                DataCell(Text('数据1')),
+                DataCell(Text(item.evaluateLevel)),
                 DataCell(Text(
                   '${item.evaluateType} - ${item.evaluateClassification}',
                   textAlign: TextAlign.center,
@@ -165,36 +165,49 @@ class PatientDetailPage extends StatelessWidget {
                         onTap: () => vm.onClickItemUpload(item),
                         child: Padding(
                           padding: const EdgeInsets.symmetric(horizontal: 8.0),
-                          child: Text('上传', style: clickStyle),
+                          child: Text('上传',
+                              style: TextStyle(color: highlightColor)),
                         ),
                       ),
                     if (item.metaInfo?.irData.hasDate == true)
                       GestureDetector(
                         onTap: () =>
                             vm.onClickItemAnalyze(item, item.metaInfo!.irData),
-                        child: Text('${item.metaInfo?.irData.dataType}',
-                            style: clickStyle),
+                        child: Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                          child: Text('${item.metaInfo?.irData.dataType}',
+                              style: clickStyle),
+                        ),
                       ),
                     if (item.metaInfo?.eegData.hasDate == true)
                       GestureDetector(
                         onTap: () =>
                             vm.onClickItemAnalyze(item, item.metaInfo!.eegData),
-                        child: Text('${item.metaInfo?.eegData.dataType}',
-                            style: clickStyle),
+                        child: Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                          child: Text('${item.metaInfo?.eegData.dataType}',
+                              style: clickStyle),
+                        ),
                       ),
                     if (item.metaInfo?.emgData.hasDate == true)
                       GestureDetector(
                         onTap: () =>
                             vm.onClickItemAnalyze(item, item.metaInfo!.emgData),
-                        child: Text('${item.metaInfo?.emgData.dataType}',
-                            style: clickStyle),
+                        child: Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                          child: Text('${item.metaInfo?.emgData.dataType}',
+                              style: clickStyle),
+                        ),
                       ),
                     if (item.metaInfo?.imuData.hasDate == true)
                       GestureDetector(
                         onTap: () =>
                             vm.onClickItemAnalyze(item, item.metaInfo!.imuData),
-                        child: Text('${item.metaInfo?.imuData.dataType}',
-                            style: clickStyle),
+                        child: Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                          child: Text('${item.metaInfo?.imuData.dataType}',
+                              style: clickStyle),
+                        ),
                       ),
                   ],
                 )),

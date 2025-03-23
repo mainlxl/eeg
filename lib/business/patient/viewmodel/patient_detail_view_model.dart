@@ -1,3 +1,4 @@
+import 'package:eeg/app.dart';
 import 'package:eeg/business/assess/mode/assess_evaluation.dart';
 import 'package:eeg/business/assess/page/assess_select_page.dart';
 import 'package:eeg/business/assess/page/assess_upload_page.dart';
@@ -9,6 +10,7 @@ import 'package:eeg/business/patient/page/add_or_patient_page.dart';
 import 'package:eeg/common/widget/loading_status_page.dart';
 import 'package:eeg/core/base/view_model_builder.dart';
 import 'package:eeg/core/network/http_service.dart';
+import 'package:eeg/core/utils/iterable_extend.dart';
 import 'package:eeg/core/utils/router_utils.dart';
 import 'package:eeg/core/utils/toast.dart';
 import 'package:flutter/material.dart';
@@ -26,6 +28,9 @@ class PatientDetailViewModel extends LoadingPageStatusViewModel {
   @override
   void init() {
     loadPatientEvaluateList();
+    addSubscription(eventBus
+        .on<UpdateOrInsertPatientEvaluateEvent>()
+        .listen(_onCreatePatientEvaluateEvent));
   }
 
   onClickUpdate() async {
@@ -117,15 +122,27 @@ class PatientDetailViewModel extends LoadingPageStatusViewModel {
         inputHasUploaded: item.metaInfo?.uploadedName,
       ),
     );
+    _onUpdateOrInsertEvaluationByPatientId(item.patientEvaluationId);
+  }
+
+  Future<void> _onUpdateOrInsertEvaluationByPatientId(
+      int patientEvaluationId) async {
     var post = await HttpService.post(
       '/api/v1/patients/evaluate/GetPatientEvaluate',
-      data: {"patient_evaluation_id": item.patientEvaluationId},
+      data: {"patient_evaluation_id": patientEvaluationId},
     );
     if (post.status == 0 && post.data != null) {
       var data = Evaluation.fromJson(post.data);
-      var indexOf = evaluationtList.indexOf(item);
-      if (indexOf >= 0 && evaluationtList[indexOf] != data) {
-        evaluationtList[indexOf] = data;
+      var old = evaluationtList.firstWhereOrNull(
+          (element) => element.patientEvaluationId == patientEvaluationId);
+      if (old != null) {
+        var indexOf = evaluationtList.indexOf(old);
+        if (indexOf >= 0) {
+          evaluationtList[indexOf] = data;
+          notifyListeners();
+        }
+      } else {
+        evaluationtList.add(data);
         notifyListeners();
       }
     }
@@ -150,4 +167,19 @@ class PatientDetailViewModel extends LoadingPageStatusViewModel {
           channels: emgData.channels,
         )));
   }
+
+  void _onCreatePatientEvaluateEvent(
+      UpdateOrInsertPatientEvaluateEvent event) async {
+    if (patient.id == event.patientId) {
+      _onUpdateOrInsertEvaluationByPatientId(event.patientEvaluationId);
+    }
+  }
+}
+
+class UpdateOrInsertPatientEvaluateEvent {
+  final int patientEvaluationId;
+  final int patientId;
+
+  UpdateOrInsertPatientEvaluateEvent(
+      {required this.patientEvaluationId, required this.patientId});
 }

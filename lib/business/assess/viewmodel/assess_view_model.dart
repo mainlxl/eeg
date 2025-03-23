@@ -1,9 +1,11 @@
 import 'dart:async' show Timer;
 
+import 'package:eeg/app.dart';
 import 'package:eeg/business/assess/mode/assess_data.dart';
 import 'package:eeg/business/assess/mode/assess_record.dart';
 import 'package:eeg/business/assess/page/assess_upload_page.dart';
 import 'package:eeg/business/patient/mode/patient_info_mode.dart';
+import 'package:eeg/business/patient/viewmodel/patient_detail_view_model.dart';
 import 'package:eeg/common/widget/left_menu_page.dart';
 import 'package:eeg/common/widget/loading_status_page.dart';
 import 'package:eeg/core/network/http_service.dart';
@@ -169,6 +171,7 @@ class AssessViewModel extends LoadingPageStatusViewModel {
           '/api/v1/patients/evaluate/CreatePatientEvaluate',
           data: {
             "patient_id": patient.id,
+            "evaluate_level": _selectedCategory.name,
             "evaluate_type": _selectedSubCategory.name,
             "evaluate_classification": _assessInspectionPoint.name,
             "evaluation_date": DateTime.timestamp().toIso8601String(),
@@ -179,6 +182,8 @@ class AssessViewModel extends LoadingPageStatusViewModel {
         patientEvaluationId = assessRecord.patientEvaluationId;
       }
       if (patientEvaluationId > 0) {
+        eventBus.fire(UpdateOrInsertPatientEvaluateEvent(
+            patientEvaluationId: patientEvaluationId, patientId: patient.id));
         Future.microtask(_onNextUploadData);
         return true;
       } else {

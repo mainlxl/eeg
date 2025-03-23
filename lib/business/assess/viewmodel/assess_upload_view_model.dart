@@ -5,6 +5,7 @@ import 'package:dio/dio.dart';
 import 'package:eeg/core/base/view_model_builder.dart';
 import 'package:eeg/core/network/http_service.dart';
 import 'package:eeg/core/utils/crypto.dart';
+import 'package:eeg/core/utils/iterable_extend.dart';
 import 'package:eeg/core/utils/router_utils.dart';
 import 'package:eeg/core/utils/toast.dart';
 import 'package:flutter/material.dart';
@@ -21,9 +22,8 @@ class UploadRecording {
 class AssessUploadViewModel extends BaseViewModel {
   final int patientId;
   final int patientEvaluationId;
-
+  TextEditingController sampleRateController = TextEditingController();
   File? selectedFile;
-  int? sampleRate;
   String? dataType;
   String? dataSha256;
   int? dataSize;
@@ -66,11 +66,6 @@ class AssessUploadViewModel extends BaseViewModel {
     notifyListeners();
   }
 
-  void setSampleRate(String value) {
-    sampleRate = int.tryParse(value);
-    notifyListeners();
-  }
-
   void setDataType(String? value) {
     dataType = value;
     notifyListeners();
@@ -83,7 +78,9 @@ class AssessUploadViewModel extends BaseViewModel {
       return;
     }
     final fileType = fileTypeControl.value.firstOrNull;
-    if (sampleRate == null || fileType == null || dataType == null) {
+    if (sampleRateController.text.isEmpty ||
+        fileType == null ||
+        dataType == null) {
       '请填写所有必填项'.toast;
       return;
     }
@@ -98,7 +95,7 @@ class AssessUploadViewModel extends BaseViewModel {
             {
               "patient_evaluation_id": ${patientEvaluationId},
               "patient_id": ${patientId},
-              "sample_rate": ${sampleRate},
+              "sample_rate": ${sampleRateController.text},
               "file_type": "${fileType}",
               "data_type": "${dataType}",
               "data_varify": "${dataSha256}",
@@ -117,47 +114,56 @@ class AssessUploadViewModel extends BaseViewModel {
       );
       // 处理响应
       if (res.ok) {
+        hideLoading();
+        uploadRecording.firstWhereOrNull((e) => e.name == dataType)?.upload =
+            true;
+        var toBeUploaded = uploadRecording.where((e) => !e.upload);
         final nextContinue = await showShadDialog(
           context: context,
-          builder: (context) => ShadDialog.alert(
-            title: Text('${dataType}上传成功'),
-            description: Padding(
-              padding: EdgeInsets.only(bottom: 8),
-              child: Text(
-                "还可以上传数据: ${uploadRecording.where((e) => !e.upload).map((e) => e.name).join(' , ')}",
+          builder: (context) {
+            return ShadDialog.alert(
+              title: Text('${dataType}上传成功'),
+              description: Padding(
+                padding: EdgeInsets.only(bottom: 8),
+                child: Text(
+                  toBeUploaded.isNotEmpty
+                      ? "还可以上传数据: ${toBeUploaded.map((e) => e.name).join(' , ')}"
+                      : '数据已全部上传完成(${uploadRecording.map((e) => e.name).join(', ')})',
+                ),
               ),
-            ),
-            actions: [
-              ShadButton.destructive(
-                child: const Text('结束上传'),
-                onPressed: () => Navigator.of(context).pop(false),
-              ),
-              ShadButton(
-                onPressed: () async {
-                  context.popPage(true);
-                },
-                gradient: LinearGradient(colors: [
-                  Colors.cyan,
-                  Colors.indigo,
-                ]),
-                shadows: [
-                  BoxShadow(
-                    color: Colors.blue.withOpacity(.4),
-                    spreadRadius: 4,
-                    blurRadius: 10,
-                    offset: const Offset(0, 2),
-                  ),
-                ],
-                child: const Text('继续上传'),
-              )
-            ],
-          ),
+              actions: [
+                ShadButton.destructive(
+                  child: const Text('结束上传'),
+                  onPressed: () => Navigator.of(context).pop(false),
+                ),
+                if (toBeUploaded.isNotEmpty)
+                  ShadButton(
+                    onPressed: () async {
+                      context.popPage(true);
+                    },
+                    gradient: LinearGradient(colors: [
+                      Colors.cyan,
+                      Colors.indigo,
+                    ]),
+                    shadows: [
+                      BoxShadow(
+                        color: Colors.blue.withOpacity(.4),
+                        spreadRadius: 4,
+                        blurRadius: 10,
+                        offset: const Offset(0, 2),
+                      ),
+                    ],
+                    child: const Text('继续上传'),
+                  )
+              ],
+            );
+          },
         );
         if (!nextContinue) {
           context.popPage(true);
         } else {
           selectedFile = null;
-          sampleRate = null;
+          sampleRateController.clear();
           dataType = null;
           dataSha256 = null;
           dataSize = null;

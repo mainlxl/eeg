@@ -178,12 +178,12 @@ class AssessUploadPage extends StatelessWidget {
           width: 150,
           child: TextField(
             maxLines: 1,
+            controller: vm.sampleRateController,
             decoration: const InputDecoration(
               labelText: '采样率 (Hz)',
               border: OutlineInputBorder(),
             ),
             keyboardType: TextInputType.number,
-            onChanged: vm.setSampleRate,
           ),
         )
       ],

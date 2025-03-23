@@ -1,3 +1,4 @@
+import 'package:eeg/business/assess/mode/assess_evaluation.dart';
 import 'package:eeg/business/patient/mode/patient_info_mode.dart';
 
 class AssessRecord {
@@ -10,8 +11,8 @@ class AssessRecord {
   DateTime evaluationDate;
   String evaluateType;
   String evaluateClassification;
-  String metaInfo;
-  String featureData;
+  EvaluationMetaInfo? metaInfo;
+  FeatureData? featureData;
   Patient patient;
 
   AssessRecord({
@@ -43,8 +44,12 @@ class AssessRecord {
           DateTime.parse(json['evaluation_date'] ?? DateTime(1970).toString()),
       evaluateType: json['evaluate_type'] ?? "",
       evaluateClassification: json['evaluate_classification'] ?? "",
-      metaInfo: json['meta_info'] ?? "{}",
-      featureData: json['feature_data'] ?? "{}",
+      metaInfo: json['meta_info'] != null
+          ? EvaluationMetaInfo.fromJson(json['meta_info'])
+          : null,
+      featureData: json['feature_data'] != null
+          ? FeatureData.fromJson(json['feature_data'])
+          : null,
       patient: Patient.fromJson(json['Patient'] ?? {}),
     );
   }
