@@ -1,3 +1,4 @@
+import 'package:eeg/core/network/http_service.dart';
 import 'package:flutter/material.dart';
 
 class TestPage extends StatelessWidget {
@@ -5,7 +6,20 @@ class TestPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MyPaginatedDataTable();
+    return Column(
+      children: [
+        IconButton(
+          icon: Icon(Icons.arrow_back),
+          onPressed: _onClick,
+        ),
+        MyPaginatedDataTable(),
+      ],
+    );
+  }
+
+  void _onClick() {
+    var future = HttpService.get("/api/v1/patients/evaluate/feature_meta/");
+    print('Mainli - TestPage._onClick - future: $future');
   }
 }
 

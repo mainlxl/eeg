@@ -1,8 +1,8 @@
 import 'package:eeg/common/app_colors.dart';
+import 'package:eeg/common/widget/drag_to_move_area_widget.dart';
 import 'package:eeg/core/base/view_model_builder.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:window_manager/window_manager.dart';
 
 enum PageStatus { idle, loading, error, empty, loading_success }
 
@@ -53,7 +53,7 @@ class LoadingPageStatusWidget<T extends LoadingPageStatusViewModel>
             ),
           )
         : _buildStatusPageContent(context, createOrGetViewMode());
-    return enableDragToMove ? DragToMoveArea(child: content) : content;
+    return enableDragToMove ? DragToMoveWidget(child: content) : content;
   }
 
   Widget _buildStatusPageContent(BuildContext context, T viewModel) {

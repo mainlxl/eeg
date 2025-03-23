@@ -1,21 +1,23 @@
 class ChannelMeta {
-  String? data_id;
-  String? data_type;
+  String? dataId;
+  String? dataType;
+  int patientEvaluationId;
   String? description;
   List<String>? channels;
-  int second;
+  int totalSecond;
 
   String get channelJoin => channels?.join(',') ?? '';
 
   ChannelMeta({
-    required this.data_id,
-    required this.data_type,
+    required this.dataId,
+    required this.dataType,
+    required this.patientEvaluationId,
     this.description,
     required this.channels,
-    this.second = 0,
+    this.totalSecond = 0,
   }) {
     // 数据验证: 可以根据需要添加字段的检验逻辑
-    if (data_id == null || data_id!.isEmpty) {
+    if (dataId == null || dataId!.isEmpty) {
       throw ArgumentError('data_id cannot be null or empty');
     }
     // 可以添加更多的验证逻辑
@@ -24,10 +26,11 @@ class ChannelMeta {
   // 从 JSON 创建 ChannelMeta 实例
   factory ChannelMeta.fromJson(Map<String, dynamic> json) {
     return ChannelMeta(
-      data_id: json['data_id'] as String?,
-      data_type: json['data_type'] as String?,
+      dataId: json['data_id'] as String?,
+      dataType: json['data_type'] as String?,
       description: json['description'] as String?,
-      second: json['second'] as int? ?? 0,
+      patientEvaluationId: json['patient_evaluation_id'] as int? ?? 0,
+      totalSecond: json['second'] as int? ?? 0,
       channels: (json['channels'] as List<dynamic>?)
           ?.map((item) => item.toString())
           .toList(),
@@ -37,11 +40,11 @@ class ChannelMeta {
   // 将 ChannelMeta 实例转换为 JSON
   Map<String, dynamic> toJson() {
     return {
-      'data_id': data_id,
-      'data_type': data_type,
+      'data_id': dataId,
+      'data_type': dataType,
       'description': description,
       'channels': channels,
-      'second': second,
+      'second': totalSecond,
     };
   }
 
@@ -62,28 +65,13 @@ class ChannelMeta {
       identical(this, other) ||
       other is ChannelMeta &&
           runtimeType == other.runtimeType &&
-          data_id == other.data_id;
+          dataId == other.dataId;
 
   @override
-  int get hashCode => data_id.hashCode;
-
-  // copyWith 方法
-  ChannelMeta copyWith({
-    String? data_id,
-    String? data_type,
-    String? description,
-    List<String>? channels,
-  }) {
-    return ChannelMeta(
-      data_id: data_id ?? this.data_id,
-      data_type: data_type ?? this.data_type,
-      description: description ?? this.description,
-      channels: channels ?? this.channels,
-    );
-  }
+  int get hashCode => dataId.hashCode;
 
   @override
   String toString() {
-    return 'ChannelMeta{data_id: $data_id, data_type: $data_type, description: $description, channels: $channels}';
+    return 'ChannelMeta{data_id: $dataId, data_type: $dataType, description: $description, channels: $channels}';
   }
 }

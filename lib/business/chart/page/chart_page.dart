@@ -3,11 +3,11 @@ import 'dart:math';
 import 'package:eeg/business/chart/mode/channels_meta_data.dart';
 import 'package:eeg/business/chart/viewmodel/chart_line_view_model.dart';
 import 'package:eeg/business/chart/widget/chart_line_widget.dart';
+import 'package:eeg/common/widget/drag_to_move_area_widget.dart';
 import 'package:eeg/common/widget/loading_status_page.dart';
 import 'package:fluent_ui/fluent_ui.dart' as fluent;
 import 'package:flutter/material.dart';
 import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
-import 'package:window_manager/window_manager.dart';
 
 class EegLineChart extends StatelessWidget {
   final ChannelMeta channelMeta;
@@ -116,7 +116,7 @@ class EegLineChart extends StatelessWidget {
 
   AppBar _buildAppBar() {
     return AppBar(
-      title: DragToMoveArea(
+      title: DragToMoveWidget(
           child: fluent.SizedBox(width: double.infinity, child: Text(title))),
       actions: [
         Builder(builder: (context) {
@@ -124,8 +124,8 @@ class EegLineChart extends StatelessWidget {
             icon: const Icon(Icons.info), // 使用帮助图标
             onPressed: () {
               SmartDialog.showToast('''
-类型: ${channelMeta.data_type}
-数据id: ${channelMeta.data_id}
+类型: ${channelMeta.dataType}
+数据id: ${channelMeta.dataId}
 通道: ${channelMeta.channels}
 Tips:       
     1.鼠标横向滚动查看: 按住[shift]+键拨动滚轮
@@ -193,33 +193,5 @@ class NoScrollBehavior extends ScrollBehavior {
   Widget buildOverscrollIndicator(
       BuildContext context, Widget child, ScrollableDetails details) {
     return child; // 返回子部件，不显示过度滚动指示器
-  }
-}
-
-class DragToMoveArea extends StatelessWidget {
-  const DragToMoveArea({
-    super.key,
-    required this.child,
-  });
-
-  final Widget child;
-
-  @override
-  Widget build(BuildContext context) {
-    return GestureDetector(
-      behavior: HitTestBehavior.opaque,
-      onPanStart: (details) {
-        windowManager.startDragging();
-      },
-      onDoubleTap: () async {
-        bool isMaximized = await windowManager.isMaximized();
-        if (!isMaximized) {
-          windowManager.maximize();
-        } else {
-          windowManager.unmaximize();
-        }
-      },
-      child: child,
-    );
   }
 }

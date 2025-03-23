@@ -1,8 +1,8 @@
 import 'dart:io';
 
 import 'package:eeg/business/assess/viewmodel/assess_upload_view_model.dart';
-import 'package:eeg/business/chart/page/chart_page.dart';
 import 'package:eeg/common/app_colors.dart';
+import 'package:eeg/common/widget/drag_to_move_area_widget.dart';
 import 'package:eeg/core/base/view_model_builder.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
@@ -22,7 +22,7 @@ class AssessUploadPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return DragToMoveArea(
+    return DragToMoveWidget(
       child: ViewModelBuilder<AssessUploadViewModel>(
         create: () => AssessUploadViewModel(
             patientId, patientEvaluationId, inputHasUploaded),

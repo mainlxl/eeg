@@ -3,6 +3,7 @@ import 'package:eeg/business/chart/page/chart_page.dart';
 import 'package:eeg/business/patient/mode/patient_info_mode.dart';
 import 'package:eeg/business/patient/viewmodel/patient_detail_view_model.dart';
 import 'package:eeg/common/app_colors.dart';
+import 'package:eeg/common/widget/drag_to_move_area_widget.dart';
 import 'package:eeg/common/widget/expandable_text.dart';
 import 'package:eeg/common/widget/loading_status_page.dart';
 import 'package:eeg/core/base/view_model_builder.dart';
@@ -24,22 +25,23 @@ class PatientDetailPage extends StatelessWidget {
       create: () =>
           PatientDetailViewModel(this.patient, onClosePage: onClosePage),
       child: Consumer<PatientDetailViewModel>(
-        builder: (context, vm, _) => embed
+        builder: (context, vm, _) =>
+        embed
             ? _buildContent(vm)
             : Scaffold(
-                backgroundColor: bgColor,
-                appBar: AppBar(
-                  leading: BackButton(onPressed: vm.popPage),
-                  title: Text('${patient.name} 的详情'),
-                  actions: [
-                    IconButton(
-                      icon: const Icon(Icons.edit_outlined),
-                      onPressed: vm.onClickUpdate,
-                    )
-                  ],
-                ),
-                body: _buildContent(vm),
-              ),
+          backgroundColor: bgColor,
+          appBar: AppBar(
+            leading: BackButton(onPressed: vm.popPage),
+            title: Text('${patient.name} 的详情'),
+            actions: [
+              IconButton(
+                icon: const Icon(Icons.edit_outlined),
+                onPressed: vm.onClickUpdate,
+              )
+            ],
+          ),
+          body: _buildContent(vm),
+        ),
       ),
     );
   }
@@ -59,12 +61,16 @@ class PatientDetailPage extends StatelessWidget {
               const SizedBox(width: 4),
               Expanded(
                 child: SelectableExpandableText(
-                    onExpandableChange: vm.onExpandableChange,
-                    isExpanded: vm.isExpanded,
+                    onExpandableChange: (e) {
+                      vm.onExpandableClick();
+                      return false;
+                    },
+                    isExpanded: false,
                     textStyle: const TextStyle(fontSize: 14, color: textColor),
                     linkTextColor: iconColor,
                     text:
-                        '病史: ${patient.medicalHistory.isNotEmpty ? patient.medicalHistory : '暂未填写'}'),
+                    '病史: ${patient.medicalHistory.isNotEmpty ? patient
+                        .medicalHistory : '暂未填写'}'),
               ),
             ],
           ),
@@ -73,7 +79,7 @@ class PatientDetailPage extends StatelessWidget {
         ],
       ),
     );
-    return DragToMoveArea(
+    return DragToMoveWidget(
       child: vm.isExpanded ? SingleChildScrollView(child: content) : content,
     );
   }
@@ -151,9 +157,9 @@ class PatientDetailPage extends StatelessWidget {
                   item.evaluationDate.yyyy_MM_dd_n_HH_mm_ss,
                   textAlign: TextAlign.center,
                 )),
-                DataCell(Text(item.evaluateLevel)),
                 DataCell(Text(
-                  '${item.evaluateType} - ${item.evaluateClassification}',
+                  '${item.evaluateLevel} - ${item.evaluateType} - ${item
+                      .evaluateClassification}',
                   textAlign: TextAlign.center,
                 )),
                 DataCell(Row(
@@ -213,19 +219,19 @@ class PatientDetailPage extends StatelessWidget {
                 )),
                 DataCell(item.hasFeatureData()
                     ? Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          GestureDetector(
-                            onTap: () => vm.onClickItemReportPreview(item),
-                            child: Text('预览', style: clickStyle),
-                          ),
-                          SizedBox(width: 8),
-                          GestureDetector(
-                            onTap: () => vm.onClickItemReportDownload(item),
-                            child: Text('下载', style: clickStyle),
-                          ),
-                        ],
-                      )
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    GestureDetector(
+                      onTap: () => vm.onClickItemReportPreview(item),
+                      child: Text('预览', style: clickStyle),
+                    ),
+                    SizedBox(width: 8),
+                    GestureDetector(
+                      onTap: () => vm.onClickItemReportDownload(item),
+                      child: Text('下载', style: clickStyle),
+                    ),
+                  ],
+                )
                     : Text('无')),
               ],
             );
@@ -241,9 +247,7 @@ class PatientDetailPage extends StatelessWidget {
                 fontSize: 20, color: textColor, fontWeight: FontWeight.w500)),
       ),
       const SizedBox(height: 4),
-      vm.isExpanded
-          ? loadingPageStatusWidget
-          : Expanded(child: loadingPageStatusWidget)
+      Expanded(child: loadingPageStatusWidget)
     ];
   }
 
@@ -255,12 +259,9 @@ class PatientDetailPage extends StatelessWidget {
           label: Text('   评估时间   ',
               style: titleStyle, textAlign: TextAlign.center)),
       DataColumn(
-        columnWidth: FixedColumnWidth(130),
-        label: Text('评估类型', style: titleStyle, textAlign: TextAlign.center),
-      ),
-      DataColumn(
         columnWidth: FixedColumnWidth(160),
-        label: Text('评估 - 部位', style: titleStyle, textAlign: TextAlign.center),
+        label: Text(
+            '评估 - 部位', style: titleStyle, textAlign: TextAlign.center),
       ),
       DataColumn(
         columnWidth: FixedColumnWidth(140),

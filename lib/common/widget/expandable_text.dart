@@ -2,7 +2,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 
-typedef OnExpandableChange = void Function(bool isExpanded);
+typedef OnExpandableChange = bool Function(bool isExpanded);
 
 class SelectableExpandableText extends StatefulWidget {
   final String text;
@@ -44,8 +44,10 @@ class _SelectableExpandableTextState extends State<SelectableExpandableText> {
       style: TextStyle(color: widget.linkTextColor),
       recognizer: TapGestureRecognizer()
         ..onTap = () {
-          _isExpanded = !isExpanded;
-          widget.onExpandableChange?.call(_isExpanded);
+          if (widget.onExpandableChange == null ||
+              widget.onExpandableChange!(_isExpanded) == true) {
+            _isExpanded = !isExpanded;
+          }
           setState(() {});
         },
     );

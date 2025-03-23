@@ -27,7 +27,7 @@ class ChartLineViewModel extends LoadingPageStatusViewModel {
   int _dataSecond = 0;
   int _page_size = 3;
 
-  bool get _hasMore => _dataSecond < channelMeta.second;
+  bool get _hasMore => _dataSecond < channelMeta.totalSecond;
 
   int get _nextPage => (_dataSecond / _page_size).toInt() + 1;
   bool _isLoadingMore = false;
@@ -50,7 +50,7 @@ class ChartLineViewModel extends LoadingPageStatusViewModel {
   void initData() async {
     setPageStatus(PageStatus.loading);
     var response = await _rawLoadData(
-        page_size: min(channelMeta.second - _dataSecond, _page_size), page: 1);
+        page_size: min(channelMeta.totalSecond - _dataSecond, _page_size), page: 1);
     if (response.ok) {
       if (response.data != null) {
         Channels channelsData = Channels.fromJson(response.data!);
@@ -80,11 +80,12 @@ class ChartLineViewModel extends LoadingPageStatusViewModel {
   Future<ResponseData> _rawLoadData(
       {required int page, required int page_size}) async {
     return HttpService.post('/api/v1/eeg-data', data: {
-      "data_id": channelMeta.data_id,
+      "data_id": channelMeta.dataId,
       "page": page,
       "drop_rate": 1,
+      "patient_evaluation_id": channelMeta.patientEvaluationId,
       "page_size": page <= 1 ? _page_size * 3 : _page_size, //第一次请求3页
-      "data_type": channelMeta.data_type,
+      "data_type": channelMeta.dataType,
       "channels": channelMeta.channelJoin
     });
   }
@@ -168,8 +169,8 @@ class ChartLineViewModel extends LoadingPageStatusViewModel {
   void _loadMoreData() async {
     showLoading();
     var response = await _rawLoadData(page_size: _page_size, page: _nextPage);
-    if (response.data.isNotEmpty) {
-      channels = mergeChannels(channels, response.data);
+    if (response.ok && response.data != null) {
+      channels = mergeChannels(channels, Channels.fromJson(response.data).data);
       totalLine = channels.length;
       totalPoints = channels.isEmpty
           ? 0
@@ -189,18 +190,18 @@ class ChartLineViewModel extends LoadingPageStatusViewModel {
   }
 
   List<Channel> mergeChannels(List<Channel> list1, List<Channel> list2) {
-    Map<int, Channel> channelMap = {};
+    Map<String, Channel> channelMap = {};
 
     // 遍历第一个列表，将元素添加到 Map 中
     for (var channel in list1) {
-      channelMap[channel.channel] = channel;
+      channelMap[channel.channelName] = channel;
     }
 
     // 遍历第二个列表，检查是否已经存在于 Map 中
     for (var channel in list2) {
-      if (channelMap.containsKey(channel.channel)) {
+      if (channelMap.containsKey(channel.channelName)) {
         // 合并 data 列表
-        var existingChannel = channelMap[channel.channel];
+        var existingChannel = channelMap[channel.channelName];
 
         existingChannel!.data.addAll(channel.data);
         // 计算新的 max 和 min
@@ -212,7 +213,7 @@ class ChartLineViewModel extends LoadingPageStatusViewModel {
             : channel.min;
       } else {
         // 如果不存在，则添加到 Map 中
-        channelMap[channel.channel] = channel;
+        channelMap[channel.channelName] = channel;
       }
     }
 

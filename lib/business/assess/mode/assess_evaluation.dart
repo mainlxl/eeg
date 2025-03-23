@@ -98,6 +98,19 @@ class EvaluationMetaInfo {
   final int version;
   final String evaluateReport;
 
+  MetaItemInfo? findMetaInfoByType(String dataType) {
+    if (dataType == irData.dataType) {
+      return irData;
+    } else if (dataType == eegData.dataType) {
+      return eegData;
+    } else if (dataType == emgData.dataType) {
+      return emgData;
+    } else if (dataType == imuData.dataType) {
+      return imuData;
+    }
+    return null;
+  }
+
   EvaluationMetaInfo({
     required this.irData,
     required this.version,
@@ -171,6 +184,7 @@ class MetaItemInfo {
   final int sampleRate;
   final String dataOriPath;
   final bool evaluateState;
+  final int totalSecond;
 
   MetaItemInfo({
     required this.dataId,
@@ -180,6 +194,7 @@ class MetaItemInfo {
     required this.sampleRate,
     required this.dataOriPath,
     required this.evaluateState,
+    required this.totalSecond,
   });
 
   bool get hasDate => dataId.isNotEmpty;
@@ -193,6 +208,7 @@ class MetaItemInfo {
       dataType: json['data_type'] ?? '',
       channelNum: json['channel_num'] ?? 0,
       sampleRate: json['sample_rate'] ?? 0,
+      totalSecond: json['total_second'] ?? 0,
       dataOriPath: json['data_ori_path'] ?? '',
       evaluateState: json['evaluate_state'] ?? false,
     );

@@ -1,8 +1,8 @@
 import 'package:easy_localization/easy_localization.dart';
-import 'package:eeg/business/chart/page/chart_page.dart';
 import 'package:eeg/business/user/viewmodel/login_view_model.dart';
 import 'package:eeg/common/app_colors.dart';
 import 'package:eeg/common/font_family.dart';
+import 'package:eeg/common/widget/drag_to_move_area_widget.dart';
 import 'package:eeg/common/widget/title_bar.dart';
 import 'package:eeg/core/base/view_model_builder.dart';
 import 'package:fluent_ui/fluent_ui.dart' as fluent;
@@ -14,7 +14,8 @@ class LoginPage extends BasePage {
 
   @override
   Widget build(BuildContext context) {
-    return DragToMoveArea(
+    return DragToMoveWidget(
+      enableDoubleTap: true,
       child: Container(
         decoration: const BoxDecoration(
           image: DecorationImage(

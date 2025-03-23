@@ -1,18 +1,18 @@
 import 'package:eeg/business/home/page/home_page.dart';
 import 'package:eeg/business/test/page/test_widget.dart';
 import 'package:eeg/business/test/viewmodel/home_test_viewmodel.dart';
+import 'package:eeg/common/widget/drag_to_move_area_widget.dart';
 import 'package:eeg/common/widget/left_menu_page.dart';
 import 'package:eeg/core/base/view_model_builder.dart';
 import 'package:fluent_ui/fluent_ui.dart';
 import 'package:provider/provider.dart';
-import 'package:window_manager/window_manager.dart';
 
 class TestHomePage extends StatelessWidget {
   const TestHomePage({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return DragToMoveArea(
+    return DragToMoveWidget(
       child: Container(
         color: const Color(0xFFF5F5F5),
         child: ViewModelBuilder(

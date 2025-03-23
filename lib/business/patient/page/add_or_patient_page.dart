@@ -3,6 +3,7 @@ import 'package:eeg/business/chart/page/chart_page.dart';
 import 'package:eeg/business/patient/mode/patient_info_mode.dart';
 import 'package:eeg/business/patient/viewmodel/add_patient_view_model.dart';
 import 'package:eeg/common/app_colors.dart';
+import 'package:eeg/common/widget/drag_to_move_area_widget.dart';
 import 'package:eeg/core/base/view_model_builder.dart';
 import 'package:eeg/core/utils/id_card_check_utils.dart';
 import 'package:eeg/core/utils/phone_utils.dart';
@@ -16,7 +17,7 @@ class AddPatientPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return DragToMoveArea(
+    return DragToMoveWidget(
       child: ViewModelBuilder<AddPatientViewModel>(
         create: () => AddPatientViewModel(this.patient),
         child: Consumer<AddPatientViewModel>(

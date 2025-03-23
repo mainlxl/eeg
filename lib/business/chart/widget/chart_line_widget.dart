@@ -2,6 +2,7 @@ import 'package:eeg/business/chart/mode/channel_page_data.dart';
 import 'package:eeg/common/app_colors.dart';
 import 'package:fluent_ui/fluent_ui.dart';
 
+/// 折线
 class ChannelLineChartPainter extends CustomPainter {
   final Channel data;
   late final int maxShowCount;
@@ -63,7 +64,7 @@ class ChannelLineChartPainter extends CustomPainter {
   void drawChannelName(
       Canvas canvas, Size size, Offset position, bool isStart) {
     var channelName = data.channelName;
-    if (channelName?.isNotEmpty == true) {
+    if (channelName.isNotEmpty) {
       TextPainter textPainter = TextPainter(
         text: TextSpan(
           text: channelName,

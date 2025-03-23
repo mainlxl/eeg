@@ -15,22 +15,19 @@ class Channels {
 
 class Channel {
   Channel({
-    required this.channel,
     required this.channelName,
     required this.data,
     required this.max,
     required this.min,
   });
 
-  int channel;
-  String? channelName;
+  String channelName;
   List<double> data;
   double max;
   double min;
 
   factory Channel.fromJson(Map<String, dynamic> json) => Channel(
-        channel: json["channel"] ?? 0,
-        channelName: json["channel_name"],
+        channelName: json["channel_name"] ?? '',
         data: json["data"] == null
             ? []
             : List<double>.from(json["data"]!.map((x) => x.toDouble())),
@@ -38,11 +35,13 @@ class Channel {
         min: json["min"]?.toDouble() ?? 0,
       );
 
-  Map<String, dynamic> toJson() => {
-        "channel": channel,
-        "channel_name": channelName,
-        "data": data,
-        "max": max,
-        "min": min,
-      };
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is Channel &&
+          runtimeType == other.runtimeType &&
+          channelName == other.channelName;
+
+  @override
+  int get hashCode => channelName.hashCode;
 }

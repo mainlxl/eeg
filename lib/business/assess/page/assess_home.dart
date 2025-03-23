@@ -1,11 +1,11 @@
 import 'package:eeg/business/assess/viewmodel/assess_home_view_model.dart';
 import 'package:eeg/business/patient/mode/patient_info_mode.dart';
 import 'package:eeg/common/app_colors.dart';
+import 'package:eeg/common/widget/drag_to_move_area_widget.dart';
 import 'package:eeg/core/base/view_model_builder.dart';
 import 'package:fluent_ui/fluent_ui.dart' as fluent;
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:window_manager/window_manager.dart';
 
 class AssessHomePage extends StatelessWidget {
   Patient? patient;
@@ -14,7 +14,7 @@ class AssessHomePage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return DragToMoveArea(
+    return DragToMoveWidget(
       child: ViewModelBuilder(
         create: () => AssessHomeViewModel(patient),
         child: Consumer<AssessHomeViewModel>(

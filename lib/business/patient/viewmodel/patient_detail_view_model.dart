@@ -7,6 +7,7 @@ import 'package:eeg/business/chart/mode/channels_meta_data.dart';
 import 'package:eeg/business/chart/page/chart_page.dart';
 import 'package:eeg/business/patient/mode/patient_info_mode.dart';
 import 'package:eeg/business/patient/page/add_or_patient_page.dart';
+import 'package:eeg/common/app_colors.dart';
 import 'package:eeg/common/widget/loading_status_page.dart';
 import 'package:eeg/core/base/view_model_builder.dart';
 import 'package:eeg/core/network/http_service.dart';
@@ -97,11 +98,6 @@ class PatientDetailViewModel extends LoadingPageStatusViewModel {
     //     channelMeta: channelMeta));
   }
 
-  void onExpandableChange(bool isExpanded) {
-    this.isExpanded = isExpanded;
-    notifyListeners();
-  }
-
   void onClickShowAssessDialog() async {
     assessHomePageManager.addNextPage(
         title: '选择评估部位',
@@ -125,7 +121,7 @@ class PatientDetailViewModel extends LoadingPageStatusViewModel {
     _onUpdateOrInsertEvaluationByPatientId(item.patientEvaluationId);
   }
 
-  Future<void> _onUpdateOrInsertEvaluationByPatientId(
+  Future<Evaluation?> _onUpdateOrInsertEvaluationByPatientId(
       int patientEvaluationId) async {
     var post = await HttpService.post(
       '/api/v1/patients/evaluate/GetPatientEvaluate',
@@ -145,7 +141,9 @@ class PatientDetailViewModel extends LoadingPageStatusViewModel {
         evaluationtList.add(data);
         notifyListeners();
       }
+      return data;
     }
+    return null;
   }
 
   /// 点击分析
@@ -157,14 +155,28 @@ class PatientDetailViewModel extends LoadingPageStatusViewModel {
   /// 点击预览报告
   void onClickItemReportPreview(Evaluation item) {}
 
-  /// 点击分析
-  void onClickItemAnalyze(Evaluation item, MetaItemInfo emgData) {
+  /// 点击数据展示
+  void onClickItemAnalyze(Evaluation item, MetaItemInfo metaInfo) async {
+    MetaItemInfo meta = metaInfo;
+    if (meta.channels == null || meta.channels?.isEmpty == true) {
+      Evaluation? data = await _onUpdateOrInsertEvaluationByPatientId(
+          item.patientEvaluationId);
+      var newMeta = data?.metaInfo?.findMetaInfoByType(metaInfo.dataType);
+      var newChannels = newMeta?.channels;
+      if (newMeta == null || newChannels == null || newChannels.isEmpty) {
+        "数据正在解析,中请稍后再试!!!".toast;
+        return;
+      }
+      meta = newMeta;
+    }
     context.push((ctx) => EegLineChart(
-        title: '${patient.name}:${emgData.dataType}:${emgData.dataId}',
+        title: '${patient.name}:${metaInfo.dataType}:${metaInfo.dataId}',
         channelMeta: ChannelMeta(
-          data_id: emgData.dataId,
-          data_type: emgData.dataType,
-          channels: emgData.channels,
+          dataId: meta.dataId,
+          dataType: meta.dataType,
+          patientEvaluationId: item.patientEvaluationId,
+          channels: meta.channels,
+          totalSecond: meta.totalSecond,
         )));
   }
 
@@ -173,6 +185,41 @@ class PatientDetailViewModel extends LoadingPageStatusViewModel {
     if (patient.id == event.patientId) {
       _onUpdateOrInsertEvaluationByPatientId(event.patientEvaluationId);
     }
+  }
+
+  void onExpandableClick() {
+    showShadDialog<bool?>(
+      context: context,
+      builder: (context) => Container(
+        margin: const EdgeInsets.all(40),
+        decoration: BoxDecoration(
+          color: bgColor,
+          borderRadius: BorderRadius.circular(15),
+        ),
+        child: Column(
+          children: [
+            Row(
+              mainAxisSize: MainAxisSize.max,
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text("  病史:"),
+                IconButton(
+                  icon: const Icon(Icons.close),
+                  onPressed: () {
+                    context.pop(); // 关闭页面
+                  },
+                ),
+              ],
+            ),
+            Expanded(
+              child: SingleChildScrollView(
+                  padding: const EdgeInsets.symmetric(horizontal: 15),
+                  child: SelectableText('  ${patient.medicalHistory}')),
+            ),
+          ],
+        ),
+      ),
+    );
   }
 }
 

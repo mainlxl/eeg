@@ -1,7 +1,7 @@
 import 'package:eeg/business/assess/mode/assess_data.dart';
 import 'package:eeg/business/assess/viewmodel/assess_view_model.dart';
-import 'package:eeg/business/chart/page/chart_page.dart';
 import 'package:eeg/business/patient/mode/patient_info_mode.dart';
+import 'package:eeg/common/widget/drag_to_move_area_widget.dart';
 import 'package:eeg/common/widget/left_menu_page.dart';
 import 'package:eeg/common/widget/video_widget.dart';
 import 'package:eeg/core/base/view_model_builder.dart';
@@ -24,7 +24,7 @@ class AssessPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return DragToMoveArea(
+    return DragToMoveWidget(
       child: ViewModelBuilder<AssessViewModel>(
         create: () => AssessViewModel(patient, selectedCategory,
             selectedSubCategory, assessInspectionPoint),

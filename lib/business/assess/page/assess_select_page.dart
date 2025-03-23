@@ -3,6 +3,7 @@ import 'package:eeg/business/assess/viewmodel/assess_select_view_model.dart';
 import 'package:eeg/business/chart/page/chart_page.dart';
 import 'package:eeg/business/patient/mode/patient_info_mode.dart';
 import 'package:eeg/common/app_colors.dart';
+import 'package:eeg/common/widget/drag_to_move_area_widget.dart';
 import 'package:eeg/common/widget/enable_widget.dart';
 import 'package:eeg/common/widget/loading_status_page.dart';
 import 'package:eeg/core/utils/router_utils.dart';
@@ -17,7 +18,7 @@ class AssessSelectPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = ShadTheme.of(context);
-    return DragToMoveArea(
+    return DragToMoveWidget(
       child: GestureDetector(
         behavior: HitTestBehavior.translucent,
         onTap: context.popPage,

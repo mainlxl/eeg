@@ -1,3 +1,4 @@
+import 'package:eeg/common/widget/drag_to_move_area_widget.dart';
 import 'package:eeg/core/utils/config.dart';
 import 'package:fluent_ui/fluent_ui.dart';
 import 'package:window_manager/window_manager.dart';
@@ -22,7 +23,8 @@ class TitleBar extends StatelessWidget {
               height: height,
               child: isWeb
                   ? child
-                  : DragToMoveArea(
+                  : DragToMoveWidget(
+                      enableDoubleTap: true,
                       child: SizedBox(
                         width: constraints.maxWidth,
                         height: height,
