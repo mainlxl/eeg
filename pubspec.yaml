@@ -67,7 +67,6 @@ flutter:
       fonts:
         - asset: fonts/Siyuan-Light.otf
   assets:
-    - assets/
     - images/background/
     - images/loading/
     - logo/logo.png

@@ -40,4 +40,10 @@ class LoginViewModel extends BaseViewModel {
     showDialog(context: context, builder: (context) => RegisterPage());
     // context?.pushPage('register');
   }
+
+  @override
+  bool onClickClose() {
+    return false;
+  }
+
 }
