@@ -47,7 +47,7 @@ class AssessPage extends StatelessWidget {
             constraints: BoxConstraints.expand(),
             color: Colors.white,
             alignment: Alignment.center,
-            child: _renderResource(vm, data, '${data.dataPath}/${item}'),
+            child: _renderResource(vm, data, '${data.dataPath}/$item'),
           ),
         );
       }).toList(),

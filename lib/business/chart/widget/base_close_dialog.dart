@@ -33,7 +33,7 @@ abstract class BaseCloseDialog extends StatelessWidget {
 
   Widget buildContentWidget();
 
-  Widget? buildTitleWidget() {}
+  Widget? buildTitleWidget() => null;
 
   void _onClickClose(BuildContext context) {
     Navigator.pop(context);

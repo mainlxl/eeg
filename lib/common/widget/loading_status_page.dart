@@ -4,7 +4,7 @@ import 'package:eeg/core/base/view_model_builder.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
-enum PageStatus { idle, loading, error, empty, loading_success }
+enum PageStatus { idle, loading, error, empty, loadingSuccess }
 
 class LoadingPageStatusViewModel extends BaseViewModel {
   PageStatus _pageStatus = PageStatus.idle;
@@ -116,11 +116,7 @@ Container _buildGeneralTapView({
             ),
             SizedBox(height: 20),
             if (onTap != null)
-              BorderRedBtnWidget(
-                content: "重新加载",
-                onClick: onTap,
-                padding: 40.0,
-              ),
+              BorderRedBtnWidget(content: "重新加载", onClick: onTap),
           ],
         ),
       ),
@@ -131,19 +127,13 @@ Container _buildGeneralTapView({
 class BorderRedBtnWidget extends StatelessWidget {
   const BorderRedBtnWidget({
     super.key,
-    padding = 16.0,
-    radius = 19.0,
     @required content,
     @required onClick,
   })  : _content = content,
-        _padding = padding,
-        _onClick = onClick,
-        _radius = radius;
+        _onClick = onClick;
 
   final String _content;
-  final double _padding;
   final VoidCallback _onClick;
-  final double _radius; //圆角
 
   @override
   Widget build(BuildContext context) {

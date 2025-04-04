@@ -8,9 +8,9 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 class AssessHomePage extends StatelessWidget {
-  Patient? patient;
+  final Patient? patient;
 
-  AssessHomePage({super.key, this.patient});
+  const AssessHomePage({super.key, this.patient});
 
   @override
   Widget build(BuildContext context) {

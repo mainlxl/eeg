@@ -34,7 +34,7 @@ class AssessSelectViewModel extends LoadingPageStatusViewModel {
         await HttpService.get('/api/v1/patients/evaluate/classfy_list');
     if (response.status == 0) {
       data = AssessCategoryJson.fromJson(response.data).config;
-      setPageStatus(PageStatus.loading_success);
+      setPageStatus(PageStatus.loadingSuccess);
     } else {
       setPageStatus(PageStatus.error);
     }

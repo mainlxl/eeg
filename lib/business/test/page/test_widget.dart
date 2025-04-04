@@ -1,4 +1,3 @@
-import 'package:eeg/core/network/http_service.dart';
 import 'package:flutter/material.dart';
 
 class TestPage extends StatelessWidget {
@@ -18,8 +17,7 @@ class TestPage extends StatelessWidget {
   }
 
   void _onClick() {
-    var future = HttpService.get("/api/v1/patients/evaluate/feature_meta/");
-    print('Mainli - TestPage._onClick - future: $future');
+    // var future = HttpService.get("/api/v1/patients/evaluate/feature_meta/");
   }
 }
 
@@ -62,7 +60,6 @@ class MyDataSource extends DataTableSource {
   @override
   DataRow getRow(int index) {
     assert(index >= 0);
-    if (index >= _data.length) return null!;
     final myData = _data[index];
     return DataRow(cells: [
       DataCell(Text(myData.id.toString())),

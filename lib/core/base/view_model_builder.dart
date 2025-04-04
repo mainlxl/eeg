@@ -47,7 +47,7 @@ class _ViewModelBuilderState<T extends BaseViewModel>
   @override
   void dispose() {
     windowManager.removeListener(this);
-    WidgetsBinding.instance.removeObserver(this); // 移除观察者
+    WidgetsBinding.instance.removeObserver(this);
     if (!_viewModel.isDisposed) {
       _viewModel.dispose();
     }
@@ -56,7 +56,6 @@ class _ViewModelBuilderState<T extends BaseViewModel>
 
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
-    // 监听生命周期状态的变化
     switch (state) {
       case AppLifecycleState.resumed:
         _viewModel.onPageResume();

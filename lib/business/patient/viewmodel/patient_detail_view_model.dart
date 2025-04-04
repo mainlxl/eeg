@@ -76,7 +76,7 @@ class PatientDetailViewModel extends LoadingPageStatusViewModel {
       var listFromJson = Evaluation.listFromJson(jsonList);
       evaluationtList = listFromJson;
       setPageStatus(evaluationtList.isNotEmpty
-          ? PageStatus.loading_success
+          ? PageStatus.loadingSuccess
           : PageStatus.empty);
     } else {
       setPageStatus(PageStatus.error);

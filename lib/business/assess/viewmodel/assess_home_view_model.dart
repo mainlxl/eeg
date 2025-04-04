@@ -72,7 +72,7 @@ class AssessHomeViewModel extends BaseViewModel {
     if (items.length > 1) {
       var old = items[1];
       items[1] = fluent.BreadcrumbItem(
-        label: _buildTitle('用户:${name}'),
+        label: _buildTitle('用户:$name'),
         value: old.value,
       );
       notifyListeners();

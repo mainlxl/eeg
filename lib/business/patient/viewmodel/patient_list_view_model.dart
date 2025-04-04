@@ -33,7 +33,7 @@ class PatientListViewModel extends LoadingPageStatusViewModel {
             .map((item) => Patient.fromJson(item as Map<String, dynamic>))
             .toList();
         if (enableLoadingPage) {
-          setPageStatus(PageStatus.loading_success);
+          setPageStatus(PageStatus.loadingSuccess);
         } else {
           notifyListeners();
         }

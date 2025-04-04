@@ -93,18 +93,18 @@ class AssessUploadViewModel extends BaseViewModel {
           {
             'metadata': '''
             {
-              "patient_evaluation_id": ${patientEvaluationId},
-              "patient_id": ${patientId},
+              "patient_evaluation_id": $patientEvaluationId,
+              "patient_id": $patientId,
               "sample_rate": ${sampleRateController.text},
-              "file_type": "${fileType}",
-              "data_type": "${dataType}",
-              "data_varify": "${dataSha256}",
-              "data_size": ${dataSize}
+              "file_type": "$fileType",
+              "data_type": "$dataType",
+              "data_varify": "$dataSha256",
+              "data_size": $dataSize
             }
             ''',
             'file': await MultipartFile.fromFile(
               path,
-              filename: '${DateTime.now().millisecondsSinceEpoch}.${fileType}',
+              filename: '${DateTime.now().millisecondsSinceEpoch}.$fileType',
             ),
           },
         ),
@@ -160,7 +160,9 @@ class AssessUploadViewModel extends BaseViewModel {
           },
         );
         if (!nextContinue) {
-          context.popPage(true);
+          if (mounted) {
+            context.popPage(true);
+          }
         } else {
           selectedFile = null;
           sampleRateController.clear();
@@ -174,7 +176,7 @@ class AssessUploadViewModel extends BaseViewModel {
       }
     } on TimeoutException {
       '请求超时，请检查网络'.toast;
-    } on http.ClientException catch (e) {
+    } on http.ClientException {
       '网络错误'.toast;
     } catch (e) {
       '发生未知错误: $e'.toast;

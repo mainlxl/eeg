@@ -4,9 +4,9 @@ import 'package:shadcn_ui/shadcn_ui.dart';
 class MultiLevelSelectionBox extends StatelessWidget {
   MultiLevelSelectionBox({super.key});
 
-  ShadSelectController<String> controller1 = ShadSelectController();
-  ShadSelectController<String> controller2 = ShadSelectController();
-  ShadSelectController<String> controller3 = ShadSelectController();
+  final ShadSelectController<String> controller1 = ShadSelectController();
+  final ShadSelectController<String> controller2 = ShadSelectController();
+  final ShadSelectController<String> controller3 = ShadSelectController();
 
   @override
   Widget build(BuildContext context) {

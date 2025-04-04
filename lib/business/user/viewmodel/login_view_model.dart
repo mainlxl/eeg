@@ -25,9 +25,10 @@ class LoginViewModel extends BaseViewModel {
     var post = await HttpService.post('/api/v1/login',
         data: {"username": username, "password": password.md5});
     hideLoading();
-    var responseData = post?.data as Map<String, dynamic>?;
-    if (responseData != null) {
-      if (await UserInfo.checkAndSaveLoginInfo(responseData)) {
+    if (post.ok) {
+      var responseData = post.data as Map<String, dynamic>?;
+      if (responseData != null &&
+          await UserInfo.checkAndSaveLoginInfo(responseData)) {
         showToast("登录成功");
         context.pushReplacementNamed('/home');
         return;
@@ -45,5 +46,4 @@ class LoginViewModel extends BaseViewModel {
   bool onClickClose() {
     return false;
   }
-
 }

@@ -52,13 +52,13 @@ dependencies:
   # https://bdlukaa.github.io/fluent_ui/
   fluent_ui: ^4.9.2
   #https://flutter-shadcn-ui.mariuti.com/
-  shadcn_ui: ^0.23.1
+  shadcn_ui: ^0.24.0
   # 视频播放
   media_kit: ^1.1.5
   media_kit_video: ^1.2.5
   media_kit_libs_video: ^1.0.5
   data_table_2: ^2.6.0
-  file_picker: ^9.2.1
+  file_picker: ^10.0.0
 
 # 升级所有库版本到最新 flutter pub upgrade --major-versions
 

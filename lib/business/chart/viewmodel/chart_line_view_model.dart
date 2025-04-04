@@ -68,7 +68,7 @@ class ChartLineViewModel extends LoadingPageStatusViewModel {
                 .data
                 .length;
         _dataSecond = _page_size;
-        setPageStatus(PageStatus.loading_success);
+        setPageStatus(PageStatus.loadingSuccess);
       } else {
         setPageStatus(PageStatus.empty);
       }

@@ -8,9 +8,9 @@ import 'package:flutter/material.dart';
 typedef PatientCallback = void Function(Patient);
 
 class PatientListSelectPage extends StatelessWidget {
-  PatientCallback onSelect;
+  final PatientCallback onSelect;
 
-  PatientListSelectPage({super.key, required this.onSelect});
+  const PatientListSelectPage({super.key, required this.onSelect});
 
   @override
   Widget build(BuildContext context) {
@@ -19,7 +19,7 @@ class PatientListSelectPage extends StatelessWidget {
         buildPageContent: (ctx, vm) => Scaffold(
               backgroundColor: bgColor,
               floatingActionButton: Visibility(
-                visible: vm.pageStatus == PageStatus.loading_success,
+                visible: vm.pageStatus == PageStatus.loadingSuccess,
                 child: FloatingActionButton(
                   onPressed: () => showDialog(
                     context: context,
@@ -74,7 +74,6 @@ class PatientListSelectPage extends StatelessWidget {
                 ],
               ),
             ));
-    ;
   }
 
   String avatarName(Patient patient) =>
