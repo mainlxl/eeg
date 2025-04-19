@@ -1,7 +1,7 @@
 import 'package:fluent_ui/fluent_ui.dart';
 import 'package:flutter/material.dart' as material;
 
-abstract class BaseCloseDialog extends StatelessWidget {
+abstract class BaseCloseDialog<T> extends StatelessWidget {
   BaseCloseDialog({super.key});
 
   @mustCallSuper
@@ -17,14 +17,14 @@ abstract class BaseCloseDialog extends StatelessWidget {
     );
   }
 
-  show(BuildContext context) {
-    showDialog(
+  Future<T?> show(BuildContext context) async {
+    T? res = await showDialog<T>(
       barrierDismissible: true,
       context: context,
       builder: (ctx) => this,
-    ).then((_) {
-      onCloseDialog();
-    });
+    );
+    onCloseDialog();
+    return res;
   }
 
   List<Widget> actionsWidget() {
@@ -36,8 +36,13 @@ abstract class BaseCloseDialog extends StatelessWidget {
   Widget? buildTitleWidget() => null;
 
   void _onClickClose(BuildContext context) {
-    Navigator.pop(context);
+    Navigator.pop(context, buildResult());
+    onCloseDialog();
   }
 
   void onCloseDialog() {}
+
+  T? buildResult() {
+    return null;
+  }
 }

@@ -16,10 +16,25 @@ import 'package:flutter/services.dart';
 class ChartLineViewModel extends LoadingPageStatusViewModel {
   final ScrollController scrollHorizontalController = ScrollController();
   final ScrollController scrollVerticalController = ScrollController();
-  int totalPoints = 0;
-  int totalLine = 0;
   double? lineTargetHeight;
-  List<Channel> channels = [];
+  List<Channel> _channels = [];
+  Map<String, bool> _channelsSelect = {};
+
+  List<Channel> get channels {
+    if (_channelsSelect.isEmpty) {
+      return _channels;
+    }
+    return _channels
+        .where((name) => _channelsSelect[name.channelName] ?? false)
+        .toList();
+  }
+
+  set channels(List<Channel> value) {
+    _channels = value;
+    _channelsSelect = {};
+  }
+
+  int totalPoints = 0;
   int pointGap = 3;
   double lineHeightMin = 30;
   double lineHeightMax = 300;
@@ -50,19 +65,19 @@ class ChartLineViewModel extends LoadingPageStatusViewModel {
   void initData() async {
     setPageStatus(PageStatus.loading);
     var response = await _rawLoadData(
-        page_size: min(channelMeta.totalSecond - _dataSecond, _page_size), page: 1);
+        page_size: min(channelMeta.totalSecond - _dataSecond, _page_size),
+        page: 1);
     if (response.ok) {
       if (response.data != null) {
         Channels channelsData = Channels.fromJson(response.data!);
-        channels = channelsData.data;
-        if (channels.isEmpty) {
+        _channels = channelsData.data;
+        if (_channels.isEmpty) {
           setPageStatus(PageStatus.empty);
           return;
         }
-        totalLine = channels.length;
-        totalPoints = channels.isEmpty
+        totalPoints = _channels.isEmpty
             ? 0
-            : channels
+            : _channels
                 .reduce((curr, next) =>
                     curr.data.length > next.data.length ? curr : next)
                 .data
@@ -105,8 +120,14 @@ class ChartLineViewModel extends LoadingPageStatusViewModel {
     }
   }
 
-  void onClickChannelFilter() {
-    ChannelFilterDialog(channelMeta: channelMeta).show(context);
+  void onClickChannelFilter() async {
+    if (_channelsSelect.isEmpty) {
+      _channelsSelect = {
+        for (var channel in _channels) channel.channelName: false
+      };
+    }
+    await ChannelFilterDialog(channelSelect: _channelsSelect).show(context);
+    notifyListeners();
   }
 
   void onClickAlgorithm() {
@@ -170,11 +191,11 @@ class ChartLineViewModel extends LoadingPageStatusViewModel {
     showLoading();
     var response = await _rawLoadData(page_size: _page_size, page: _nextPage);
     if (response.ok && response.data != null) {
-      channels = mergeChannels(channels, Channels.fromJson(response.data).data);
-      totalLine = channels.length;
-      totalPoints = channels.isEmpty
+      _channels =
+          mergeChannels(_channels, Channels.fromJson(response.data).data);
+      totalPoints = _channels.isEmpty
           ? 0
-          : channels
+          : _channels
               .reduce((curr, next) =>
                   curr.data.length > next.data.length ? curr : next)
               .data

@@ -25,13 +25,14 @@ class EegLineChart extends StatelessWidget {
           buildPageContent: (ctx, vm) {
             return LayoutBuilder(
               builder: (context, constraints) {
-                var maxWidth = constraints.maxWidth;
-                var maxHeight = constraints.maxHeight;
+                final maxWidth = constraints.maxWidth;
+                final maxHeight = constraints.maxHeight;
                 // int countByWidth = (maxWidth / vm.pointGap).ceil();
+                final channels = vm.channels;
+                final totalLine = channels.length;
                 double lineHeight = vm.lineTargetHeight ??=
-                    max(maxHeight / vm.totalLine, vm.lineHeightMin);
-                var canvasWidth = vm.canvasWidth;
-                var channels = vm.channels;
+                    max(maxHeight / totalLine, vm.lineHeightMin);
+                final canvasWidth = vm.canvasWidth;
                 return Column(
                   children: [
                     SizedBox(
@@ -64,7 +65,7 @@ class EegLineChart extends StatelessWidget {
                                                   vm.scrollVerticalController,
                                               physics:
                                                   ClampingScrollPhysics(), // 去掉弹性效果
-                                              itemCount: vm.totalLine,
+                                              itemCount: channels.length,
                                               itemBuilder: (context, index) =>
                                                   CustomPaint(
                                                 size: Size(
@@ -156,20 +157,6 @@ Tips:
 
   List<Widget> _buildOption(BuildContext context, ChartLineViewModel vm) {
     return [
-      // _dropDownButtonItems(
-      //   leading: '横坐标间隔',
-      //   title: '${vm.pointGap}',
-      //   items: List<MenuFlyoutItem>.generate(
-      //     10,
-      //     (index) {
-      //       var size = (index + 1) * 3;
-      //       return MenuFlyoutItem(
-      //         text: Text('${size}'),
-      //         onPressed: () => vm.onPointGapChange(size),
-      //       );
-      //     },
-      //   ),
-      // ),
       fluent.Button(
           onPressed: vm.onClickChangeWidth, child: Text('横坐标间隔${vm.pointGap}')),
       fluent.Button(
