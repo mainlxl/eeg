@@ -90,6 +90,11 @@ class AssessHomeViewModel extends BaseViewModel {
     super.dispose();
     assessHomePageManager = AssessHomePageManager();
   }
+
+  @override
+  bool onClickClose() {
+    return false;
+  }
 }
 
 typedef AssessHomePageBuilder = Widget Function(Patient? patient);
