@@ -6,7 +6,7 @@ import 'package:provider/provider.dart';
 
 enum PageStatus { idle, loading, error, empty, loadingSuccess }
 
-class LoadingPageStatusViewModel extends BaseViewModel {
+abstract class LoadingPageStatusViewModel extends BaseViewModel {
   PageStatus _pageStatus = PageStatus.idle;
 
   PageStatus get pageStatus => _pageStatus;
@@ -18,7 +18,7 @@ class LoadingPageStatusViewModel extends BaseViewModel {
     }
   }
 
-  void onClickRetryeLoadingData() {}
+  void onClickRetryeLoadingData();
 }
 
 typedef BuildPageContent<T> = Widget Function(

@@ -206,4 +206,7 @@ class AssessViewModel extends LoadingPageStatusViewModel {
     );
     context.popPage();
   }
+
+  @override
+  void onClickRetryeLoadingData() {}
 }

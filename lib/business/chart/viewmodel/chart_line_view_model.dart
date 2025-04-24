@@ -123,7 +123,7 @@ class ChartLineViewModel extends LoadingPageStatusViewModel {
   void onClickChannelFilter() async {
     if (_channelsSelect.isEmpty) {
       _channelsSelect = {
-        for (var channel in _channels) channel.channelName: false
+        for (var channel in _channels) channel.channelName: true
       };
     }
     await ChannelFilterDialog(channelSelect: _channelsSelect).show(context);

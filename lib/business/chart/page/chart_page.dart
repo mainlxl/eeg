@@ -100,11 +100,14 @@ class EegLineChart extends StatelessWidget {
                         ),
                       ),
                     ),
-                    SizedBox(
-                      height: 30,
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceAround,
-                        children: _buildOption(context, vm),
+                    DragToMoveWidget(
+                      enableDoubleTap: true,
+                      child: SizedBox(
+                        height: 30,
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceAround,
+                          children: _buildOption(context, vm),
+                        ),
                       ),
                     ),
                   ],
@@ -118,6 +121,7 @@ class EegLineChart extends StatelessWidget {
   AppBar _buildAppBar() {
     return AppBar(
       title: DragToMoveWidget(
+          enableDoubleTap: true,
           child: fluent.SizedBox(width: double.infinity, child: Text(title))),
       actions: [
         Builder(builder: (context) {
@@ -163,7 +167,8 @@ Tips:
           onPressed: vm.onClickChangeHeight,
           child: Text('单通道高度${vm.lineTargetHeight?.toStringAsFixed(0)}')),
       fluent.Button(onPressed: vm.onClickChannelFilter, child: Text('通道筛选')),
-      fluent.Button(onPressed: vm.onClickAlgorithm, child: Text('算法')),
+      fluent.Button(onPressed: vm.onClickAlgorithm, child: Text('信号预处理')),
+      fluent.Button(onPressed: vm.onClickAlgorithm, child: Text('特征处理计算')),
     ];
   }
 }

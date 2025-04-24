@@ -1,7 +1,13 @@
+import 'package:eeg/business/chart/mode/channel_alagorithm.dart';
 import 'package:eeg/business/chart/mode/channels_meta_data.dart';
 import 'package:eeg/business/chart/widget/base_close_dialog.dart';
+import 'package:eeg/common/app_colors.dart';
+import 'package:eeg/common/widget/loading_status_page.dart';
+import 'package:eeg/core/network/http_service.dart';
+import 'package:eeg/core/utils/size.dart';
 import 'package:fluent_ui/fluent_ui.dart' as fluent;
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 class AlgorithmDialog extends BaseCloseDialog {
   final ChannelMeta channelMeta;
@@ -15,12 +21,26 @@ class AlgorithmDialog extends BaseCloseDialog {
 
   @override
   Widget buildContentWidget() {
-    return ChannelSelector(channels: channelMeta.channels ?? []);
+    return SizedBox(
+      width: SizeUtils.screenWidth * 0.8,
+      height: SizeUtils.screenHeight * 0.8,
+      child: LoadingPageStatusWidget<AlgorithmViewModel>(
+        createOrGetViewMode: () => AlgorithmViewModel(),
+        buildPageContent: (ctx, vm) {
+          return Consumer<AlgorithmViewModel>(builder: (context, vm, _) {
+            return ListView.builder(
+                itemCount: vm.data.length,
+                itemBuilder: (_, index) =>
+                    AlgorithmItemWidget(datum: vm.data[index]));
+          });
+        },
+      ),
+    );
   }
 
   @override
   Widget? buildTitleWidget() {
-    return const Text("算法选择");
+    return const Text("特征处理计算");
   }
 
   @override
@@ -31,71 +51,112 @@ class AlgorithmDialog extends BaseCloseDialog {
   }
 }
 
-class ChannelSelector extends StatefulWidget {
-  final List<String>? channels;
-
-  ChannelSelector({Key? key, required this.channels}) : super(key: key);
+class AlgorithmViewModel extends LoadingPageStatusViewModel {
+  late List<AlgorithmDatum> data;
 
   @override
-  _ChannelSelectorState createState() => _ChannelSelectorState();
-}
+  void init() async {
+    super.init();
+    await _loadData();
+  }
 
-class _ChannelSelectorState extends State<ChannelSelector> {
-  List<bool> _selectedChannels = [];
-
-  @override
-  void initState() {
-    super.initState();
-    // 初始化复选框状态
-    if (widget.channels != null) {
-      _selectedChannels = List<bool>.filled(widget.channels!.length, false);
+  Future<void> _loadData() async {
+    setPageStatus(PageStatus.loading);
+    ResponseData response =
+        await HttpService.get('/api/v1/patients/evaluate/feature_meta');
+    if (response.ok) {
+      setPageStatus(PageStatus.loadingSuccess);
+      data = AlgorithmDatum.listFromJson(response.data);
+    } else {
+      setPageStatus(PageStatus.error);
     }
   }
 
-  // 获取最终选择的频道
-  List<String> getSelectedChannels() {
-    List<String> selected = [];
-    for (int i = 0; i < _selectedChannels.length; i++) {
-      if (_selectedChannels[i]) {
-        selected.add(widget.channels![i]);
-      }
-    }
-    return selected;
-  }
-
   @override
-  Widget build(BuildContext context) {
-    return Center(child: Text('没有频道可供选择'));
+  void onClickRetryeLoadingData() {
+    _loadData();
   }
 }
 
-class CustomCheckboxListTile extends StatelessWidget {
-  final String title;
-  final bool value;
-  final ValueChanged<bool?> onChanged;
+class AlgorithmItemWidget extends StatelessWidget {
+  final AlgorithmDatum datum;
 
-  const CustomCheckboxListTile({
-    Key? key,
-    required this.title,
-    required this.value,
-    required this.onChanged,
-  }) : super(key: key);
+  const AlgorithmItemWidget({super.key, required this.datum});
 
   @override
   Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: () {
-        onChanged(!value);
-      },
-      child: Row(
+    return Theme(
+      data: ThemeData().copyWith(
+        dividerColor: Colors.transparent, // 隐藏默认分割线
+      ),
+      child: ExpansionTile(
+        childrenPadding: EdgeInsets.only(left: 20),
+        title: Text('${datum.category}',
+            style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w400)),
+        iconColor: iconColor,
+        collapsedIconColor: iconColor,
+        leading: const Icon(
+          Icons.category,
+          color: iconColor,
+        ),
         children: [
-          Checkbox(
-            value: value,
-            onChanged: onChanged,
+          Container(
+            decoration: BoxDecoration(
+              border: Border(left: BorderSide(color: subtitleColor)),
+            ),
+            child: ListView.builder(
+              shrinkWrap: true, // 关键！防止滚动冲突
+              physics: NeverScrollableScrollPhysics(), // 禁止子列表独立滚动
+              itemCount: datum.features.length,
+              itemBuilder: (context, featureIndex) {
+                return ExpansionTile(
+                    childrenPadding: EdgeInsets.only(left: 20),
+                    title: Text(datum.features[featureIndex].name),
+                    leading: const Icon(
+                      Icons.featured_play_list,
+                      color: iconColor,
+                    ),
+                    children: datum.features[featureIndex].parameters
+                        .map((param) => _buildFeaturesParametersItem(param))
+                        .toList());
+              },
+            ),
           ),
-          Expanded(
-            child: Text(title),
-          ),
+        ],
+      ),
+    );
+  }
+
+  ListTile _buildFeaturesParametersItem(AlgorithmParameter param) {
+    return ListTile(
+      title: RichText(
+        text: TextSpan(
+          children: [
+            TextSpan(
+              text: "${param.type ?? ''}: ",
+              style: TextStyle(
+                  color: iconColor, fontSize: 18, fontWeight: FontWeight.bold),
+            ),
+            TextSpan(
+              text: param.name ?? '',
+              style: TextStyle(
+                  color: textColor, fontSize: 16, fontWeight: FontWeight.w400),
+            ),
+            TextSpan(
+              text: " (${param.description ?? ''})",
+              style: TextStyle(color: subtitleColor, fontSize: 12),
+            ),
+          ],
+        ),
+        overflow: TextOverflow.ellipsis,
+      ),
+      subtitle: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text("类型: ${param.type}"),
+          Text("默认值: ${param.defaultValue}"),
+          if (param.enums) Text("枚举"),
+          if (param.required) Text("必填"),
         ],
       ),
     );
