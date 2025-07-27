@@ -1,7 +1,9 @@
 import 'package:eeg/business/patient/mode/patient_info_mode.dart';
 import 'package:eeg/business/patient/page/add_or_patient_page.dart';
 import 'package:eeg/business/patient/viewmodel/patient_list_view_model.dart';
+import 'package:eeg/business/user/user_info.dart';
 import 'package:eeg/common/app_colors.dart';
+import 'package:eeg/common/common_dialog.dart';
 import 'package:eeg/common/widget/loading_status_page.dart';
 import 'package:flutter/material.dart';
 
@@ -20,17 +22,29 @@ class PatientListSelectPage extends StatelessWidget {
               backgroundColor: bgColor,
               floatingActionButton: Visibility(
                 visible: vm.pageStatus == PageStatus.loadingSuccess,
-                child: FloatingActionButton(
-                  onPressed: () => showDialog(
-                    context: context,
-                    builder: (context) => Container(
-                        margin: const EdgeInsets.all(15),
-                        child: const AddPatientPage()),
+                child: GestureDetector(
+                  onLongPress: () {
+                    CommonDialog.show(
+                        context: context,
+                        title: '退出登录',
+                        content: '确认要退出登录吗？',
+                        type: DialogType.warning,
+                        confirmButtonText: '取消',
+                        cancelButtonText: '确认',
+                        onCancel: UserInfo.cleanTaskAndPushLoginPage);
+                  },
+                  child: FloatingActionButton(
+                    onPressed: () => showDialog(
+                      context: context,
+                      builder: (context) => Container(
+                          margin: const EdgeInsets.all(15),
+                          child: const AddPatientPage()),
+                    ),
+                    shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(50)),
+                    tooltip: '点击添加用户\n长按退出登录',
+                    child: const Icon(Icons.add),
                   ),
-                  shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(50)),
-                  tooltip: '添加用户',
-                  child: const Icon(Icons.add),
                 ),
               ),
               body: Column(

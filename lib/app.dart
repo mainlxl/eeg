@@ -37,7 +37,7 @@ class MyApp extends StatelessWidget {
       //
       //   ),
       // ),
-      appBuilder: (context, theme) => fluent.FluentApp(
+      appBuilder: (context) => fluent.FluentApp(
         debugShowCheckedModeBanner: false,
         // 关闭右上角的DEBUG标识
         navigatorKey: _navigatorKey,

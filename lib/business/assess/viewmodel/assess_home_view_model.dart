@@ -1,7 +1,7 @@
 import 'package:eeg/app.dart';
 import 'package:eeg/business/patient/mode/patient_info_mode.dart';
 import 'package:eeg/business/patient/page/patient_detail_page.dart';
-import 'package:eeg/business/patient/page/patient_list_select_page.dart';
+import 'package:eeg/business/patient/page/patient_user_list_select_page.dart';
 import 'package:eeg/business/patient/viewmodel/patient_list_view_model.dart';
 import 'package:eeg/common/app_colors.dart';
 import 'package:eeg/core/base/view_model_builder.dart';

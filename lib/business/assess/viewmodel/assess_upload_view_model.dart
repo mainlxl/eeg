@@ -53,7 +53,7 @@ class AssessUploadViewModel extends BaseViewModel {
       await _calculateFileInfo(file);
       final ext = file.path.split('.').last.toLowerCase();
       if (['edf', 'cnt', 'csv'].contains(ext)) {
-        fileTypeControl.value = [ext];
+        fileTypeControl.value = {ext};
       }
       selectedFile = file;
     }
@@ -147,7 +147,7 @@ class AssessUploadViewModel extends BaseViewModel {
                     ]),
                     shadows: [
                       BoxShadow(
-                        color: Colors.blue.withOpacity(.4),
+                        color: Colors.blue.withValues(alpha: .4),
                         spreadRadius: 4,
                         blurRadius: 10,
                         offset: const Offset(0, 2),
@@ -169,8 +169,8 @@ class AssessUploadViewModel extends BaseViewModel {
           dataType = null;
           dataSha256 = null;
           dataSize = null;
-          fileTypeControl.value = [];
-          dataTypeControl.value = [];
+          fileTypeControl.value = {};
+          dataTypeControl.value = {};
           notifyListeners();
         }
       }
