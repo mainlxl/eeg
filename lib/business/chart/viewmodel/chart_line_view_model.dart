@@ -1,10 +1,12 @@
 import 'dart:convert';
 import 'dart:math';
 
+import 'package:eeg/business/chart/dialog/channel_filter_dialog.dart';
+import 'package:eeg/business/chart/dialog/features_algorithm_dialog.dart';
+import 'package:eeg/business/chart/dialog/preprocessing_algorithm_dialog.dart';
+import 'package:eeg/business/chart/mode/channel_alagorithm.dart';
 import 'package:eeg/business/chart/mode/channel_page_data.dart';
 import 'package:eeg/business/chart/mode/channels_meta_data.dart';
-import 'package:eeg/business/chart/widget/algorithm_dialog.dart';
-import 'package:eeg/business/chart/widget/channel_filter_dialog.dart';
 import 'package:eeg/common/widget/loading_status_page.dart';
 import 'package:eeg/common/widget/slider_dialog.dart';
 import 'package:eeg/core/network/http_service.dart';
@@ -94,7 +96,7 @@ class ChartLineViewModel extends LoadingPageStatusViewModel {
 
   Future<ResponseData> _rawLoadData(
       {required int page, required int page_size}) async {
-    return HttpService.post('/api/v1/eeg-data', data: {
+    var data = {
       "data_id": channelMeta.dataId,
       "page": page,
       "drop_rate": 1,
@@ -102,7 +104,14 @@ class ChartLineViewModel extends LoadingPageStatusViewModel {
       "page_size": page <= 1 ? _page_size * 3 : _page_size, //第一次请求3页
       "data_type": channelMeta.dataType,
       "channels": channelMeta.channelJoin
-    });
+    };
+    if (usePreporcessingAlgorithm) {
+      var list = preporcessingAlgorithmList;
+      data['data_adapters'] = list != null && list.isNotEmpty
+          ? List<dynamic>.from(list.map((x) => x.toJson()))
+          : [];
+    }
+    return HttpService.post('/api/v1/eeg-data', data: data);
   }
 
   @override
@@ -130,10 +139,18 @@ class ChartLineViewModel extends LoadingPageStatusViewModel {
     notifyListeners();
   }
 
-  void onClickAlgorithm() {
-    AlgorithmDialog(
+  // 特征算法
+  void onClickFeaturesAlgorithm() {
+    FeaturesAlgorithmDialog(
             channelMeta: channelMeta, onClickOneKey: onClickOneKeyAlgorithm)
         .show(context);
+  }
+
+  // 预处理算法
+  void onClickPreprocessingAlgorithm() async {
+    PreprocessingAlgorithmDialog(
+      parentViewModel: this,
+    ).show(context);
   }
 
   void onClickChangeHeight() {
@@ -270,6 +287,16 @@ class ChartLineViewModel extends LoadingPageStatusViewModel {
       (scrollHorizontalController.hasClients
           ? scrollHorizontalController.position.isScrollingNotifier.value
           : false);
+
+  // 预处理算法
+  bool usePreporcessingAlgorithm = false;
+  List<PreporcessingAlgorithm>? preporcessingAlgorithmList;
+
+  // 应用预处理算法
+  void applicationPreprocessingAlgorithm({required bool enable}) {
+    usePreporcessingAlgorithm = enable;
+    initData();
+  }
 
   void onPointerDown(PointerDownEvent event) {
     lastMousePosition = event.position;

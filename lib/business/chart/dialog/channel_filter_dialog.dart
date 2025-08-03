@@ -1,4 +1,4 @@
-import 'package:eeg/business/chart/widget/base_close_dialog.dart';
+import 'package:eeg/business/chart/dialog/base_close_dialog.dart';
 import 'package:eeg/core/utils/size.dart';
 import 'package:fluent_ui/fluent_ui.dart' as fluent;
 import 'package:flutter/material.dart';

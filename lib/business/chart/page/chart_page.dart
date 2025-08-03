@@ -167,8 +167,8 @@ Tips:
           onPressed: vm.onClickChangeHeight,
           child: Text('单通道高度${vm.lineTargetHeight?.toStringAsFixed(0)}')),
       fluent.Button(onPressed: vm.onClickChannelFilter, child: Text('通道筛选')),
-      fluent.Button(onPressed: vm.onClickAlgorithm, child: Text('信号预处理')),
-      fluent.Button(onPressed: vm.onClickAlgorithm, child: Text('特征处理计算')),
+      fluent.Button(onPressed: vm.onClickPreprocessingAlgorithm, child: Text('信号预处理')),
+      fluent.Button(onPressed: vm.onClickFeaturesAlgorithm, child: Text('特征处理计算')),
     ];
   }
 }

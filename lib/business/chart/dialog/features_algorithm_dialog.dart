@@ -1,6 +1,6 @@
 import 'package:eeg/business/chart/mode/channel_alagorithm.dart';
 import 'package:eeg/business/chart/mode/channels_meta_data.dart';
-import 'package:eeg/business/chart/widget/base_close_dialog.dart';
+import 'package:eeg/business/chart/dialog/base_close_dialog.dart';
 import 'package:eeg/common/app_colors.dart';
 import 'package:eeg/common/widget/loading_status_page.dart';
 import 'package:eeg/core/network/http_service.dart';
@@ -9,11 +9,12 @@ import 'package:fluent_ui/fluent_ui.dart' as fluent;
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
-class AlgorithmDialog extends BaseCloseDialog {
+// 特征算法
+class FeaturesAlgorithmDialog extends BaseCloseDialog {
   final ChannelMeta channelMeta;
   final VoidCallback onClickOneKey;
 
-  AlgorithmDialog({
+  FeaturesAlgorithmDialog({
     super.key,
     required this.channelMeta,
     required this.onClickOneKey,
