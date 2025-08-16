@@ -105,8 +105,12 @@ class ChartLineViewModel extends LoadingPageStatusViewModel {
       "data_type": channelMeta.dataType,
       "channels": channelMeta.channelJoin
     };
+    // 如果有预处理算法 则捎带上
     if (usePreporcessingAlgorithm) {
-      var list = preporcessingAlgorithmList;
+      final list = preporcessingAlgorithmList
+          ?.where((e) => e.checked)
+          .where((e) => e.available())
+          .toList();
       data['data_adapters'] = list != null && list.isNotEmpty
           ? List<dynamic>.from(list.map((x) => x.toJson()))
           : [];

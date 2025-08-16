@@ -77,6 +77,7 @@ class PreporcessingAlgorithm {
   String algorithmName;
   String des;
   List<PreporcessingParam> params;
+  bool checked = false;
 
   PreporcessingAlgorithm({
     required this.algorithmName,

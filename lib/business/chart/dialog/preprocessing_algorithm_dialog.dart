@@ -12,7 +12,7 @@ import 'package:flutter/material.dart';
 // 预处理算法
 class PreprocessingAlgorithmDialog extends BaseCloseDialog {
   final ChartLineViewModel parentViewModel;
-  bool isUseInputSynchronizeData = false;
+  final ScrollController _scrollController = ScrollController();
 
   PreprocessingAlgorithmDialog({
     super.key,
@@ -20,22 +20,37 @@ class PreprocessingAlgorithmDialog extends BaseCloseDialog {
   });
 
   Widget _renderList(PreprocessingAlgorithmViewModel vm) {
-    return ReorderableListView.builder(
+    return Scrollbar(
+      controller: _scrollController,
+      thickness: 8.0,
+      radius: Radius.circular(8),
+      thumbVisibility: true,
+      child: ReorderableListView.builder(
+        scrollController: _scrollController,
         padding: EdgeInsets.zero,
         buildDefaultDragHandles: false,
         itemCount: vm.data.length,
         onReorder: vm.onDargReorder,
         itemBuilder: (_, index) =>
-            _ItemWidget(index: index, data: vm.data[index]));
+            _ItemWidget(index: index, data: vm.data[index], vm: vm),
+      ),
+    );
   }
 
   @override
   Widget? buildTitleWidget() {
+    const smallText = TextStyle(fontSize: 12);
     return Row(
       children: [
-        const Text("预处理(拖动对应条目的"),
+        const Text("预处理"),
+        const Spacer(),
+        const Text("点击可切换 ， 生效算法: ", style: smallText),
         const Icon(Icons.featured_play_list, color: iconColor),
-        const Text("可调整顺序)"),
+        const Text("  忽略算法: ", style: smallText),
+        const Icon(Icons.featured_play_list, color: subtitleColor),
+        const Text("    |    拖动对应条目的 ", style: smallText),
+        const Icon(Icons.featured_play_list, color: iconColor),
+        const Text(" 可调整算法顺序 ", style: smallText),
       ],
     );
   }
@@ -58,16 +73,22 @@ class PreprocessingAlgorithmDialog extends BaseCloseDialog {
     return [
       fluent.Button(
         onPressed: () {
-          final list = parentViewModel.preporcessingAlgorithmList;
+          var list = parentViewModel.preporcessingAlgorithmList;
           if (list == null || list.isEmpty) {
             '没有可用的预处理算法，请点击重试获取参数后再试！'.toast;
+            return;
+          }
+          list = list.where((e) => e.checked).toList();
+          if (list.isEmpty) {
+            '请先点击选中一种预处理算法！'.toast;
             return;
           }
           if (list.any((e) => !e.available())) {
             '有参数错误,请检查输入参数'.toast;
             return;
           }
-          isUseInputSynchronizeData = true;
+          parentViewModel.preporcessingAlgorithmList
+              ?.forEach((e) => e.synchronizeData(isInput: true));
           closeDialog(parentViewModel.context);
           parentViewModel.applicationPreprocessingAlgorithm(enable: true);
         },
@@ -97,12 +118,9 @@ class PreprocessingAlgorithmDialog extends BaseCloseDialog {
 
   @override
   void onCloseDialog() {
-    final list = parentViewModel.preporcessingAlgorithmList;
-    if (list != null) {
-      for (var e in list) {
-        e.synchronizeData(isInput: isUseInputSynchronizeData);
-      }
-    }
+    // 如果未点击应用预处理参数，则重置所有参数 如果点击了应用预处理参数
+    parentViewModel.preporcessingAlgorithmList
+        ?.forEach((e) => e.synchronizeData(isInput: false));
   }
 }
 
@@ -153,14 +171,22 @@ class PreprocessingAlgorithmViewModel extends LoadingPageStatusViewModel {
     final item = data.removeAt(oldIndex);
     data.insert(newIndex, item);
   }
+
+  // 点击预处理算法条目
+  void onClickItemPreporcessingAlgorithm(
+      int index, PreporcessingAlgorithm data) {
+    data.checked = !data.checked;
+    notifyListeners();
+  }
 }
 
 class _ItemWidget extends StatelessWidget {
   final PreporcessingAlgorithm data;
   final int index;
+  final PreprocessingAlgorithmViewModel vm;
 
   // key 必须唯一用于拖动
-  _ItemWidget({required this.index, required this.data})
+  _ItemWidget({required this.index, required this.data, required this.vm})
       : super(key: Key('$index'));
 
   @override
@@ -170,23 +196,27 @@ class _ItemWidget extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          fluent.Row(
-            children: [
-              ReorderableDragStartListener(
-                  index: index,
-                  child:
-                      const Icon(Icons.featured_play_list, color: iconColor)),
-              SizedBox(width: 10),
-              Text(data.des,
-                  style: TextStyle(
-                      color: textColor,
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold)),
-            ],
+          TextButton(
+            onPressed: () => vm.onClickItemPreporcessingAlgorithm(index, data),
+            child: Row(
+              children: [
+                ReorderableDragStartListener(
+                    index: index,
+                    child: Icon(Icons.featured_play_list,
+                        color: data.checked ? iconColor : subtitleColor)),
+                SizedBox(width: 10),
+                Text(data.des,
+                    style: TextStyle(
+                        color: data.checked ? textColor : subtitleColor,
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold)),
+              ],
+            ),
           ),
-          SizedBox(height: 10),
-          ...List.generate(data.params.length,
-              (index) => _buildFeaturesParametersItem(data.params[index])),
+          if (data.checked) SizedBox(height: 10),
+          if (data.checked)
+            ...List.generate(data.params.length,
+                (index) => _buildFeaturesParametersItem(data.params[index])),
         ],
       ),
     );
