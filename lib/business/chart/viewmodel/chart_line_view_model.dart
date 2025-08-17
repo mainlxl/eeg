@@ -40,6 +40,8 @@ class ChartLineViewModel extends LoadingPageStatusViewModel {
   int pointGap = 3;
   double lineHeightMin = 30;
   double lineHeightMax = 300;
+
+  // 通道元数据
   ChannelMeta channelMeta;
   int _dataSecond = 0;
   int _page_size = 3;
@@ -53,6 +55,9 @@ class ChartLineViewModel extends LoadingPageStatusViewModel {
 
   double get canvasWidth => (totalPoints * pointGap).toDouble();
 
+  // 特征算法
+  List<AlgorithmDatum>? algorithmDatumData;
+
   @override
   void init() async {
     super.init();
@@ -61,7 +66,7 @@ class ChartLineViewModel extends LoadingPageStatusViewModel {
   }
 
   @override
-  void onClickRetryeLoadingData() => initData();
+  void onClickRetryLoadingData() => initData();
 
   /// page_size 页数据大小 10为10秒数据
   void initData() async {
@@ -80,10 +85,10 @@ class ChartLineViewModel extends LoadingPageStatusViewModel {
         totalPoints = _channels.isEmpty
             ? 0
             : _channels
-                .reduce((curr, next) =>
-                    curr.data.length > next.data.length ? curr : next)
-                .data
-                .length;
+            .reduce((curr, next) =>
+        curr.data.length > next.data.length ? curr : next)
+            .data
+            .length;
         _dataSecond = _page_size;
         setPageStatus(PageStatus.loadingSuccess);
       } else {
@@ -146,7 +151,9 @@ class ChartLineViewModel extends LoadingPageStatusViewModel {
   // 特征算法
   void onClickFeaturesAlgorithm() {
     FeaturesAlgorithmDialog(
-            channelMeta: channelMeta, onClickOneKey: onClickOneKeyAlgorithm)
+        parentViewModel: this,
+        channelMeta: channelMeta,
+        onClickOneKey: onClickOneKeyAlgorithm)
         .show(context);
   }
 
@@ -213,14 +220,16 @@ class ChartLineViewModel extends LoadingPageStatusViewModel {
     var response = await _rawLoadData(page_size: _page_size, page: _nextPage);
     if (response.ok && response.data != null) {
       _channels =
-          mergeChannels(_channels, Channels.fromJson(response.data).data);
+          mergeChannels(_channels, Channels
+              .fromJson(response.data)
+              .data);
       totalPoints = _channels.isEmpty
           ? 0
           : _channels
-              .reduce((curr, next) =>
-                  curr.data.length > next.data.length ? curr : next)
-              .data
-              .length;
+          .reduce((curr, next) =>
+      curr.data.length > next.data.length ? curr : next)
+          .data
+          .length;
       _dataSecond += _page_size;
       _isLoadingMore = false;
       notifyListeners();
@@ -273,9 +282,10 @@ class ChartLineViewModel extends LoadingPageStatusViewModel {
   Offset? lastMousePosition;
   VelocityTracker? velocityTracker;
 
-  get scrollOffset => scrollHorizontalController.hasClients
-      ? scrollHorizontalController.offset
-      : 0;
+  get scrollOffset =>
+      scrollHorizontalController.hasClients
+          ? scrollHorizontalController.offset
+          : 0;
 
   bool _forceHorezentalScrell = false;
 
@@ -288,9 +298,9 @@ class ChartLineViewModel extends LoadingPageStatusViewModel {
 
   bool get isHorezentalScrell =>
       _forceHorezentalScrell ||
-      (scrollHorizontalController.hasClients
-          ? scrollHorizontalController.position.isScrollingNotifier.value
-          : false);
+          (scrollHorizontalController.hasClients
+              ? scrollHorizontalController.position.isScrollingNotifier.value
+              : false);
 
   // 预处理算法
   bool usePreporcessingAlgorithm = false;

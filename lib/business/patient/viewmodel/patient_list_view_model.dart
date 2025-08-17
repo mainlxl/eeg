@@ -48,7 +48,7 @@ class PatientListViewModel extends LoadingPageStatusViewModel {
   }
 
   @override
-  void onClickRetryeLoadingData() => loadData();
+  void onClickRetryLoadingData() => loadData();
 
   void onClickPatientItem(Patient patient) async {
     var result = await context.pushNamed('/patient/detail', arguments: patient);

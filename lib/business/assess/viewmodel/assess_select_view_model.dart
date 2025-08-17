@@ -41,7 +41,7 @@ class AssessSelectViewModel extends LoadingPageStatusViewModel {
   }
 
   @override
-  void onClickRetryeLoadingData() {
+  void onClickRetryLoadingData() {
     _loadData();
   }
 

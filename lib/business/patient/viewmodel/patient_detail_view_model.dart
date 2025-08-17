@@ -61,7 +61,7 @@ class PatientDetailViewModel extends LoadingPageStatusViewModel {
   }
 
   @override
-  void onClickRetryeLoadingData() {
+  void onClickRetryLoadingData() {
     loadPatientEvaluateList();
   }
 

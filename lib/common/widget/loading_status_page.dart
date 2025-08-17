@@ -18,7 +18,7 @@ abstract class LoadingPageStatusViewModel extends BaseViewModel {
     }
   }
 
-  void onClickRetryeLoadingData();
+  void onClickRetryLoadingData();
 }
 
 typedef BuildPageContent<T> = Widget Function(
@@ -63,7 +63,7 @@ class LoadingPageStatusWidget<T extends LoadingPageStatusViewModel>
       return _buildGeneralTapView(
         assetImage: "images/loading/icon_network_blocked.png",
         desc: networkBlockedDesc ?? '加载失败, 请确保网络畅通后重试',
-        onTap: viewModel.onClickRetryeLoadingData,
+        onTap: viewModel.onClickRetryLoadingData,
       );
     } else if (viewModel._pageStatus == PageStatus.empty) {
       return _buildGeneralTapView(

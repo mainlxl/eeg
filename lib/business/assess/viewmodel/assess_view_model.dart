@@ -208,5 +208,5 @@ class AssessViewModel extends LoadingPageStatusViewModel {
   }
 
   @override
-  void onClickRetryeLoadingData() {}
+  void onClickRetryLoadingData() {}
 }

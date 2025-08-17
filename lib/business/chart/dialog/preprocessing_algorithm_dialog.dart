@@ -1,6 +1,7 @@
 import 'package:eeg/business/chart/mode/channel_alagorithm.dart';
 import 'package:eeg/business/chart/dialog/base_close_dialog.dart';
 import 'package:eeg/business/chart/viewmodel/chart_line_view_model.dart';
+import 'package:eeg/business/chart/widget/features_algorithm/algorithm_params.dart';
 import 'package:eeg/common/app_colors.dart';
 import 'package:eeg/common/widget/loading_status_page.dart';
 import 'package:eeg/core/network/http_service.dart';
@@ -161,7 +162,7 @@ class PreprocessingAlgorithmViewModel extends LoadingPageStatusViewModel {
   }
 
   @override
-  void onClickRetryeLoadingData() {
+  void onClickRetryLoadingData() {
     _loadData();
   }
 
