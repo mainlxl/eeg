@@ -42,36 +42,38 @@ class AlgorithmParametersWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     var checked = data.checked ?? true;
-    return Padding(
-      padding: const EdgeInsets.all(8.0),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            children: [
-              ReorderableDragStartListener(
-                index: index,
-                child: Icon(Icons.fiber_smart_record,
-                    // color: checked ? iconColor : subtitleColor),
-                    color: iconColor),
-              ),
-              SizedBox(width: 10),
-              Text(
-                  '${data.name}${data.description.isNotEmpty ? ' - (${data.description})' : ''}',
-                  style: TextStyle(
-                      // color: checked ? textColor : subtitleColor,
-                      color: textColor,
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold)),
-            ],
-          ),
-          if (checked) SizedBox(height: 10),
-          if (checked)
-            ...List.generate(
-                data.parameters.length,
-                (index) =>
-                    _buildFeaturesParametersItem(data.parameters[index])),
-        ],
+    return SingleChildScrollView(
+      child: Padding(
+        padding: const EdgeInsets.all(8.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              children: [
+                ReorderableDragStartListener(
+                  index: index,
+                  child: Icon(Icons.fiber_smart_record,
+                      // color: checked ? iconColor : subtitleColor),
+                      color: iconColor),
+                ),
+                SizedBox(width: 10),
+                Text(
+                    '${data.name}${data.description.isNotEmpty ? ' - (${data.description})' : ''}',
+                    style: TextStyle(
+                        // color: checked ? textColor : subtitleColor,
+                        color: textColor,
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold)),
+              ],
+            ),
+            if (checked) SizedBox(height: 10),
+            if (checked)
+              ...List.generate(
+                  data.parameters.length,
+                  (index) =>
+                      _buildFeaturesParametersItem(data.parameters[index])),
+          ],
+        ),
       ),
     );
   }

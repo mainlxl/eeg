@@ -63,6 +63,11 @@ class AlgorithmParameter {
     required this.description,
   });
 
+  @override
+  String toString() {
+    return '${name}_${_controller?.text.trim()}';
+  }
+
   factory AlgorithmParameter.fromJson(Map<String, dynamic> json) =>
       AlgorithmParameter(
         name: json["name"] ?? '',

@@ -108,7 +108,7 @@ class ChartLineViewModel extends LoadingPageStatusViewModel {
     lastPage = page;
     //第一次请求3页
     lastPageSize = page <= 1 ? _page_size * 3 : _page_size;
-    final data = {
+    var data = {
       "data_id": channelMeta.dataId,
       "page": page,
       "drop_rate": 1,
