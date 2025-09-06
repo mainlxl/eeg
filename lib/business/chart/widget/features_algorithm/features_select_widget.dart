@@ -1,12 +1,13 @@
+import 'package:eeg/business/chart/dialog/features_algorithm_dialog.dart';
 import 'package:eeg/business/chart/mode/channel_alagorithm.dart';
 import 'package:eeg/common/app_colors.dart';
 import 'package:flutter/material.dart';
 
-class FeaturesAlgorithmSelectWidget extends StatelessWidget {
+class FeaturesAlgorithmSelectWidget extends ItemContainerWidget {
   final List<AlgorithmDatum> data;
   final void Function(AlgorithmDatum, int) onSelect;
 
-  const FeaturesAlgorithmSelectWidget({
+  FeaturesAlgorithmSelectWidget({
     super.key,
     required this.data,
     required this.onSelect,
@@ -25,7 +26,7 @@ class FeaturesAlgorithmSelectWidget extends StatelessWidget {
               onPressed: () => onSelect(item, index),
               child: ListTile(
                 leading: const Icon(
-                  Icons.featured_play_list,
+                  Icons.feed_outlined,
                   color: iconColor,
                 ),
                 title: Text(item.category),

@@ -7,6 +7,7 @@ import 'package:eeg/business/chart/dialog/preprocessing_algorithm_dialog.dart';
 import 'package:eeg/business/chart/mode/channel_alagorithm.dart';
 import 'package:eeg/business/chart/mode/channel_page_data.dart';
 import 'package:eeg/business/chart/mode/channels_meta_data.dart';
+import 'package:eeg/business/chart/mode/preporcessing.dart';
 import 'package:eeg/common/widget/loading_status_page.dart';
 import 'package:eeg/common/widget/slider_dialog.dart';
 import 'package:eeg/core/network/http_service.dart';
@@ -85,10 +86,10 @@ class ChartLineViewModel extends LoadingPageStatusViewModel {
         totalPoints = _channels.isEmpty
             ? 0
             : _channels
-            .reduce((curr, next) =>
-        curr.data.length > next.data.length ? curr : next)
-            .data
-            .length;
+                .reduce((curr, next) =>
+                    curr.data.length > next.data.length ? curr : next)
+                .data
+                .length;
         _dataSecond = _page_size;
         setPageStatus(PageStatus.loadingSuccess);
       } else {
@@ -99,28 +100,43 @@ class ChartLineViewModel extends LoadingPageStatusViewModel {
     }
   }
 
+  int lastPage = 0;
+  int lastPageSize = 0;
+
   Future<ResponseData> _rawLoadData(
       {required int page, required int page_size}) async {
-    var data = {
+    lastPage = page;
+    //第一次请求3页
+    lastPageSize = page <= 1 ? _page_size * 3 : _page_size;
+    final data = {
       "data_id": channelMeta.dataId,
       "page": page,
       "drop_rate": 1,
       "patient_evaluation_id": channelMeta.patientEvaluationId,
-      "page_size": page <= 1 ? _page_size * 3 : _page_size, //第一次请求3页
+      "page_size": lastPageSize,
       "data_type": channelMeta.dataType,
       "channels": channelMeta.channelJoin
     };
     // 如果有预处理算法 则捎带上
-    if (usePreporcessingAlgorithm) {
-      final list = preporcessingAlgorithmList
-          ?.where((e) => e.checked)
-          .where((e) => e.available())
-          .toList();
-      data['data_adapters'] = list != null && list.isNotEmpty
+    final list = getPreporcessingParam();
+    if (list.isNotEmpty) {
+      data['data_adapters'] = list.isNotEmpty
           ? List<dynamic>.from(list.map((x) => x.toJson()))
           : [];
     }
     return HttpService.post('/api/v1/eeg-data', data: data);
+  }
+
+  //获取预处理算法参数
+  List<PreporcessingAlgorithm> getPreporcessingParam() {
+    if (usePreporcessingAlgorithm) {
+      return preporcessingAlgorithmList
+              ?.where((e) => e.checked)
+              .where((e) => e.available())
+              .toList() ??
+          [];
+    }
+    return [];
   }
 
   @override
@@ -151,9 +167,7 @@ class ChartLineViewModel extends LoadingPageStatusViewModel {
   // 特征算法
   void onClickFeaturesAlgorithm() {
     FeaturesAlgorithmDialog(
-        parentViewModel: this,
-        channelMeta: channelMeta,
-        onClickOneKey: onClickOneKeyAlgorithm)
+            parentViewModel: this, onClickOneKey: onClickOneKeyAlgorithm)
         .show(context);
   }
 
@@ -220,16 +234,14 @@ class ChartLineViewModel extends LoadingPageStatusViewModel {
     var response = await _rawLoadData(page_size: _page_size, page: _nextPage);
     if (response.ok && response.data != null) {
       _channels =
-          mergeChannels(_channels, Channels
-              .fromJson(response.data)
-              .data);
+          mergeChannels(_channels, Channels.fromJson(response.data).data);
       totalPoints = _channels.isEmpty
           ? 0
           : _channels
-          .reduce((curr, next) =>
-      curr.data.length > next.data.length ? curr : next)
-          .data
-          .length;
+              .reduce((curr, next) =>
+                  curr.data.length > next.data.length ? curr : next)
+              .data
+              .length;
       _dataSecond += _page_size;
       _isLoadingMore = false;
       notifyListeners();
@@ -282,10 +294,9 @@ class ChartLineViewModel extends LoadingPageStatusViewModel {
   Offset? lastMousePosition;
   VelocityTracker? velocityTracker;
 
-  get scrollOffset =>
-      scrollHorizontalController.hasClients
-          ? scrollHorizontalController.offset
-          : 0;
+  get scrollOffset => scrollHorizontalController.hasClients
+      ? scrollHorizontalController.offset
+      : 0;
 
   bool _forceHorezentalScrell = false;
 
@@ -298,17 +309,19 @@ class ChartLineViewModel extends LoadingPageStatusViewModel {
 
   bool get isHorezentalScrell =>
       _forceHorezentalScrell ||
-          (scrollHorizontalController.hasClients
-              ? scrollHorizontalController.position.isScrollingNotifier.value
-              : false);
+      (scrollHorizontalController.hasClients
+          ? scrollHorizontalController.position.isScrollingNotifier.value
+          : false);
 
   // 预处理算法
-  bool usePreporcessingAlgorithm = false;
+  bool _usePreporcessingAlgorithm = false;
+
+  bool get usePreporcessingAlgorithm => _usePreporcessingAlgorithm;
   List<PreporcessingAlgorithm>? preporcessingAlgorithmList;
 
   // 应用预处理算法
   void applicationPreprocessingAlgorithm({required bool enable}) {
-    usePreporcessingAlgorithm = enable;
+    _usePreporcessingAlgorithm = enable;
     initData();
   }
 

@@ -1,5 +1,6 @@
-import 'package:fluent_ui/fluent_ui.dart';
-import 'package:flutter/material.dart' as material;
+import 'package:eeg/core/utils/size.dart';
+import 'package:fluent_ui/fluent_ui.dart' as fluent;
+import 'package:flutter/material.dart';
 
 abstract class BaseCloseDialog<T> extends StatelessWidget {
   BaseCloseDialog({super.key});
@@ -7,12 +8,13 @@ abstract class BaseCloseDialog<T> extends StatelessWidget {
   @mustCallSuper
   @override
   Widget build(BuildContext context) {
-    return material.AlertDialog(
+    return AlertDialog(
       title: buildTitleWidget(),
       content: buildContentWidget(),
       actions: [
         ...actionsWidget(),
-        Button(child: const Text('关闭'), onPressed: () => _onClickClose(context))
+        fluent.Button(
+            child: const Text('关闭'), onPressed: () => _onClickClose(context))
       ],
     );
   }
@@ -48,5 +50,52 @@ abstract class BaseCloseDialog<T> extends StatelessWidget {
 
   T? buildResult() {
     return null;
+  }
+}
+
+typedef _UpdateActions = void Function();
+
+class DialogActionsController {
+  List<Widget> actionWidgets = [];
+  _UpdateActions? _updateAction;
+
+  void notifyActionWidgets([List<Widget>? actionWidgets]) {
+    if (actionWidgets != null) {
+      this.actionWidgets = actionWidgets;
+    }
+    _updateAction?.call();
+  }
+}
+
+class StatefulActionsWidget extends StatefulWidget {
+  final DialogActionsController controller;
+
+  const StatefulActionsWidget({super.key, required this.controller});
+
+  @override
+  State<StatefulWidget> createState() => _StatefulActionsWidget();
+}
+
+class _StatefulActionsWidget extends State<StatefulActionsWidget> {
+  @override
+  void initState() {
+    super.initState();
+    widget.controller._updateAction = () {
+      if (mounted) {
+        setState(() {});
+      }
+    };
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return SizedBox(
+      height: 40,
+      width: SizeUtils.screenWidth * 0.6,
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.end,
+        children: widget.controller.actionWidgets,
+      ),
+    );
   }
 }

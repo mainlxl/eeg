@@ -59,6 +59,7 @@ dependencies:
   media_kit_libs_video: ^1.0.5
   data_table_2: ^2.6.0
   file_picker: ^10.0.0
+  flutter_svg: ^2.2.1
 
 # 升级所有库版本到最新 flutter pub upgrade --major-versions
 

@@ -3,25 +3,28 @@ import 'package:eeg/business/chart/mode/channels_meta_data.dart';
 import 'package:eeg/business/chart/dialog/base_close_dialog.dart';
 import 'package:eeg/business/chart/viewmodel/chart_line_view_model.dart';
 import 'package:eeg/business/chart/widget/features_algorithm/algorithm_parames_select_widget.dart';
-import 'package:eeg/business/chart/widget/features_algorithm/features_algorithm_select_widget.dart';
+import 'package:eeg/business/chart/widget/features_algorithm/algorithm_result_widget.dart';
+import 'package:eeg/business/chart/widget/features_algorithm/algorithm_select_widget.dart';
+import 'package:eeg/business/chart/widget/features_algorithm/features_select_widget.dart';
 import 'package:eeg/common/app_colors.dart';
 import 'package:eeg/common/widget/loading_status_page.dart';
 import 'package:eeg/core/network/http_service.dart';
 import 'package:eeg/core/utils/size.dart';
+import 'package:eeg/core/utils/toast.dart';
 import 'package:fluent_ui/fluent_ui.dart' as fluent;
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 // 特征算法
 class FeaturesAlgorithmDialog extends BaseCloseDialog {
-  final ChannelMeta channelMeta;
   final VoidCallback onClickOneKey;
   final ChartLineViewModel parentViewModel;
+  final DialogActionsController actionButtonsController =
+      DialogActionsController();
 
   FeaturesAlgorithmDialog({
     super.key,
     required this.parentViewModel,
-    required this.channelMeta,
     required this.onClickOneKey,
   });
 
@@ -31,7 +34,8 @@ class FeaturesAlgorithmDialog extends BaseCloseDialog {
       width: SizeUtils.screenWidth * 0.8,
       height: SizeUtils.screenHeight * 0.8,
       child: LoadingPageStatusWidget<AlgorithmViewModel>(
-        createOrGetViewMode: () => AlgorithmViewModel(parentViewModel),
+        createOrGetViewMode: () =>
+            AlgorithmViewModel(parentViewModel, actionButtonsController),
         buildPageContent: (ctx, vm) {
           return Consumer<AlgorithmViewModel>(builder: (context, vm, _) {
             return _renderBody(ctx, vm);
@@ -55,7 +59,7 @@ class FeaturesAlgorithmDialog extends BaseCloseDialog {
           height: 40,
           padding: const EdgeInsets.symmetric(horizontal: 10),
           alignment: Alignment.centerLeft,
-          child: fluent.BreadcrumbBar<Widget>(
+          child: fluent.BreadcrumbBar<ItemContainerWidget>(
             items: vm.uiItems,
             onItemPressed: vm.onUiSelectedIndex,
           ),
@@ -71,19 +75,18 @@ class FeaturesAlgorithmDialog extends BaseCloseDialog {
 
   @override
   List<Widget> actionsWidget() {
-    return [
-      fluent.Button(onPressed: onClickOneKey, child: const Text('一键应用默认参数'))
-    ];
+    return [StatefulActionsWidget(controller: actionButtonsController)];
   }
 }
 
 class AlgorithmViewModel extends LoadingPageStatusViewModel {
-  late final uiItems = <fluent.BreadcrumbItem<Widget>>[];
+  late final uiItems = <fluent.BreadcrumbItem<ItemContainerWidget>>[];
   int selectUiIndex = 0;
   late List<AlgorithmDatum> data;
   final ChartLineViewModel parentViewModel;
+  final DialogActionsController actionButtonsController;
 
-  AlgorithmViewModel(this.parentViewModel);
+  AlgorithmViewModel(this.parentViewModel, this.actionButtonsController);
 
   @override
   void init() async {
@@ -106,11 +109,16 @@ class AlgorithmViewModel extends LoadingPageStatusViewModel {
         setPageStatus(PageStatus.error);
       }
     }
+    if (uiItems.isNotEmpty) {
+      uiItems.clear();
+    }
+    selectUiIndex = 0;
     uiItems.add(fluent.BreadcrumbItem(
-      label: _buildTitle('选择算法'),
+      label: _buildTitle('算法分类'),
       value: FeaturesAlgorithmSelectWidget(
-          data: data, onSelect: onSelectAlgorithm),
+          data: data, onSelect: onSelectAlgorithmClass),
     ));
+    _onStartShowWidget();
   }
 
   Widget _buildTitle(String title) {
@@ -121,109 +129,83 @@ class AlgorithmViewModel extends LoadingPageStatusViewModel {
   void onClickRetryLoadingData() => _loadData();
 
   // 选择算法
-  void onSelectAlgorithm(AlgorithmDatum data, int index) {
+  void onSelectAlgorithmClass(AlgorithmDatum data, int index) {
     uiItems.add(fluent.BreadcrumbItem(
-      label: _buildTitle('${data.category}'),
-      value:
-          AlgorithmParamsSelectWidget(data: data, onSelect: onSelectAlgorithm),
+      label: _buildTitle(data.category),
+      value: AlgorithmSelectWidget(
+          data: data, onSelect: (e, index) => onSelectAlgorithm(data, e)),
     ));
     selectUiIndex = uiItems.length - 1;
+    _onStartShowWidget();
     notifyListeners();
   }
 
-  void onUiSelectedIndex(fluent.BreadcrumbItem<Widget> item) {
+  // 选择算法
+  void onSelectAlgorithm(AlgorithmDatum algorithmDatum, AlgorithmFeature data) {
+    uiItems.add(fluent.BreadcrumbItem(
+      label: _buildTitle(data.name),
+      value: AlgorithmParamsSelectWidget(
+          data: data,
+          parentViewModel: this,
+          onComputer: (e) => onClickComputer(algorithmDatum, e)),
+    ));
+    selectUiIndex = uiItems.length - 1;
+    _onStartShowWidget();
+    notifyListeners();
+  }
+
+  void onClickComputer(
+      AlgorithmDatum algorithmDatum, AlgorithmFeature feature) {
+    for (AlgorithmParameter item in feature.parameters) {
+      if (!item.available()) {
+        '[ ${item.name} ] 参数设置有问题'.toast;
+        return;
+      }
+    }
+    nextResultFeaturesWidget(algorithmDatum, feature);
+  }
+
+  void nextResultFeaturesWidget(
+      AlgorithmDatum algorithmDatum, AlgorithmFeature data) {
+    uiItems.add(fluent.BreadcrumbItem(
+      label: _buildTitle('计算结果'),
+      value: AlgorithmResultWidget(
+          rootViewModel: parentViewModel,
+          algorithmDatum: algorithmDatum,
+          algorithmFeature: data,
+          parentViewModel: this),
+    ));
+    selectUiIndex = uiItems.length - 1;
+    _onStartShowWidget();
+    notifyListeners();
+  }
+
+  void _onStartShowWidget() {
+    if (selectUiIndex >= 0 && selectUiIndex < uiItems.length) {
+      final widget = uiItems[selectUiIndex].value;
+      widget.actionButtonsController = actionButtonsController;
+      actionButtonsController.notifyActionWidgets([]);
+      widget.onStartShowWidget();
+    }
+  }
+
+  void onUiSelectedIndex(fluent.BreadcrumbItem<ItemContainerWidget> item) {
     if (uiItems.length > 1) {
       final index = uiItems.indexOf(item);
       if (index >= 0 && index < uiItems.length - 1) {
         uiItems.removeRange(index + 1, uiItems.length);
       }
       selectUiIndex = uiItems.length - 1;
+      _onStartShowWidget();
       notifyListeners();
     }
   }
 }
-//
-// class AlgorithmItemWidget extends StatelessWidget {
-//   final AlgorithmDatum datum;
-//
-//   const AlgorithmItemWidget({super.key, required this.datum});
-//
-//   @override
-//   Widget build(BuildContext context) {
-//     return Theme(
-//       data: ThemeData().copyWith(
-//         dividerColor: Colors.transparent, // 隐藏默认分割线
-//       ),
-//       child: ExpansionTile(
-//         childrenPadding: EdgeInsets.only(left: 20),
-//         title: Text(datum.category,
-//             style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w400)),
-//         iconColor: iconColor,
-//         collapsedIconColor: iconColor,
-//         leading: const Icon(
-//           Icons.category,
-//           color: iconColor,
-//         ),
-//         children: [
-//           Container(
-//             decoration: BoxDecoration(
-//               border: Border(left: BorderSide(color: subtitleColor)),
-//             ),
-//             child: ListView.builder(
-//               shrinkWrap: true, // 关键！防止滚动冲突
-//               physics: NeverScrollableScrollPhysics(), // 禁止子列表独立滚动
-//               itemCount: datum.features.length,
-//               itemBuilder: (context, featureIndex) {
-//                 return ExpansionTile(
-//                     childrenPadding: EdgeInsets.only(left: 20),
-//                     title: Text(datum.features[featureIndex].name),
-//                     leading: const Icon(
-//                       Icons.featured_play_list,
-//                       color: iconColor,
-//                     ),
-//                     children: datum.features[featureIndex].parameters
-//                         .map((param) => _buildFeaturesParametersItem(param))
-//                         .toList());
-//               },
-//             ),
-//           ),
-//         ],
-//       ),
-//     );
-//   }
-//
-//   ListTile _buildFeaturesParametersItem(AlgorithmParameter param) {
-//     return ListTile(
-//       title: RichText(
-//         text: TextSpan(
-//           children: [
-//             TextSpan(
-//               text: "${param.type ?? ''}: ",
-//               style: TextStyle(
-//                   color: iconColor, fontSize: 18, fontWeight: FontWeight.bold),
-//             ),
-//             TextSpan(
-//               text: param.name ?? '',
-//               style: TextStyle(
-//                   color: textColor, fontSize: 16, fontWeight: FontWeight.w400),
-//             ),
-//             TextSpan(
-//               text: " (${param.description ?? ''})",
-//               style: TextStyle(color: subtitleColor, fontSize: 12),
-//             ),
-//           ],
-//         ),
-//         overflow: TextOverflow.ellipsis,
-//       ),
-//       subtitle: Column(
-//         crossAxisAlignment: CrossAxisAlignment.start,
-//         children: [
-//           Text("类型: ${param.type}"),
-//           Text("默认值: ${param.defaultValue}"),
-//           if (param.enums) Text("枚举"),
-//           if (param.required) Text("必填"),
-//         ],
-//       ),
-//     );
-//   }
-// }
+
+abstract class ItemContainerWidget extends StatelessWidget {
+  DialogActionsController? actionButtonsController;
+
+  ItemContainerWidget({super.key});
+
+  void onStartShowWidget() {}
+}
