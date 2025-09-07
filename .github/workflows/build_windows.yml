@@ -1,0 +1,45 @@
+name: Flutter Windows Build
+
+on:
+  push:
+    branches:
+      - main # 当推送到 main 分支时触发
+  pull_request:
+    branches:
+      - main # 当有针对 main 分支的 Pull Request 时触发
+
+jobs:
+  build_windows:
+    runs-on: windows-latest # 指定在最新的 Windows 虚拟机上运行
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4 # 检查代码到工作目录
+
+      - name: Setup Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: '3.32.8' #  Flutter 版本，例如 '3.32.8'
+          channel: 'stable'
+
+      - name: Install dependencies
+        run: flutter pub get
+
+      - name: Enable Windows Desktop Support
+        run: flutter config --enable-windows-desktop # 启用 Windows 桌面支持（如果项目还未设置过）
+
+      - name: Build Flutter Windows Application
+        run: flutter build windows --release # 构建 release 模式的 Windows 应用
+        # 可选参数：
+        # --split-debug-info=<path> 收集调试信息
+        # --dart-define=FLAVOR=prod 等，如果需要定义环境变量
+        # --tree-shake-icons 从 Material Design 图标摇树代码
+
+      - name: Upload Windows Artifact
+        uses: actions/upload-artifact@v4 # 上传编译好的 Windows 包作为 GitHub Actions 的产物
+        with:
+          name: windows-release-bundle
+          path: build/windows/x64/runner/Release/ # Flutter Windows build 默认输出目录
+          # 具体路径可能取决于你的 Flutter 版本和项目配置。
+          # 通常是 build/windows/x64/runner/Release/ 或 build/windows/runner/Release/
+          # 检查你的本地 flutter build windows --release 命令完成后，实际生成文件的位置

@@ -119,9 +119,7 @@ class AlgorithmParameter {
     if (text != null && text.isNotEmpty) {
       try {
         if (type == 'double' || type == 'float64' || type == 'float') {
-          if (double.tryParse(text) != null) {
-            return true;
-          }
+            return double.tryParse(text) != null;
         } else if (type == 'int') {
           var intDate = int.tryParse(text);
           if (intDate != null) {
