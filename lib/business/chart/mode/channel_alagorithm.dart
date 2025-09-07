@@ -135,6 +135,8 @@ class AlgorithmParameter {
           }
         } else if (type == 'string') {
           return true;
+        } else if (type == 'bool') {
+          return text == 'true' || text == 'false';
         }
       } catch (e) {
         return false;
