@@ -25,9 +25,6 @@ jobs:
       - name: Install dependencies
         run: flutter pub get
 
-      - name: Enable Windows Desktop Support
-        run: flutter config --enable-windows-desktop # 启用 Windows 桌面支持（如果项目还未设置过）
-
       - name: Build Flutter Windows Application
         run: flutter build windows --release # 构建 release 模式的 Windows 应用
         # 可选参数：
