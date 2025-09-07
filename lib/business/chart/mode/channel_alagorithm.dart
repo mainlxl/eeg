@@ -118,7 +118,7 @@ class AlgorithmParameter {
     var text = _controller?.text.trim();
     if (text != null && text.isNotEmpty) {
       try {
-        if (type == 'double' || type == 'float64') {
+        if (type == 'double' || type == 'float64' || type == 'float') {
           if (double.tryParse(text) != null) {
             return true;
           }
