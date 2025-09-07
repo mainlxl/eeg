@@ -106,7 +106,8 @@ class AlgorithmParameter {
         return [];
       case 'double':
       case 'float64':
-        return [FilteringTextInputFormatter.allow(RegExp(r'[0-9\.]'))];
+      case 'float':
+        return [FilteringTextInputFormatter.allow(RegExp(r'[0-9.]'))];
       case 'int':
       default:
         return [FilteringTextInputFormatter.allow(RegExp(r'[0-9]'))];
