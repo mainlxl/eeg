@@ -76,7 +76,7 @@ class PatientListSelectPage extends StatelessWidget {
                             ),
                             title: Text(patient.name),
                             subtitle: Text(
-                              '年龄: ${patient.age} 性别: ${patient.gender}',
+                              '年龄: ${patient.age} 性别: ${patient.genderInfo} 需求: ${patient.usageNeeds}',
                             ),
                             isThreeLine: false,
                             onTap: () => onSelect(patient),

@@ -103,14 +103,12 @@ class RegisterViewModel extends BaseViewModel {
   void _rawRegister(String username, String password, String email) async {
     if (await checkConnectivityAndShowToast()) {
       showLoading("注册中...");
-      var post = await HttpService.post('/api/v1/register', data: {
-        "username": username,
-        "email": email,
-        "password": password.md5
+      var post = await HttpService.post('/api/v2/doctor/register', data: {
+        'user': {"username": username, "email": email, "password": password.md5}
       });
       hideLoading();
       if (post.status == -1) {
-        '注册失败,请减产网络后再试或者联系管理员!!!'.toast;
+        '注册失败,请检查网络后再试或者联系管理员!!!'.toast;
         return;
       }
       '注册成功,请登录'.toast;

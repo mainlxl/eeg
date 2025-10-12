@@ -18,12 +18,17 @@ class UserModule extends BaseModule {
           if (UserInfo.token.isNotEmpty) {
             options.headers['Authorization'] = UserInfo.token;
           }
-          if (UserInfo.userId.isNotEmpty) {
-            options.headers['id'] = UserInfo.userId;
+          if (UserInfo.userId != -1) {
+            if (options.data == null) {
+              options.data = {'user_id': UserInfo.userId};
+              options.contentType = Headers.jsonContentType;
+            } else if (options.data.runtimeType != FormData) {
+              options.data = {'user_id': UserInfo.userId, ...options.data};
+            }
           }
           return handler.next(options); // continue
         },
-        onError: (DioException e, handler) {
+        onError: (e, handler) {
           if (e.response?.statusCode == HttpStatus.unauthorized) {
             onServerUnauthorized(e.requestOptions.path);
           }

@@ -88,20 +88,16 @@ class AssessUploadViewModel extends BaseViewModel {
       showLoading();
       notifyListeners();
       ResponseData res = await HttpService.post(
-        '/api/v1/patients/evaluate/UpdatePatientEvaluateData',
+        '/api/v2/data/upload',
         data: FormData.fromMap(
           {
-            'metadata': '''
-            {
-              "patient_evaluation_id": $patientEvaluationId,
-              "patient_id": $patientId,
-              "sample_rate": ${sampleRateController.text},
-              "file_type": "$fileType",
-              "data_type": "$dataType",
-              "data_varify": "$dataSha256",
-              "data_size": $dataSize
-            }
-            ''',
+            "evaluate_id": patientEvaluationId,
+            "patient_id": patientId,
+            "sample_rate": sampleRateController.text,
+            "file_type": fileTypeControl.value.firstOrNull,
+            "data_type": dataType,
+            "data_sign": dataSha256,
+            "data_size": dataSize,
             'file': await MultipartFile.fromFile(
               path,
               filename: '${DateTime.now().millisecondsSinceEpoch}.$fileType',

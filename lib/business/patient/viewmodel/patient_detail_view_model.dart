@@ -67,14 +67,20 @@ class PatientDetailViewModel extends LoadingPageStatusViewModel {
 
   void loadPatientEvaluateList() async {
     setPageStatus(PageStatus.loading);
-    var post = await HttpService.post(
-      '/api/v1/patients/evaluate/GetPatientEvaluateList',
-      data: {"patient_id": patient.id},
+    final post = await HttpService.post(
+      '/api/v2/evaluation/list',
+      data: patient.requestMiniParam,
     );
     if (post.status == 0 && post.data != null) {
-      var jsonList = post.data as List<dynamic>;
-      var listFromJson = Evaluation.listFromJson(jsonList);
-      evaluationtList = listFromJson;
+      evaluationtList = post.data['evaluate_list']
+              ?.map((json) => json['evaluate_info'] != null
+                  ? Evaluation.fromJson(
+                      json['evaluate_info'], json['evaluate_data'])
+                  : null) // 将 null 过滤掉
+              .where((evaluation) => evaluation != null)
+              .cast<Evaluation>()
+              .toList() ??
+          [];
       setPageStatus(evaluationtList.isNotEmpty
           ? PageStatus.loadingSuccess
           : PageStatus.empty);
@@ -113,12 +119,12 @@ class PatientDetailViewModel extends LoadingPageStatusViewModel {
     await showShadDialog<bool?>(
       context: context,
       builder: (context) => AssessUploadPage(
-        patientId: patient.id,
-        patientEvaluationId: item.patientEvaluationId,
+        patientId: patient.patientId,
+        patientEvaluationId: item.evaluationId,
         inputHasUploaded: item.metaInfo?.uploadedName,
       ),
     );
-    _onUpdateOrInsertEvaluationByPatientId(item.patientEvaluationId);
+    _onUpdateOrInsertEvaluationByPatientId(item.evaluationId);
   }
 
   Future<Evaluation?> _onUpdateOrInsertEvaluationByPatientId(
@@ -128,9 +134,9 @@ class PatientDetailViewModel extends LoadingPageStatusViewModel {
       data: {"patient_evaluation_id": patientEvaluationId},
     );
     if (post.status == 0 && post.data != null) {
-      var data = Evaluation.fromJson(post.data);
+      var data = Evaluation.fromJson(post.data,null);
       var old = evaluationtList.firstWhereOrNull(
-          (element) => element.patientEvaluationId == patientEvaluationId);
+          (element) => element.evaluationId == patientEvaluationId);
       if (old != null) {
         var indexOf = evaluationtList.indexOf(old);
         if (indexOf >= 0) {
@@ -159,8 +165,8 @@ class PatientDetailViewModel extends LoadingPageStatusViewModel {
   void onClickItemAnalyze(Evaluation item, MetaItemInfo metaInfo) async {
     MetaItemInfo meta = metaInfo;
     if (meta.channels == null || meta.channels?.isEmpty == true) {
-      Evaluation? data = await _onUpdateOrInsertEvaluationByPatientId(
-          item.patientEvaluationId);
+      Evaluation? data =
+          await _onUpdateOrInsertEvaluationByPatientId(item.evaluationId);
       var newMeta = data?.metaInfo?.findMetaInfoByType(metaInfo.dataType);
       var newChannels = newMeta?.channels;
       if (newMeta == null || newChannels == null || newChannels.isEmpty) {
@@ -174,7 +180,7 @@ class PatientDetailViewModel extends LoadingPageStatusViewModel {
         channelMeta: ChannelMeta(
           dataId: meta.dataId,
           dataType: meta.dataType,
-          patientEvaluationId: item.patientEvaluationId,
+          patientEvaluationId: item.evaluationId,
           channels: meta.channels,
           totalSecond: meta.totalSecond,
         )));
@@ -182,7 +188,7 @@ class PatientDetailViewModel extends LoadingPageStatusViewModel {
 
   void _onCreatePatientEvaluateEvent(
       UpdateOrInsertPatientEvaluateEvent event) async {
-    if (patient.id == event.patientId) {
+    if (patient.patientId == event.patientId) {
       _onUpdateOrInsertEvaluationByPatientId(event.patientEvaluationId);
     }
   }

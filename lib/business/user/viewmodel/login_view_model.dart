@@ -22,8 +22,15 @@ class LoginViewModel extends BaseViewModel {
       return;
     }
     showLoading("登录中...");
-    var post = await HttpService.post('/api/v1/login',
-        data: {"username": username, "password": password.md5});
+    var post = await HttpService.post(
+      '/api/v2/doctor/login',
+      data: {
+        "user": {
+          "username": username,
+          "password": password.md5,
+        }
+      },
+    );
     hideLoading();
     if (post.ok) {
       var responseData = post.data as Map<String, dynamic>?;

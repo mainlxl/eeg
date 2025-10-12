@@ -25,13 +25,16 @@ class PatientListViewModel extends LoadingPageStatusViewModel {
   Future<void> loadData([bool enableLoadingPage = true]) async {
     try {
       if (enableLoadingPage) setPageStatus(PageStatus.loading);
-      ResponseData response =
-          await HttpService.get('/api/v1/patients/by-user/${UserInfo.userId}');
+      ResponseData response = await HttpService.post('/api/v2/patient/list');
       if (response.status == 0) {
-        var dataList = (response.data as List<dynamic>?) ?? [];
-        _patients = dataList
-            .map((item) => Patient.fromJson(item as Map<String, dynamic>))
-            .toList();
+        final dataList = response.data['patient_list'];
+        if (dataList == null || dataList is! List || dataList.isEmpty) {
+          _patients = [];
+        } else {
+          _patients = dataList
+              .map((item) => Patient.fromJson(item as Map<String, dynamic>))
+              .toList();
+        }
         if (enableLoadingPage) {
           setPageStatus(PageStatus.loadingSuccess);
         } else {
@@ -56,7 +59,7 @@ class PatientListViewModel extends LoadingPageStatusViewModel {
     if (patients != null && result != null) {
       if (result is Patient) {
         for (var i = 0; i < _patients!.length; i++) {
-          if (_patients![i].id == patient.id) {
+          if (_patients![i].patientId == patient.patientId) {
             _patients![i] = patient;
             notifyListeners();
             break;
@@ -79,13 +82,13 @@ class PatientListViewModel extends LoadingPageStatusViewModel {
           .where((patient) =>
               patient.name.toString().toLowerCase().contains(query) ||
               patient.gender.toString().toLowerCase().contains(query) ||
+              patient.genderInfo.toString().toLowerCase().contains(query) ||
               patient.phoneNumber.toString().toLowerCase().contains(query) ||
+              patient.usageNeeds.toString().toLowerCase().contains(query) ||
               patient.age.toString().toLowerCase().contains(query))
           .toList();
-      if (searchResult.isNotEmpty) {
-        _searchResults = searchResult;
-        notifyListeners();
-      }
+      _searchResults = searchResult;
+      notifyListeners();
     }
   }
 }

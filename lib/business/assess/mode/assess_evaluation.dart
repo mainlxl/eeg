@@ -1,8 +1,7 @@
 import 'dart:convert';
 
 class Evaluation {
-  int id;
-  int patientEvaluationId;
+  int evaluationId;
   int patientId;
   String evaluationDate;
   String evaluateLevel;
@@ -21,8 +20,7 @@ class Evaluation {
 
   // 构造函数，字段可以为空时给出默认值
   Evaluation({
-    required this.id,
-    required this.patientEvaluationId,
+    required this.evaluationId,
     required this.patientId,
     required this.evaluateLevel,
     required this.evaluationDate,
@@ -32,26 +30,22 @@ class Evaluation {
     this.featureData, // 默认空 JSON 字符串
   });
 
-  static List<Evaluation> listFromJson(List<dynamic> jsonList) {
-    return jsonList.map((json) => Evaluation.fromJson(json)).toList();
-  }
-
-  factory Evaluation.fromJson(Map<String, dynamic> json) {
+  factory Evaluation.fromJson(
+      Map<String, dynamic> info, Map<String, dynamic>? data) {
     return Evaluation(
-      id: json['ID'] ?? 0,
-      patientEvaluationId: json['patient_evaluation_id'] ?? 0,
-      evaluateLevel: json['evaluate_level'] ?? '',
-      patientId: json['patient_id'] ?? 0,
-      evaluationDate: json['evaluation_date'] ?? '',
-      evaluateType: json['evaluate_type'] ?? '',
-      evaluateClassification: json['evaluate_classification'] ?? '',
-      metaInfo: json['meta_info'] == null || json['meta_info'] == '{}'
+      evaluationId: info['evaluate_id'] ?? 0,
+      evaluateLevel: info['evaluate_level'] ?? '',
+      patientId: info['patient_id'] ?? 0,
+      evaluationDate: info['evaluate_date'] ?? '',
+      evaluateType: info['evaluate_type'] ?? '',
+      evaluateClassification: info['evaluate_classification'] ?? '',
+      metaInfo: info['meta_info'] == null || info['meta_info'] == '{}'
           ? null
-          : json['meta_info'].runtimeType == String
-              ? EvaluationMetaInfo.fromJsonStr(json['meta_info'])
-              : EvaluationMetaInfo.fromJson(json['meta_info']),
-      featureData: json['feature_data'] != null
-          ? FeatureData.fromJson(json['feature_data'])
+          : info['meta_info'].runtimeType == String
+              ? EvaluationMetaInfo.fromJsonStr(info['meta_info'])
+              : EvaluationMetaInfo.fromJson(info['meta_info']),
+      featureData: info['feature_data'] != null
+          ? FeatureData.fromJson(info['feature_data'])
           : null,
     );
   }
@@ -61,10 +55,10 @@ class Evaluation {
       identical(this, other) ||
       other is Evaluation &&
           runtimeType == other.runtimeType &&
-          patientEvaluationId == other.patientEvaluationId;
+          evaluationId == other.evaluationId;
 
   @override
-  int get hashCode => patientEvaluationId.hashCode;
+  int get hashCode => evaluationId.hashCode;
 }
 
 class FeatureData {

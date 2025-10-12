@@ -11,6 +11,7 @@ import 'package:flutter/material.dart';
 
 class AddPatientViewModel extends BaseViewModel {
   late final TextEditingController nameController;
+  late final TextEditingController usageNeedsController;
   late final TextEditingController phoneController;
   late final TextEditingController idCardController;
 
@@ -28,6 +29,7 @@ class AddPatientViewModel extends BaseViewModel {
   AddPatientViewModel(Patient? patient) {
     _patient = patient;
     nameController = TextEditingController(text: patient?.name);
+    usageNeedsController = TextEditingController(text: patient?.usageNeeds);
     phoneController = TextEditingController(text: patient?.phoneNumber);
     idCardController = TextEditingController(text: patient?.identityInfo);
     medicalHistoryController =
@@ -39,17 +41,17 @@ class AddPatientViewModel extends BaseViewModel {
     if (patient != null && formKey.currentState!.validate()) {
       showLoading();
       var idCard = idCardController.text;
-      var newData = {
+      final newData = {
         "name": nameController.text.trim(),
         "age": IdCardUtils.getAge(idCard),
         "gender": IdCardUtils.getGender(idCard),
         "medical_history": medicalHistoryController.text.trim(),
         "phone_number": phoneController.text.trim(),
+        "usage_needs": usageNeedsController.text.trim(),
         "identity_info": idCard,
       };
-      ResponseData post = await HttpService.post(
-          '/api/v1/patients/update/${patient.id}',
-          data: newData);
+      ResponseData post = await HttpService.post('/api/v2/patient/update',
+          data: {'patient_id': patient.patientId, 'patient': newData});
       hideLoading();
       if (post.status == 0) {
         '用户信息已更新'.showToast();
@@ -62,6 +64,7 @@ class AddPatientViewModel extends BaseViewModel {
         patient.medicalHistory = newData['medical_history'] as String;
         patient.phoneNumber = newData['phone_number'] as String;
         patient.identityInfo = newData['identity_info'] as String;
+        patient.usageNeeds = newData['usage_needs'] as String;
         eventBus.fire(PatientListRefreshEvent(patient.name));
         context.popPage(patient);
       }
@@ -74,14 +77,16 @@ class AddPatientViewModel extends BaseViewModel {
     if (formKey.currentState!.validate()) {
       showLoading();
       var idCard = idCardController.text;
-      ResponseData post = await HttpService.post('/api/v1/patients', data: {
-        "name": nameController.text.trim(),
-        "age": IdCardUtils.getAge(idCard),
-        "gender": IdCardUtils.getGender(idCard),
-        "medical_history": medicalHistoryController.text.trim(),
-        "usage_needs": "",
-        "phone_number": phoneController.text.trim(),
-        "identity_info": idCard,
+      ResponseData post = await HttpService.post('/api/v2/patient/add', data: {
+        'patient': {
+          "name": nameController.text.trim(),
+          "age": IdCardUtils.getAge(idCard),
+          "gender": IdCardUtils.getGender(idCard),
+          "medical_history": medicalHistoryController.text.trim(),
+          "usage_needs": usageNeedsController.text.trim(),
+          "phone_number": phoneController.text.trim(),
+          "identity_info": idCard,
+        }
       });
       hideLoading();
       if (post.status == 0) {
@@ -103,11 +108,12 @@ class AddPatientViewModel extends BaseViewModel {
       // 展示对话框如果用户确认删除
       if (await confirmDeleteDialog(patient)) {
         showLoading();
-        ResponseData post =
-            await HttpService.post('/api/v1/patients/delete/${patient.id}');
+        ResponseData post = await HttpService.post(
+            '/api/v2/patient/delete',data: {'patient_id': patient.patientId});
         hideLoading();
         if (post.status == 0) {
           '用户信息已删除'.showToast();
+          eventBus.fire(PatientListRefreshEvent(patient.name));
           Navigator.pop(context, PagePopType.deleteData);
         } else {
           '删除失败'.showToast();

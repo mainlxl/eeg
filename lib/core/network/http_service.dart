@@ -144,14 +144,16 @@ class ResponseData {
   final int? status;
   final String? message;
   final dynamic data;
+  final int? logid;
 
   bool get ok => status == 0;
 
-  ResponseData({this.status, this.message, this.data});
+  ResponseData({this.status, this.message, this.data, this.logid});
 
   factory ResponseData.fromJson(Map<String, dynamic> json) => ResponseData(
         status: json["status"],
         message: json["message"],
         data: json["data"],
+        logid: json["data"]?["logid"] as int?,
       );
 }

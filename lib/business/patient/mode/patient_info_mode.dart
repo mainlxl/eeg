@@ -1,8 +1,5 @@
 class Patient {
-  int id;
-  DateTime createdAt;
-  DateTime updatedAt;
-  String? deletedAt;
+  int patientId = 1;
   String name;
   int age;
   String gender;
@@ -10,13 +7,13 @@ class Patient {
   String usageNeeds;
   String phoneNumber;
   String identityInfo;
-  int userId;
+
+  String get genderInfo => gender.toLowerCase() == 'male'
+      ? '男'
+      : (gender.toLowerCase() == 'female' ? '女' : '未知');
 
   Patient({
-    required this.id,
-    required this.createdAt,
-    required this.updatedAt,
-    this.deletedAt,
+    required this.patientId,
     required this.name,
     required this.age,
     required this.gender,
@@ -24,17 +21,11 @@ class Patient {
     required this.usageNeeds,
     required this.phoneNumber,
     required this.identityInfo,
-    required this.userId,
   });
 
   factory Patient.fromJson(Map<String, dynamic> json) {
     return Patient(
-      id: json['ID'] as int? ?? 0,
-      createdAt: DateTime.parse(
-          json['CreatedAt'] as String? ?? DateTime.now().toIso8601String()),
-      updatedAt: DateTime.parse(
-          json['UpdatedAt'] as String? ?? DateTime.now().toIso8601String()),
-      deletedAt: json['DeletedAt'] as String?,
+      patientId: json['patient_id'] as int? ?? 0,
       name: json['name'] as String? ?? '',
       age: json['age'] as int? ?? 0,
       gender: json['gender'] as String? ?? '',
@@ -42,14 +33,11 @@ class Patient {
       usageNeeds: json['usage_needs'] as String? ?? '',
       phoneNumber: json['phone_number'] as String? ?? '',
       identityInfo: json['identity_info'] as String? ?? '',
-      userId: json['user_id'] as int? ?? 0,
     );
   }
 
   Map<String, dynamic> toJson() {
     return {
-      'UpdatedAt': DateTime.now().toIso8601String(),
-      'DeletedAt': deletedAt,
       'name': name,
       'age': age,
       'gender': gender,
@@ -57,15 +45,18 @@ class Patient {
       'usage_needs': usageNeeds,
       'phone_number': phoneNumber,
       'identity_info': identityInfo,
-      'user_id': userId,
     };
   }
 
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
-      other is Patient && runtimeType == other.runtimeType && id == other.id;
+      other is Patient &&
+          runtimeType == other.runtimeType &&
+          patientId == other.patientId;
+
+  Map get requestMiniParam => {'patient_id': patientId};
 
   @override
-  int get hashCode => id.hashCode;
+  int get hashCode => patientId.hashCode;
 }

@@ -24,23 +24,22 @@ class PatientDetailPage extends StatelessWidget {
       create: () =>
           PatientDetailViewModel(this.patient, onClosePage: onClosePage),
       child: Consumer<PatientDetailViewModel>(
-        builder: (context, vm, _) =>
-        embed
+        builder: (context, vm, _) => embed
             ? _buildContent(vm)
             : Scaffold(
-          backgroundColor: bgColor,
-          appBar: AppBar(
-            leading: BackButton(onPressed: vm.popPage),
-            title: Text('${patient.name} 的详情'),
-            actions: [
-              IconButton(
-                icon: const Icon(Icons.edit_outlined),
-                onPressed: vm.onClickUpdate,
-              )
-            ],
-          ),
-          body: _buildContent(vm),
-        ),
+                backgroundColor: bgColor,
+                appBar: AppBar(
+                  leading: BackButton(onPressed: vm.popPage),
+                  title: Text('${patient.name} 的详情'),
+                  actions: [
+                    IconButton(
+                      icon: const Icon(Icons.edit_outlined),
+                      onPressed: vm.onClickUpdate,
+                    )
+                  ],
+                ),
+                body: _buildContent(vm),
+              ),
       ),
     );
   }
@@ -68,8 +67,7 @@ class PatientDetailPage extends StatelessWidget {
                     textStyle: const TextStyle(fontSize: 14, color: textColor),
                     linkTextColor: iconColor,
                     text:
-                    '病史: ${patient.medicalHistory.isNotEmpty ? patient
-                        .medicalHistory : '暂未填写'}'),
+                        '病史: ${patient.medicalHistory.isNotEmpty ? patient.medicalHistory : '暂未填写'}'),
               ),
             ],
           ),
@@ -88,12 +86,10 @@ class PatientDetailPage extends StatelessWidget {
       children: [
         _buildInfoItem('姓名', patient.name, Icons.person),
         _buildInfoItem('年龄', '${patient.age}', Icons.cake),
-        _buildInfoItem('性别', patient.gender, Icons.transgender),
+        _buildInfoItem('性别', patient.genderInfo, Icons.transgender),
         _buildInfoItem('身份证', patient.identityInfo, Icons.credit_card),
         _buildInfoItem('电话', patient.phoneNumber, Icons.phone),
         _buildInfoItem('需求', patient.usageNeeds, Icons.accessibility),
-        _buildDateItem('创建', patient.createdAt),
-        _buildDateItem('更新', patient.updatedAt),
       ],
     );
   }
@@ -157,8 +153,7 @@ class PatientDetailPage extends StatelessWidget {
                   textAlign: TextAlign.center,
                 )),
                 DataCell(Text(
-                  '${item.evaluateLevel} - ${item.evaluateType} - ${item
-                      .evaluateClassification}',
+                  '${item.evaluateLevel} - ${item.evaluateType} - ${item.evaluateClassification}',
                   textAlign: TextAlign.center,
                 )),
                 DataCell(Row(
@@ -218,19 +213,19 @@ class PatientDetailPage extends StatelessWidget {
                 )),
                 DataCell(item.hasFeatureData()
                     ? Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    GestureDetector(
-                      onTap: () => vm.onClickItemReportPreview(item),
-                      child: Text('预览', style: clickStyle),
-                    ),
-                    SizedBox(width: 8),
-                    GestureDetector(
-                      onTap: () => vm.onClickItemReportDownload(item),
-                      child: Text('下载', style: clickStyle),
-                    ),
-                  ],
-                )
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          GestureDetector(
+                            onTap: () => vm.onClickItemReportPreview(item),
+                            child: Text('预览', style: clickStyle),
+                          ),
+                          SizedBox(width: 8),
+                          GestureDetector(
+                            onTap: () => vm.onClickItemReportDownload(item),
+                            child: Text('下载', style: clickStyle),
+                          ),
+                        ],
+                      )
                     : Text('无')),
               ],
             );
@@ -259,8 +254,7 @@ class PatientDetailPage extends StatelessWidget {
               style: titleStyle, textAlign: TextAlign.center)),
       DataColumn(
         columnWidth: FixedColumnWidth(160),
-        label: Text(
-            '评估 - 部位', style: titleStyle, textAlign: TextAlign.center),
+        label: Text('评估 - 部位', style: titleStyle, textAlign: TextAlign.center),
       ),
       DataColumn(
         columnWidth: FixedColumnWidth(140),

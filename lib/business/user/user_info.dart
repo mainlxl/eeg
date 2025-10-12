@@ -30,25 +30,24 @@ class UserInfo {
     return _token ?? '';
   }
 
-  static String? _userId;
+  static int? _userId;
 
-  static String get userId {
+  static int get userId {
     if (_userId == null) {
-      var readToken =
+      var userId =
           SharedPreferencesUtils.get(key: "login_user_id", defaultValue: -1);
-      if (readToken != -1) {
-        _userId = readToken.toString();
+      if (userId != -1) {
+        _userId = userId;
       }
     }
-    return _userId ?? '';
+    return _userId ?? -1;
   }
 
   static Future<bool> checkAndSaveLoginInfo(Map<String, dynamic> info) async {
     var token = info['token'] as String?;
-    var user = info['user'] as Map<String, dynamic>?;
-    var userId = (user?['id'] as int?) ?? -1;
-    if (token != null && user != null && userId != -1 && token.isNotEmpty) {
-      _userId = userId.toString();
+    var userId = info['user_id'] as int? ?? -1;
+    if (token != null && userId != -1 && token.isNotEmpty) {
+      _userId = userId;
       _token = token;
       var tokenPut =
           await SharedPreferencesUtils.put(key: "login_token", value: token);

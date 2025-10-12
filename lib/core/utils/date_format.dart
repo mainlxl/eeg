@@ -19,10 +19,12 @@ extension IntDateFormatExtension on int {
 }
 
 extension StringFormatExtension on String {
-  String get yyyy_MM_dd => _yyyy_MM_dd.format(DateTime.parse(this));
+  String get yyyy_MM_dd =>
+      isEmpty ? '' : _yyyy_MM_dd.format(DateTime.parse(this));
 
   String get yyyy_MM_dd_HH_mm_ss =>
-      _yyyy_MM_dd_HH_mm_ss.format(DateTime.parse(this));
+      isEmpty ? '' : _yyyy_MM_dd_HH_mm_ss.format(DateTime.parse(this));
+
   String get yyyy_MM_dd_n_HH_mm_ss =>
-      _yyyy_MM_dd_n_HH_mm_ss.format(DateTime.parse(this));
+      isEmpty ? '' : _yyyy_MM_dd_n_HH_mm_ss.format(DateTime.parse(this));
 }

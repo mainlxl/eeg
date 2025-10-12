@@ -167,23 +167,31 @@ class AssessViewModel extends LoadingPageStatusViewModel {
   Future<bool> onClickUploadData() async {
     if (patientEvaluationId <= 0) {
       showLoading();
-      ResponseData post = await HttpService.post(
-          '/api/v1/patients/evaluate/CreatePatientEvaluate',
-          data: {
-            "patient_id": patient.id,
+      ResponseData post =
+          await HttpService.post('/api/v2/evaluation/add', data: {
+        "patient_id": patient.patientId,
+        'patient_evaluation': {
+          'evaluate_info': {
             "evaluate_level": _selectedCategory.name,
             "evaluate_type": _selectedSubCategory.name,
             "evaluate_classification": _assessInspectionPoint.name,
-            "evaluation_date": DateTime.timestamp().toIso8601String(),
-          });
+            "evaluate_date": DateTime.timestamp().toIso8601String(),
+          },
+        }
+      });
       hideLoading();
-      if (post.status == 0) {
-        var assessRecord = AssessRecord.fromJson(post.data);
-        patientEvaluationId = assessRecord.patientEvaluationId;
+      if (post.status == 0 &&
+          post.data['evaluate_list'] != null &&
+          post.data['evaluate_list'].isNotEmpty &&
+          post.data['evaluate_list'][0]['evaluate_info'] != null) {
+        var assessRecord = AssessRecord.fromJson(
+            post.data['evaluate_list'][0]['evaluate_info']);
+        patientEvaluationId = assessRecord.evaluationId;
       }
       if (patientEvaluationId > 0) {
         eventBus.fire(UpdateOrInsertPatientEvaluateEvent(
-            patientEvaluationId: patientEvaluationId, patientId: patient.id));
+            patientEvaluationId: patientEvaluationId,
+            patientId: patient.patientId));
         Future.microtask(_onNextUploadData);
         return true;
       } else {
@@ -200,7 +208,7 @@ class AssessViewModel extends LoadingPageStatusViewModel {
     await showShadDialog(
       context: context,
       builder: (context) => AssessUploadPage(
-        patientId: patient.id,
+        patientId: patient.patientId,
         patientEvaluationId: patientEvaluationId,
       ),
     );

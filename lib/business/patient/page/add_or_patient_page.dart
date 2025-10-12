@@ -123,9 +123,17 @@ class AddPatientPage extends StatelessWidget {
                       ),
                       const SizedBox(width: 20.0),
                       Expanded(
-                          child: const SizedBox(
-                        width: 1,
-                      )),
+                        child: _buildItem(
+                          labelText: '需求用途',
+                          hintText: '请输入需求用途',
+                          maxLength: 20,
+                          keyboardType: TextInputType.text,
+                          controller: vm.usageNeedsController,
+                          validator: (value) {
+                            return null;
+                          },
+                        ),
+                      ),
                     ],
                   ),
                   // const SizedBox(height: 20.0),
