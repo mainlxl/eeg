@@ -6,10 +6,10 @@ class Channels {
 
   factory Channels.fromJson(Map<String, dynamic> json) => Channels(
         page: json["page"],
-        data: json["data"] == null
+        data: json["data_info"] == null
             ? []
             : List<Channel>.from(
-                json["data"]!.map((item) => Channel.fromJson(item))),
+                json["data_info"]!.map((item) => Channel.fromJson(item))),
       );
 }
 
@@ -27,7 +27,7 @@ class Channel {
   double min;
 
   factory Channel.fromJson(Map<String, dynamic> json) => Channel(
-        channelName: json["channel_name"] ?? '',
+        channelName: json["channel"] ?? '',
         data: json["data"] == null
             ? []
             : List<double>.from(json["data"]!.map((x) => x.toDouble())),

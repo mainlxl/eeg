@@ -76,8 +76,9 @@ class ChartLineViewModel extends LoadingPageStatusViewModel {
         page_size: min(channelMeta.totalSecond - _dataSecond, _page_size),
         page: 1);
     if (response.ok) {
-      if (response.data != null) {
-        Channels channelsData = Channels.fromJson(response.data!);
+      var dataSeg = response.data?['DataSeg'];
+      if (dataSeg != null) {
+        Channels channelsData = Channels.fromJson(dataSeg);
         _channels = channelsData.data;
         if (_channels.isEmpty) {
           setPageStatus(PageStatus.empty);
@@ -109,22 +110,26 @@ class ChartLineViewModel extends LoadingPageStatusViewModel {
     //第一次请求3页
     lastPageSize = page <= 1 ? _page_size * 3 : _page_size;
     var data = {
-      "data_id": channelMeta.dataId,
-      "page": page,
-      "drop_rate": 1,
-      "patient_evaluation_id": channelMeta.patientEvaluationId,
-      "page_size": lastPageSize,
-      "data_type": channelMeta.dataType,
-      "channels": channelMeta.channelJoin
+      'patient_evalution_data': {
+        "data_type": channelMeta.dataType,
+        "data_id": channelMeta.dataId,
+        "patient_evaluation_id": channelMeta.patientEvaluationId,
+        'show_data_info': {
+          "page": page,
+          "drop_rate": 1,
+          "page_size": lastPageSize,
+          "channels": channelMeta.channelJoin,
+        }
+      }
     };
     // 如果有预处理算法 则捎带上
     final list = getPreporcessingParam();
     if (list.isNotEmpty) {
-      data['data_adapters'] = list.isNotEmpty
+      data['patient_evalution_data']?['preprocess_algorithm'] = list.isNotEmpty
           ? List<dynamic>.from(list.map((x) => x.toJson()))
           : [];
     }
-    return HttpService.post('/api/v1/eeg-data', data: data);
+    return HttpService.post('/api/v2/data/detail', data: data);
   }
 
   //获取预处理算法参数

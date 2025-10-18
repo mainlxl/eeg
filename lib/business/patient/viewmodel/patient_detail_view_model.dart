@@ -121,35 +121,9 @@ class PatientDetailViewModel extends LoadingPageStatusViewModel {
       builder: (context) => AssessUploadPage(
         patientId: patient.patientId,
         patientEvaluationId: item.evaluationId,
-        inputHasUploaded: item.metaInfo?.uploadedName,
       ),
     );
-    _onUpdateOrInsertEvaluationByPatientId(item.evaluationId);
-  }
-
-  Future<Evaluation?> _onUpdateOrInsertEvaluationByPatientId(
-      int patientEvaluationId) async {
-    var post = await HttpService.post(
-      '/api/v1/patients/evaluate/GetPatientEvaluate',
-      data: {"patient_evaluation_id": patientEvaluationId},
-    );
-    if (post.status == 0 && post.data != null) {
-      var data = Evaluation.fromJson(post.data,null);
-      var old = evaluationtList.firstWhereOrNull(
-          (element) => element.evaluationId == patientEvaluationId);
-      if (old != null) {
-        var indexOf = evaluationtList.indexOf(old);
-        if (indexOf >= 0) {
-          evaluationtList[indexOf] = data;
-          notifyListeners();
-        }
-      } else {
-        evaluationtList.add(data);
-        notifyListeners();
-      }
-      return data;
-    }
-    return null;
+    loadPatientEvaluateList();
   }
 
   /// 点击分析
@@ -162,34 +136,24 @@ class PatientDetailViewModel extends LoadingPageStatusViewModel {
   void onClickItemReportPreview(Evaluation item) {}
 
   /// 点击数据展示
-  void onClickItemAnalyze(Evaluation item, MetaItemInfo metaInfo) async {
-    MetaItemInfo meta = metaInfo;
-    if (meta.channels == null || meta.channels?.isEmpty == true) {
-      Evaluation? data =
-          await _onUpdateOrInsertEvaluationByPatientId(item.evaluationId);
-      var newMeta = data?.metaInfo?.findMetaInfoByType(metaInfo.dataType);
-      var newChannels = newMeta?.channels;
-      if (newMeta == null || newChannels == null || newChannels.isEmpty) {
-        "数据正在解析,中请稍后再试!!!".toast;
-        return;
-      }
-      meta = newMeta;
-    }
-    context.push((ctx) => EegLineChart(
-        title: '${patient.name}:${metaInfo.dataType}:${metaInfo.dataId}',
+  void onClickItemAnalyze(Evaluation data, DataItem item) {
+    context.push(
+      (ctx) => EegLineChart(
+        title: '${patient.name}:${item.dataType}:${item.dataId}',
         channelMeta: ChannelMeta(
-          dataId: meta.dataId,
-          dataType: meta.dataType,
-          patientEvaluationId: item.evaluationId,
-          channels: meta.channels,
-          totalSecond: meta.totalSecond,
-        )));
+          dataId: item.dataId,
+          dataType: item.dataType,
+          patientEvaluationId: data.evaluationId,
+          channels: item.channel,
+          totalSecond: item.totalSecond,
+        ),
+      ),
+    );
   }
 
-  void _onCreatePatientEvaluateEvent(
-      UpdateOrInsertPatientEvaluateEvent event) async {
+  void _onCreatePatientEvaluateEvent(UpdateOrInsertPatientEvaluateEvent event) {
     if (patient.patientId == event.patientId) {
-      _onUpdateOrInsertEvaluationByPatientId(event.patientEvaluationId);
+      loadPatientEvaluateList();
     }
   }
 

@@ -7,12 +7,8 @@ class Evaluation {
   String evaluateLevel;
   String evaluateType;
   String evaluateClassification;
-  EvaluationMetaInfo? metaInfo;
   FeatureData? featureData;
-
-  bool hasMetaInfo() {
-    return metaInfo != null;
-  }
+  List<DataItem>? data;
 
   bool hasFeatureData() {
     return featureData != null;
@@ -26,12 +22,11 @@ class Evaluation {
     required this.evaluationDate,
     required this.evaluateType,
     required this.evaluateClassification,
-    this.metaInfo, // 默认空 JSON 字符串
     this.featureData, // 默认空 JSON 字符串
+    this.data,
   });
 
-  factory Evaluation.fromJson(
-      Map<String, dynamic> info, Map<String, dynamic>? data) {
+  factory Evaluation.fromJson(Map<String, dynamic> info, List<dynamic>? data) {
     return Evaluation(
       evaluationId: info['evaluate_id'] ?? 0,
       evaluateLevel: info['evaluate_level'] ?? '',
@@ -39,14 +34,10 @@ class Evaluation {
       evaluationDate: info['evaluate_date'] ?? '',
       evaluateType: info['evaluate_type'] ?? '',
       evaluateClassification: info['evaluate_classification'] ?? '',
-      metaInfo: info['meta_info'] == null || info['meta_info'] == '{}'
-          ? null
-          : info['meta_info'].runtimeType == String
-              ? EvaluationMetaInfo.fromJsonStr(info['meta_info'])
-              : EvaluationMetaInfo.fromJson(info['meta_info']),
       featureData: info['feature_data'] != null
           ? FeatureData.fromJson(info['feature_data'])
           : null,
+      data: data?.map((item) => DataItem.fromJson(item)).toList(),
     );
   }
 
@@ -84,150 +75,45 @@ class FeatureData {
   }
 }
 
-class EvaluationMetaInfo {
-  final MetaItemInfo irData;
-  final MetaItemInfo eegData;
-  final MetaItemInfo emgData;
-  final MetaItemInfo imuData;
-  final int version;
-  final String evaluateReport;
-
-  MetaItemInfo? findMetaInfoByType(String dataType) {
-    if (dataType == irData.dataType) {
-      return irData;
-    } else if (dataType == eegData.dataType) {
-      return eegData;
-    } else if (dataType == emgData.dataType) {
-      return emgData;
-    } else if (dataType == imuData.dataType) {
-      return imuData;
-    }
-    return null;
-  }
-
-  EvaluationMetaInfo({
-    required this.irData,
-    required this.version,
-    required this.eegData,
-    required this.emgData,
-    required this.imuData,
-    required this.evaluateReport,
-  });
-
-  List<String> get uploadedName {
-    List<String> dataList = [];
-    if (irData.hasDate) dataList.add(irData.dataType);
-    if (eegData.hasDate) dataList.add(eegData.dataType);
-    if (emgData.hasDate) dataList.add(emgData.dataType);
-    if (imuData.hasDate) dataList.add(imuData.dataType);
-    return dataList;
-  }
-
-  bool get needUpload {
-    if (irData.hasDate &&
-        eegData.hasDate &&
-        emgData.hasDate &&
-        imuData.hasDate) {
-      return false;
-    }
-    return true;
-  }
-
-  factory EvaluationMetaInfo.fromJson(Map<String, dynamic> json) {
-    return EvaluationMetaInfo(
-      irData: MetaItemInfo.fromJson(json['ir_data'] ?? {}),
-      version: json['version'] ?? 0,
-      eegData: MetaItemInfo.fromJson(json['eeg_data'] ?? {}),
-      emgData: MetaItemInfo.fromJson(json['emg_data'] ?? {}),
-      imuData: MetaItemInfo.fromJson(json['imu_data'] ?? {}),
-      evaluateReport: json['evaluate_report'] ?? '',
-    );
-  }
-
-  factory EvaluationMetaInfo.fromJsonStr(String jsonStr) {
-    return EvaluationMetaInfo.fromJson(jsonDecode(jsonStr));
-  }
-
-  @override
-  bool operator ==(Object other) =>
-      identical(this, other) ||
-      other is EvaluationMetaInfo &&
-          runtimeType == other.runtimeType &&
-          irData == other.irData &&
-          eegData == other.eegData &&
-          emgData == other.emgData &&
-          imuData == other.imuData &&
-          version == other.version &&
-          evaluateReport == other.evaluateReport;
-
-  @override
-  int get hashCode =>
-      irData.hashCode ^
-      eegData.hashCode ^
-      emgData.hashCode ^
-      imuData.hashCode ^
-      version.hashCode ^
-      evaluateReport.hashCode;
-}
-
-class MetaItemInfo {
-  final String dataId;
-  final List<String>? channels;
+class DataItem {
+  final int dataId;
+  final List<String>? channel;
   final String dataType;
-  final int channelNum;
   final int sampleRate;
-  final String dataOriPath;
-  final bool evaluateState;
   final int totalSecond;
 
-  MetaItemInfo({
+  DataItem({
     required this.dataId,
-    required this.channels,
+    required this.channel,
     required this.dataType,
-    required this.channelNum,
     required this.sampleRate,
-    required this.dataOriPath,
-    required this.evaluateState,
     required this.totalSecond,
   });
 
-  bool get hasDate => dataId.isNotEmpty;
-
   // 从Json转换成EEGData对象
-  factory MetaItemInfo.fromJson(Map<String, dynamic> json) {
-    return MetaItemInfo(
-      dataId: json['data_id'] ?? '',
-      channels:
-          json['channels'] != null ? List<String>.from(json['channels']) : null,
+  factory DataItem.fromJson(Map<String, dynamic> json) {
+    return DataItem(
+      dataId: json['data_id'] ?? 0,
+      channel:
+          json['channel'] != null ? List<String>.from(json['channel']) : null,
       dataType: json['data_type'] ?? '',
-      channelNum: json['channel_num'] ?? 0,
       sampleRate: json['sample_rate'] ?? 0,
       totalSecond: json['total_second'] ?? 0,
-      dataOriPath: json['data_ori_path'] ?? '',
-      evaluateState: json['evaluate_state'] ?? false,
     );
   }
 
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
-      other is MetaItemInfo &&
+      other is DataItem &&
           runtimeType == other.runtimeType &&
           dataId == other.dataId &&
-          channels == other.channels &&
+          channel == other.channel &&
           dataType == other.dataType &&
-          channelNum == other.channelNum &&
           sampleRate == other.sampleRate &&
-          dataOriPath == other.dataOriPath &&
-          evaluateState == other.evaluateState;
+          totalSecond == other.totalSecond;
 
   @override
   int get hashCode =>
-      dataId.hashCode ^
-      channels.hashCode ^
-      dataType.hashCode ^
-      channelNum.hashCode ^
-      sampleRate.hashCode ^
-      dataOriPath.hashCode ^
-      evaluateState.hashCode;
+      Object.hash(dataId, channel, dataType, sampleRate, totalSecond);
 }

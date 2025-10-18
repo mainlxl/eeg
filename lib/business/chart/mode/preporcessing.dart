@@ -2,15 +2,19 @@ import 'package:fluent_ui/fluent_ui.dart';
 import 'package:flutter/services.dart';
 
 class PreporcessingAlgorithm {
+  String category;
   String algorithmName;
   String des;
-  List<PreporcessingParam> params;
+  String dataType;
+  List<FeaturesParam> features;
   bool checked = false;
 
   PreporcessingAlgorithm({
+    required this.category,
     required this.algorithmName,
     required this.des,
-    required this.params,
+    required this.features,
+    required this.dataType,
   });
 
   static List<PreporcessingAlgorithm> listFromJson(List<dynamic> jsonList) {
@@ -19,49 +23,55 @@ class PreporcessingAlgorithm {
         .toList();
   }
 
-  factory PreporcessingAlgorithm.fromJson(Map<String, dynamic> json) =>
-      PreporcessingAlgorithm(
-        algorithmName: json["algorithm_name"],
-        des: json["des"],
-        params: json["params"] == null
-            ? []
-            : List<PreporcessingParam>.from(
-                json["params"].map((x) => PreporcessingParam.fromJson(x))),
-      );
+  factory PreporcessingAlgorithm.fromJson(Map<String, dynamic> json) {
+    final features = json["features"]?[0];
+    return PreporcessingAlgorithm(
+      category: json["category"],
+      algorithmName: features["name"],
+      des: features["description"],
+      // des: json["des"],
+      dataType: json["data_type"] as String? ?? '',
+      features: features["parameters"] == null
+          ? []
+          : List<FeaturesParam>.from(
+              features["parameters"].map((x) => FeaturesParam.fromJson(x))),
+    );
+  }
 
   Map<String, dynamic> toJson() => {
         "algorithm_name": algorithmName,
         "des": des,
-        "params": List<dynamic>.from(params.map((x) => x.toJson())),
+        "params": List<dynamic>.from(features.map((x) => x.toJson())),
       };
 
   void synchronizeData({required bool isInput}) {
-    for (var e in params) {
+    for (var e in features) {
       e.synchronizeData(isInput: isInput);
     }
   }
 
   bool available() {
-    if (params.isEmpty) {
+    if (features.isEmpty) {
       return false;
     }
-    return !params.any((e) => !e.available());
+    return !features.any((e) => !e.available());
   }
 
   void resetDefault() {
-    for (var e in params) {
+    for (var e in features) {
       e._value = e.defaultValue;
       e.controller.text = e.defaultValue.toString();
     }
   }
 }
 
-class PreporcessingParam {
+class FeaturesParam {
   String name;
   String type;
-  num _value;
+  dynamic _value;
+  List<String> enumList;
 
-  num get value {
+  dynamic get value {
     var text = _controller?.text;
     if (text != null) {
       try {
@@ -75,14 +85,20 @@ class PreporcessingParam {
     return _value;
   }
 
-  String des;
-  late final num defaultValue = _value;
+  set value(dynamic newValue) {
+    _value = newValue;
+    controller.text = newValue.toString();
+  }
 
-  PreporcessingParam({
+  String des;
+  late final dynamic defaultValue = _value;
+
+  FeaturesParam({
     required this.name,
     required this.type,
-    required num value,
+    required dynamic value,
     required this.des,
+    required this.enumList,
   }) : _value = value;
 
   TextEditingController? _controller;
@@ -105,13 +121,24 @@ class PreporcessingParam {
     }
   }
 
-  factory PreporcessingParam.fromJson(Map<String, dynamic> json) =>
-      PreporcessingParam(
-        name: json["name"],
-        type: json["type"],
-        value: json["value"],
-        des: json["des"],
-      );
+  factory FeaturesParam.fromJson(Map<String, dynamic> json) {
+    List<String> enumList = json["enum_list"] == null
+        ? []
+        : List<String>.from(json["enum_list"].map((x) => x));
+    var value = json["value"];
+    if (enumList.isNotEmpty) {
+      if (!enumList.contains(value)) {
+        value = enumList.first;
+      }
+    }
+    return FeaturesParam(
+      name: json["name"],
+      type: json["type"] as String? ?? '',
+      value: value,
+      enumList: enumList,
+      des: json["des"] ?? '',
+    );
+  }
 
   Map<String, dynamic> toJson() => {
         "name": name,
@@ -129,7 +156,7 @@ class PreporcessingParam {
   }
 
   bool available() {
-    var text = _controller?.text;
+    var text = _controller?.text ?? value;
     if (text != null && text.isNotEmpty) {
       try {
         if (type == 'double' || type == 'float64') {
@@ -147,6 +174,8 @@ class PreporcessingParam {
               return true;
             }
           }
+        } else if (type == 'enum') {
+          return enumList.contains(text);
         }
       } catch (e) {
         return false;

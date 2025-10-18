@@ -159,8 +159,7 @@ class PatientDetailPage extends StatelessWidget {
                 DataCell(Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    if (item.metaInfo == null ||
-                        item.metaInfo?.needUpload == true)
+                    if ((item.data?.length ?? 0) <= 4)
                       GestureDetector(
                         onTap: () => vm.onClickItemUpload(item),
                         child: Padding(
@@ -169,46 +168,18 @@ class PatientDetailPage extends StatelessWidget {
                               style: TextStyle(color: highlightColor)),
                         ),
                       ),
-                    if (item.metaInfo?.irData.hasDate == true)
-                      GestureDetector(
-                        onTap: () =>
-                            vm.onClickItemAnalyze(item, item.metaInfo!.irData),
-                        child: Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 8.0),
-                          child: Text('${item.metaInfo?.irData.dataType}',
-                              style: clickStyle),
-                        ),
-                      ),
-                    if (item.metaInfo?.eegData.hasDate == true)
-                      GestureDetector(
-                        onTap: () =>
-                            vm.onClickItemAnalyze(item, item.metaInfo!.eegData),
-                        child: Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 8.0),
-                          child: Text('${item.metaInfo?.eegData.dataType}',
-                              style: clickStyle),
-                        ),
-                      ),
-                    if (item.metaInfo?.emgData.hasDate == true)
-                      GestureDetector(
-                        onTap: () =>
-                            vm.onClickItemAnalyze(item, item.metaInfo!.emgData),
-                        child: Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 8.0),
-                          child: Text('${item.metaInfo?.emgData.dataType}',
-                              style: clickStyle),
-                        ),
-                      ),
-                    if (item.metaInfo?.imuData.hasDate == true)
-                      GestureDetector(
-                        onTap: () =>
-                            vm.onClickItemAnalyze(item, item.metaInfo!.imuData),
-                        child: Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 8.0),
-                          child: Text('${item.metaInfo?.imuData.dataType}',
-                              style: clickStyle),
-                        ),
-                      ),
+                    ...(item.data?.map((dataItem) {
+                          return GestureDetector(
+                            onTap: () => vm.onClickItemAnalyze(item, dataItem),
+                            child: Padding(
+                              padding:
+                                  const EdgeInsets.symmetric(horizontal: 8.0),
+                              child: Text('${dataItem.dataType}',
+                                  style: clickStyle),
+                            ),
+                          );
+                        }).toList() ??
+                        []),
                   ],
                 )),
                 DataCell(item.hasFeatureData()

@@ -12,20 +12,15 @@ import 'package:shadcn_ui/shadcn_ui.dart';
 class AssessUploadPage extends StatelessWidget {
   final int patientId;
   final int patientEvaluationId;
-  final List<String>? inputHasUploaded;
 
   const AssessUploadPage(
-      {super.key,
-      required this.patientId,
-      required this.patientEvaluationId,
-      this.inputHasUploaded});
+      {super.key, required this.patientId, required this.patientEvaluationId});
 
   @override
   Widget build(BuildContext context) {
     return DragToMoveWidget(
       child: ViewModelBuilder<AssessUploadViewModel>(
-        create: () => AssessUploadViewModel(
-            patientId, patientEvaluationId, inputHasUploaded),
+        create: () => AssessUploadViewModel(patientId, patientEvaluationId),
         child: Consumer<AssessUploadViewModel>(
           builder: (context, vm, _) => _buildUploadInterface(context, vm),
         ),

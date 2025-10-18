@@ -1,5 +1,5 @@
 class ChannelMeta {
-  String? dataId;
+  int dataId;
   String? dataType;
   int patientEvaluationId;
   String? description;
@@ -15,18 +15,12 @@ class ChannelMeta {
     this.description,
     required this.channels,
     this.totalSecond = 0,
-  }) {
-    // 数据验证: 可以根据需要添加字段的检验逻辑
-    if (dataId == null || dataId!.isEmpty) {
-      throw ArgumentError('data_id cannot be null or empty');
-    }
-    // 可以添加更多的验证逻辑
-  }
+  });
 
   // 从 JSON 创建 ChannelMeta 实例
   factory ChannelMeta.fromJson(Map<String, dynamic> json) {
     return ChannelMeta(
-      dataId: json['data_id'] as String?,
+      dataId: json['data_id'] as int? ?? 0,
       dataType: json['data_type'] as String?,
       description: json['description'] as String?,
       patientEvaluationId: json['patient_evaluation_id'] as int? ?? 0,

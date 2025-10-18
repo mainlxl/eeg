@@ -36,7 +36,7 @@ class AssessUploadViewModel extends BaseViewModel {
   ];
 
   AssessUploadViewModel(this.patientId, this.patientEvaluationId,
-      List<String>? inputHasUploaded) {
+      [List<String>? inputHasUploaded]) {
     if (inputHasUploaded != null && inputHasUploaded.isNotEmpty) {
       for (var e in uploadRecording) {
         e.upload = inputHasUploaded.contains(e.name);
