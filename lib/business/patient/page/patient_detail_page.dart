@@ -182,7 +182,7 @@ class PatientDetailPage extends StatelessWidget {
                         []),
                   ],
                 )),
-                DataCell(item.hasFeatureData()
+                DataCell(item.evaluateReport.isNotEmpty
                     ? Row(
                         mainAxisSize: MainAxisSize.min,
                         children: [
@@ -197,7 +197,9 @@ class PatientDetailPage extends StatelessWidget {
                           ),
                         ],
                       )
-                    : Text('无')),
+                    : GestureDetector(
+                        onTap: () => vm.onClickItemReportGenerate(item),
+                        child: Text('生成报告', style: clickStyle))),
               ],
             );
           }).toList(),

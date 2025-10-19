@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'dart:io';
 
 import 'package:dio/dio.dart';
@@ -42,12 +43,16 @@ class HttpService {
     _dio.interceptors.add(
       InterceptorsWrapper(
         onRequest: (options, handler) {
-          print('请求: ${options.method} ${options.path}');
+          if (isDebug) {
+            print('请求: ${options.method} ${options.path} ${jsonEncode(options.data)}');
+          }
           return handler.next(options); // continue
         },
         onResponse: (response, handler) {
           // 处理响应数据
-          print('响应: ${response.statusCode} ${response.data}');
+          if (isDebug) {
+            print('响应: ${response.statusCode} ${jsonEncode(response.data)}');
+          }
           return handler.next(response); // continue
         },
         onError: (DioException e, handler) {
@@ -59,7 +64,7 @@ class HttpService {
   }
 
   void addInterceptors(Interceptor interceptor) {
-    _dio.interceptors.add(interceptor);
+    _dio.interceptors.insert(0, interceptor);
   }
 
   void setProxy(String proxy) {

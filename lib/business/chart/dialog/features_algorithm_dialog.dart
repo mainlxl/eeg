@@ -100,10 +100,19 @@ class AlgorithmViewModel extends LoadingPageStatusViewModel {
     if (data.isEmpty) {
       setPageStatus(PageStatus.loading);
       ResponseData response =
-          await HttpService.get('/api/v1/patients/evaluate/feature_meta');
-      if (response.ok) {
+          await HttpService.post('/api/v2/feature/list', data: {
+        'patient_evalution_data': {
+          "data_type": parentViewModel.channelMeta.dataType,
+          "data_id": parentViewModel.channelMeta.dataId,
+          "patient_evaluation_id":
+              parentViewModel.channelMeta.patientEvaluationId
+        }
+      });
+      if (response.ok &&
+          response.data?['patient_evaluate_algorithm_list'] != null) {
         setPageStatus(PageStatus.loadingSuccess);
-        data = AlgorithmDatum.listFromJson(response.data);
+        data = AlgorithmDatum.listFromJson(
+            response.data?['patient_evaluate_algorithm_list'] ?? []);
         parentViewModel.algorithmDatumData = data;
       } else {
         setPageStatus(PageStatus.error);

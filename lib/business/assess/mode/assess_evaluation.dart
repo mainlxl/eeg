@@ -7,6 +7,7 @@ class Evaluation {
   String evaluateLevel;
   String evaluateType;
   String evaluateClassification;
+  String evaluateReport;
   FeatureData? featureData;
   List<DataItem>? data;
 
@@ -21,6 +22,7 @@ class Evaluation {
     required this.evaluateLevel,
     required this.evaluationDate,
     required this.evaluateType,
+    required this.evaluateReport,
     required this.evaluateClassification,
     this.featureData, // 默认空 JSON 字符串
     this.data,
@@ -33,6 +35,7 @@ class Evaluation {
       patientId: info['patient_id'] ?? 0,
       evaluationDate: info['evaluate_date'] ?? '',
       evaluateType: info['evaluate_type'] ?? '',
+      evaluateReport: info['evaluate_report'] ?? '',
       evaluateClassification: info['evaluate_classification'] ?? '',
       featureData: info['feature_data'] != null
           ? FeatureData.fromJson(info['feature_data'])

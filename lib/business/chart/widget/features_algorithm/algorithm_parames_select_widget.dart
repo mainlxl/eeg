@@ -3,6 +3,7 @@ import 'package:eeg/business/chart/mode/channel_alagorithm.dart';
 import 'package:eeg/common/app_colors.dart';
 import 'package:fluent_ui/fluent_ui.dart' as fluent;
 import 'package:flutter/material.dart';
+import 'package:shadcn_ui/shadcn_ui.dart';
 
 class AlgorithmParamsSelectWidget extends ItemContainerWidget {
   final AlgorithmFeature data;
@@ -79,6 +80,28 @@ class AlgorithmParametersWidget extends StatelessWidget {
   }
 
   Widget _buildFeaturesParametersItem(AlgorithmParameter param) {
+    if (param.enumList.isNotEmpty) {
+      return Padding(
+        padding: const EdgeInsets.only(left: 15),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            _renderPrefix(param),
+            ConstrainedBox(
+              constraints: const BoxConstraints(minWidth: 20),
+              child: ShadSelect<String>(
+                  placeholder: Text(param.value),
+                  options: param.enumList.map((e) => ShadOption(
+                      padding: const EdgeInsets.symmetric(horizontal: 5),
+                      value: e,
+                      child: Text(e))),
+                  selectedOptionBuilder: (context, value) => Text(value),
+                  onChanged: (value) => param.value = value ?? ''),
+            ),
+          ],
+        ),
+      );
+    }
     return Padding(
       padding: const EdgeInsets.only(left: 15),
       child: TextField(

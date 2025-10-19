@@ -147,7 +147,7 @@ class PreprocessingAlgorithmViewModel extends LoadingPageStatusViewModel {
     }
     setPageStatus(PageStatus.loading);
     ResponseData response =
-        await HttpService.post('/api/v2/feature/list', data: {
+        await HttpService.post('/api/v2/data/preprocess', data: {
       'patient_evalution_data': {
         "data_type": parentViewModel.channelMeta.dataType,
         "data_id": parentViewModel.channelMeta.dataId,
@@ -161,7 +161,7 @@ class PreprocessingAlgorithmViewModel extends LoadingPageStatusViewModel {
           response.data == null
               ? []
               : PreporcessingAlgorithm.listFromJson(
-                  response.data?['patient_evaluate_algorithm_list'] ?? []);
+                  response.data?['preprocess_algorithm_list'] ?? []);
       this._data = preporcessingAlgorithmList;
       parentViewModel.preporcessingAlgorithmList = preporcessingAlgorithmList;
     } else {
@@ -214,28 +214,14 @@ class _ItemWidget extends StatelessWidget {
                     child: Icon(Icons.featured_play_list,
                         color: data.checked ? iconColor : subtitleColor)),
                 SizedBox(width: 10),
-                Text.rich(
-                  TextSpan(
-                    text: data.des,
-                    style: TextStyle(
-                      color: data.checked ? textColor : subtitleColor,
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold,
-                    ),
-                    children: [
-                      TextSpan(
-                        text: '\t分类:${data.category}',
-                        style: TextStyle(
-                          color: data.checked
-                              ? subtitleColor
-                              : textColor.withAlpha(60),
-                          fontSize: 16,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                    ],
+                Text(
+                  data.des,
+                  style: TextStyle(
+                    color: data.checked ? textColor : subtitleColor,
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
                   ),
-                ),
+                )
               ],
             ),
           ),
@@ -249,7 +235,6 @@ class _ItemWidget extends StatelessWidget {
   }
 
   Widget _buildFeaturesParametersItem(FeaturesParam param) {
-    final theme = ShadTheme.of(vm.context);
     if (param.enumList.isNotEmpty) {
       return Padding(
         padding: const EdgeInsets.only(left: 15),

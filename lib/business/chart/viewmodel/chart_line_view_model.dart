@@ -45,7 +45,7 @@ class ChartLineViewModel extends LoadingPageStatusViewModel {
   // 通道元数据
   ChannelMeta channelMeta;
   int _dataSecond = 0;
-  int _page_size = 3;
+  int _page_size = 9;
 
   bool get _hasMore => _dataSecond < channelMeta.totalSecond;
 
@@ -102,14 +102,12 @@ class ChartLineViewModel extends LoadingPageStatusViewModel {
   }
 
   int lastPage = 0;
-  int lastPageSize = 0;
 
   Future<ResponseData> _rawLoadData(
       {required int page, required int page_size}) async {
     lastPage = page;
     //第一次请求3页
-    lastPageSize = page <= 1 ? _page_size * 3 : _page_size;
-    var data = {
+    final data = {
       'patient_evalution_data': {
         "data_type": channelMeta.dataType,
         "data_id": channelMeta.dataId,
@@ -117,7 +115,7 @@ class ChartLineViewModel extends LoadingPageStatusViewModel {
         'show_data_info': {
           "page": page,
           "drop_rate": 1,
-          "page_size": lastPageSize,
+          "page_size": 9,
           "channels": channelMeta.channelJoin,
         }
       }
@@ -237,9 +235,9 @@ class ChartLineViewModel extends LoadingPageStatusViewModel {
   void _loadMoreData() async {
     showLoading();
     var response = await _rawLoadData(page_size: _page_size, page: _nextPage);
-    if (response.ok && response.data != null) {
-      _channels =
-          mergeChannels(_channels, Channels.fromJson(response.data).data);
+    if (response.ok && response.data?['DataSeg'] != null) {
+      _channels = mergeChannels(
+          _channels, Channels.fromJson(response.data?['DataSeg']).data);
       totalPoints = _channels.isEmpty
           ? 0
           : _channels

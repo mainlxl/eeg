@@ -55,8 +55,6 @@ class Patient {
           runtimeType == other.runtimeType &&
           patientId == other.patientId;
 
-  Map get requestMiniParam => {'patient_id': patientId};
-
   @override
   int get hashCode => patientId.hashCode;
 }

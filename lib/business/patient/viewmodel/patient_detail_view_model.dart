@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:eeg/app.dart';
 import 'package:eeg/business/assess/mode/assess_evaluation.dart';
 import 'package:eeg/business/assess/page/assess_select_page.dart';
@@ -14,6 +16,7 @@ import 'package:eeg/core/network/http_service.dart';
 import 'package:eeg/core/utils/iterable_extend.dart';
 import 'package:eeg/core/utils/router_utils.dart';
 import 'package:eeg/core/utils/toast.dart';
+import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:shadcn_ui/shadcn_ui.dart';
 
@@ -69,7 +72,7 @@ class PatientDetailViewModel extends LoadingPageStatusViewModel {
     setPageStatus(PageStatus.loading);
     final post = await HttpService.post(
       '/api/v2/evaluation/list',
-      data: patient.requestMiniParam,
+      data: {'patient_id': patient.patientId},
     );
     if (post.status == 0 && post.data != null) {
       evaluationtList = post.data['evaluate_list']
@@ -130,7 +133,28 @@ class PatientDetailViewModel extends LoadingPageStatusViewModel {
   void onClickItemAnalyse(Evaluation item) {}
 
   /// 点击下载报告
-  void onClickItemReportDownload(Evaluation item) {}
+  void onClickItemReportDownload(Evaluation item) async {
+    final evaluateReport = item.evaluateReport;
+    if (evaluateReport.isEmpty) {
+      '报告下载错误,报告空'.toast;
+    }
+    var filename =
+        '报告-${item.evaluationDate}-${patient.name}-${item.evaluationId}';
+    if (filename.length > 240) {
+      filename = '${filename.substring(0, 240)}……';
+    }
+    try {
+      final saveFile = await FilePicker.platform.saveFile(
+          dialogTitle: '保存报告PDF文件',
+          fileName: '$filename.pdf',
+          bytes: base64Decode(evaluateReport));
+      if (saveFile != null) {
+        '报告下载成功: $saveFile'.toast;
+      }
+    } catch (e) {
+      '报告下载失败: $e'.toast;
+    }
+  }
 
   /// 点击预览报告
   void onClickItemReportPreview(Evaluation item) {}
@@ -190,6 +214,16 @@ class PatientDetailViewModel extends LoadingPageStatusViewModel {
         ),
       ),
     );
+  }
+
+  void onClickItemReportGenerate(Evaluation item) async {
+    showLoading('正在生成报告...');
+    final post = await HttpService.post('/api/v2/report/generate', data: {
+      'patient_id': item.patientId,
+      'patient_evalution_data': {'patient_evaluation_id': item.evaluationId},
+    });
+    hideLoading();
+    showToast(post.ok ? '报告生成成功' : '报告生成失败');
   }
 }
 

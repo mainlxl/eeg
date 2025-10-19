@@ -32,8 +32,6 @@ class UserModule extends BaseModule {
           if (e.response?.statusCode == HttpStatus.unauthorized) {
             onServerUnauthorized(e.requestOptions.path);
           }
-          // 处理错误xRXWW
-          print('错误: ${e.message}');
           return handler.next(e); // continue
         },
       ),

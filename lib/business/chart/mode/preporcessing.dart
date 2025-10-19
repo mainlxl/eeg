@@ -2,7 +2,6 @@ import 'package:fluent_ui/fluent_ui.dart';
 import 'package:flutter/services.dart';
 
 class PreporcessingAlgorithm {
-  String category;
   String algorithmName;
   String des;
   String dataType;
@@ -10,7 +9,6 @@ class PreporcessingAlgorithm {
   bool checked = false;
 
   PreporcessingAlgorithm({
-    required this.category,
     required this.algorithmName,
     required this.des,
     required this.features,
@@ -24,17 +22,14 @@ class PreporcessingAlgorithm {
   }
 
   factory PreporcessingAlgorithm.fromJson(Map<String, dynamic> json) {
-    final features = json["features"]?[0];
     return PreporcessingAlgorithm(
-      category: json["category"],
-      algorithmName: features["name"],
-      des: features["description"],
-      // des: json["des"],
-      dataType: json["data_type"] as String? ?? '',
-      features: features["parameters"] == null
+      algorithmName: json["algorithm_name"],
+      des: json["des"],
+      dataType: json["type"] as String? ?? '',
+      features: json["params"] == null
           ? []
           : List<FeaturesParam>.from(
-              features["parameters"].map((x) => FeaturesParam.fromJson(x))),
+          json["params"].map((x) => FeaturesParam.fromJson(x))),
     );
   }
 

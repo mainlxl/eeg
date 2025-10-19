@@ -46,22 +46,24 @@ class AlgorithmFeature {
       );
 }
 
+// 特征算法参数
 class AlgorithmParameter {
   String name;
   String type;
-  bool enums;
+  List<String> enumList;
   bool required;
   String description;
-  dynamic defaultValue;
+  String defaultValue;
+  String value;
 
   AlgorithmParameter({
     required this.name,
     required this.type,
-    required this.enums,
+    required this.enumList,
     required this.required,
     required this.defaultValue,
     required this.description,
-  });
+  }) : value = defaultValue;
 
   @override
   String toString() {
@@ -72,26 +74,25 @@ class AlgorithmParameter {
       AlgorithmParameter(
         name: json["name"] ?? '',
         type: json["type"] ?? '',
-        enums: json["enums"] ?? false,
+        enumList: json["enum_list"]?.cast<String>() ?? [],
         required: json["required"] ?? false,
-        defaultValue: json["default"],
+        defaultValue: json["value"],
         description: json["description"] ?? '',
       );
 
   Map<String, dynamic> toJson() {
-    dynamic text = _controller?.text.trim();
+    dynamic value = _controller?.text.trim() ?? this.value;
     if (type == 'int') {
-      text = int.tryParse(text) ?? 0;
+      value = int.tryParse(value) ?? 0;
     } else if (type == 'double' || type == 'float64') {
-      text = double.tryParse(text) ?? 0.0;
+      value = double.tryParse(value) ?? 0.0;
+    } else if (type == 'enum') {
+      value = [value];
     }
     return {
       'name': name,
       'type': type,
-      'enums': enums,
-      'required': required,
-      'default': text,
-      'description': description,
+      'value': value,
     };
   }
 
@@ -115,11 +116,11 @@ class AlgorithmParameter {
   }
 
   bool available() {
-    var text = _controller?.text.trim();
-    if (text != null && text.isNotEmpty) {
+    final text = _controller?.text.trim() ?? value;
+    if (text.isNotEmpty) {
       try {
         if (type == 'double' || type == 'float64' || type == 'float') {
-            return double.tryParse(text) != null;
+          return double.tryParse(text) != null;
         } else if (type == 'int') {
           var intDate = int.tryParse(text);
           if (intDate != null) {
@@ -135,6 +136,8 @@ class AlgorithmParameter {
           return true;
         } else if (type == 'bool') {
           return text == 'true' || text == 'false';
+        } else if (type == 'enum') {
+          return enumList.contains(text);
         }
       } catch (e) {
         return false;

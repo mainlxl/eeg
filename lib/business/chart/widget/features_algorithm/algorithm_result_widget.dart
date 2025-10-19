@@ -82,14 +82,18 @@ class AlgorithmResultViewModel extends LoadingPageStatusViewModel {
     setPageStatus(PageStatus.loading);
     var rawLoadData = await _rawLoadData();
 
-    final filterData = rawLoadData.data['data_filter_info_data'];
+    final result = rawLoadData.data['patient_evaluation_feature']?[0];
     resultInfo =
-        '${filterData['data_type']}-通道(${filterData['channels']})-类别(${algorithmDatum.category})-算法(${algorithmFeature.name})-参数(${algorithmFeature.parameters.join(',')})';
-    final resultImageBase64 =
-        rawLoadData.data['patient_evaluate_feature_option']['feature_items'][0]
-            ['feature_data']['result_svg'][0];
+        '${result['data_type']}-类别(${algorithmDatum.category})-算法(${algorithmFeature.name})-参数(${algorithmFeature.parameters.join(',')})';
+    var resultImageBase64 = (result['feature_items']?[0]?['feature_data']?[0]
+            ?['result_svg']?[0]) as String? ??
+        '';
+    if (resultImageBase64.startsWith('data:image/svg+xml;base64,')) {
+      final split = resultImageBase64.split(',');
+      resultImageBase64 = split.length > 1 ? split[1] : '';
+    }
     resultImageSvg =
-        resultImageBase64 != null ? base64Decode(resultImageBase64) : null;
+        resultImageBase64.isNotEmpty ? base64Decode(resultImageBase64) : null;
     if (resultImageSvg != null) {
       setPageStatus(PageStatus.loadingSuccess);
       actionButtonsController?.notifyActionWidgets([
@@ -137,31 +141,31 @@ class AlgorithmResultViewModel extends LoadingPageStatusViewModel {
   }
 
   Future<ResponseData> _rawLoadData() async {
-    var channelMeta = rootViewModel.channelMeta;
-    var data = {
-      'data_filter_info_data': {
-        "data_id": channelMeta.dataId,
-        'channels': rootViewModel.channels.map((e) => e.channelName).join(','),
-        "patient_evaluation_id": channelMeta.patientEvaluationId,
-        "drop_rate": 1,
-        "page": rootViewModel.lastPage,
-        "page_size": rootViewModel.lastPageSize,
+    final channelMeta = rootViewModel.channelMeta;
+    final data = {
+      'patient_evalution_data': {
         "data_type": channelMeta.dataType,
-        'data_adapters': rootViewModel.getPreporcessingParam(),
-      },
-      'patient_evaluate_feature_option': {
-        'data_type': channelMeta.dataType,
-        'feature_items': [
-          {
-            'feature_name': algorithmFeature.name,
-            'feature_category': algorithmDatum.category,
-            'feature_para': algorithmFeature.parameters,
-          }
-        ]
+        "data_id": channelMeta.dataId,
+        "patient_evaluation_id": channelMeta.patientEvaluationId,
+        'feature_algorithm': {
+          'data_type': channelMeta.dataType,
+          'feature_items': [
+            {
+              'feature_name': algorithmFeature.name,
+              'feature_category': algorithmDatum.category,
+              'feature_para': algorithmFeature.parameters,
+            }
+          ]
+        }
       }
     };
-
-    return HttpService.post('/api/v1/patients/evaluate/EvaluateFeatureComputer',
-        data: data);
+    // 如果有预处理算法 则捎带上
+    final list = rootViewModel.getPreporcessingParam();
+    if (list.isNotEmpty) {
+      data['patient_evalution_data']?['preprocess_algorithm'] = list.isNotEmpty
+          ? List<dynamic>.from(list.map((x) => x.toJson()))
+          : [];
+    }
+    return HttpService.post('/api/v2/feature/evaluate', data: data);
   }
 }
