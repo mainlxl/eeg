@@ -30,8 +30,7 @@ class AssessSelectViewModel extends LoadingPageStatusViewModel {
   }
 
   Future<void> _loadData() async {
-    ResponseData response =
-        await HttpService.post('/api/v2/train/list');
+    ResponseData response = await HttpService.post('/api/v2/train/list');
     if (response.status == 0) {
       data = AssessCategoryJson.fromJson(response.data['classfy_list']).config;
       setPageStatus(PageStatus.loadingSuccess);

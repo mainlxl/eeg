@@ -1,4 +1,3 @@
-import 'package:eeg/app.dart';
 import 'package:eeg/business/patient/mode/patient_info_mode.dart';
 import 'package:eeg/business/patient/page/patient_detail_page.dart';
 import 'package:eeg/business/patient/page/patient_user_list_select_page.dart';
@@ -9,7 +8,8 @@ import 'package:fluent_ui/fluent_ui.dart' as fluent;
 import 'package:fluent_ui/fluent_ui.dart';
 import 'package:flutter/services.dart';
 
-class AssessHomeViewModel extends BaseViewModel {
+// 选择用户-评估首页view model
+class AssessHomeViewModel extends EventViewModel {
   late final items = <fluent.BreadcrumbItem<Widget>>[
     fluent.BreadcrumbItem(
       label: _buildTitle('选择用户'),
@@ -26,9 +26,7 @@ class AssessHomeViewModel extends BaseViewModel {
   @override
   void init() async {
     super.init();
-    addSubscription(eventBus
-        .on<PatientListRefreshEvent>()
-        .listen((event) => _updatePatientName(event.name)));
+    onEvent<PatientListRefreshEvent>((event) => _updatePatientName(event.name));
     _initAssessHomeManager();
 
     //设置移动端强制横屏

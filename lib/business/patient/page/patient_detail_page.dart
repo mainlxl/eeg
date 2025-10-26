@@ -10,6 +10,7 @@ import 'package:eeg/core/utils/date_format.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
+// 患者详情页面 home
 class PatientDetailPage extends StatelessWidget {
   final Patient patient;
   final bool embed;

@@ -6,4 +6,3 @@ const textColor = Color(0xff202357);
 const subtitleColor = Color(0xff8a96ae);
 const iconColor = Color(0xff5972ff);
 const highlightColor = Color(0xffac0000);
-

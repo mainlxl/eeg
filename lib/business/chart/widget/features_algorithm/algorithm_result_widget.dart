@@ -1,5 +1,4 @@
 import 'dart:convert';
-import 'dart:io';
 import 'dart:typed_data';
 
 import 'package:easy_localization/easy_localization.dart';
@@ -11,10 +10,9 @@ import 'package:eeg/common/widget/loading_status_page.dart';
 import 'package:eeg/core/network/http_service.dart';
 import 'package:eeg/core/utils/toast.dart';
 import 'package:file_picker/file_picker.dart';
-import 'package:fluent_ui/fluent_ui.dart';
 import 'package:fluent_ui/fluent_ui.dart' as fluent;
+import 'package:fluent_ui/fluent_ui.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/src/widgets/framework.dart';
 import 'package:flutter_svg/svg.dart';
 
 class AlgorithmResultWidget extends ItemContainerWidget {

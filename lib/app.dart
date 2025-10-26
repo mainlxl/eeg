@@ -1,5 +1,4 @@
 import 'package:easy_localization/easy_localization.dart';
-import 'package:eeg/business/home/page/home_page.dart';
 import 'package:eeg/business/user/page/login_page.dart';
 import 'package:eeg/business/user/user_info.dart';
 import 'package:eeg/common/font_family.dart';
@@ -8,7 +7,7 @@ import 'package:fluent_ui/fluent_ui.dart' as fluent;
 import 'package:flutter/material.dart';
 import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
 import 'package:shadcn_ui/shadcn_ui.dart';
-
+import 'business/home/page/home_page.dart';
 import 'core/base/module.dart';
 import 'core/utils/size.dart';
 import 'module.dart';
@@ -30,13 +29,6 @@ class MyApp extends StatelessWidget {
     initModule();
     SizeUtils.init();
     return ShadApp.custom(
-      // theme: ShadThemeData(
-      //   colorScheme: const ShadSlateColorScheme.light(),
-      //   brightness: Brightness.light,
-      //   sheetTheme: ShadSheetTheme(
-      //
-      //   ),
-      // ),
       appBuilder: (context) => fluent.FluentApp(
         debugShowCheckedModeBanner: false,
         // 关闭右上角的DEBUG标识

@@ -1,6 +1,5 @@
 import 'dart:convert';
 
-import 'package:eeg/app.dart';
 import 'package:eeg/business/assess/mode/assess_evaluation.dart';
 import 'package:eeg/business/assess/page/assess_select_page.dart';
 import 'package:eeg/business/assess/page/assess_upload_page.dart';
@@ -13,7 +12,6 @@ import 'package:eeg/common/app_colors.dart';
 import 'package:eeg/common/widget/loading_status_page.dart';
 import 'package:eeg/core/base/view_model_builder.dart';
 import 'package:eeg/core/network/http_service.dart';
-import 'package:eeg/core/utils/iterable_extend.dart';
 import 'package:eeg/core/utils/router_utils.dart';
 import 'package:eeg/core/utils/toast.dart';
 import 'package:file_picker/file_picker.dart';
@@ -32,9 +30,7 @@ class PatientDetailViewModel extends LoadingPageStatusViewModel {
   @override
   void init() {
     loadPatientEvaluateList();
-    addSubscription(eventBus
-        .on<UpdateOrInsertPatientEvaluateEvent>()
-        .listen(_onCreatePatientEvaluateEvent));
+    onEvent<UpdateOrInsertPatientEvaluateEvent>(_onCreatePatientEvaluateEvent);
   }
 
   onClickUpdate() async {
@@ -77,8 +73,8 @@ class PatientDetailViewModel extends LoadingPageStatusViewModel {
     if (post.status == 0 && post.data != null) {
       evaluationtList = post.data['evaluate_list']
               ?.map((json) => json['evaluate_info'] != null
-                  ? Evaluation.fromJson(
-                      json['evaluate_info'], json['evaluate_data'])
+                  ? Evaluation.fromJson(json['evaluate_info'],
+                      json['evaluate_data'], patient.patientId)
                   : null) // 将 null 过滤掉
               .where((evaluation) => evaluation != null)
               .cast<Evaluation>()
@@ -224,6 +220,7 @@ class PatientDetailViewModel extends LoadingPageStatusViewModel {
     });
     hideLoading();
     showToast(post.ok ? '报告生成成功' : '报告生成失败');
+    loadPatientEvaluateList();
   }
 }
 

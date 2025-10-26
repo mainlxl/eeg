@@ -6,7 +6,7 @@ import 'package:provider/provider.dart';
 
 enum PageStatus { idle, loading, error, empty, loadingSuccess }
 
-abstract class LoadingPageStatusViewModel extends BaseViewModel {
+abstract class LoadingPageStatusViewModel extends EventViewModel {
   PageStatus _pageStatus = PageStatus.idle;
 
   PageStatus get pageStatus => _pageStatus;

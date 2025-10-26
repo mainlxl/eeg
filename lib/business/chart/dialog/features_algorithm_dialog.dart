@@ -1,6 +1,5 @@
-import 'package:eeg/business/chart/mode/channel_alagorithm.dart';
-import 'package:eeg/business/chart/mode/channels_meta_data.dart';
 import 'package:eeg/business/chart/dialog/base_close_dialog.dart';
+import 'package:eeg/business/chart/mode/channel_alagorithm.dart';
 import 'package:eeg/business/chart/viewmodel/chart_line_view_model.dart';
 import 'package:eeg/business/chart/widget/features_algorithm/algorithm_parames_select_widget.dart';
 import 'package:eeg/business/chart/widget/features_algorithm/algorithm_result_widget.dart';

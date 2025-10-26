@@ -24,6 +24,7 @@ class AssessHomePage extends StatelessWidget {
     );
   }
 
+  //根视图
   Widget _renderBody(BuildContext ctx, AssessHomeViewModel vm) {
     return Container(
       color: bgColor,
@@ -49,46 +50,5 @@ class AssessHomePage extends StatelessWidget {
         ],
       ),
     );
-    // return fluent.NavigationView(
-    //   pane: fluent.NavigationPane(
-    //       selected: vm.selectIndex,
-    //       onItemPressed: vm.onItemPressed,
-    //       onChanged: vm.onHomeTabChange,
-    //       displayMode: vm.displayMode,
-    //       items: [
-    //         fluent.PaneItem(
-    //           icon: const Icon(fluent.FluentIcons.info),
-    //           title: const Text('基本信息'),
-    //           body: PatientDetailPage(patient: patient, embed: true),
-    //         ),
-    //         fluent.PaneItem(
-    //           icon: const Icon(fluent.FluentIcons.document),
-    //           title: const Text('评估方案'),
-    //           body: const AssessSelectModePage(),
-    //         ),
-    //         fluent.PaneItem(
-    //           icon: const Icon(fluent.FluentIcons.build),
-    //           title: const Text('训练策略'),
-    //           body: const AssessSelectModePage(),
-    //         ),
-    //         fluent.PaneItem(
-    //           icon: const Icon(fluent.FluentIcons.line_chart),
-    //           title: const Text('数据分析'),
-    //           body: const AssessSelectModePage(),
-    //         ),
-    //         fluent.PaneItem(
-    //           icon: const Icon(Icons.report),
-    //           title: const Text('康复报告'),
-    //           body: const AssessSelectModePage(),
-    //         ),
-    //       ],
-    //       footerItems: [
-    //         fluent.PaneItemAction(
-    //           icon: const Icon(fluent.FluentIcons.settings),
-    //           title: const Text('设置'),
-    //           onTap: vm.onClickSetting,
-    //         ),
-    //       ]),
-    // );
   }
 }

@@ -1,4 +1,4 @@
-import 'dart:convert';
+
 
 class Evaluation {
   int evaluationId;
@@ -28,11 +28,12 @@ class Evaluation {
     this.data,
   });
 
-  factory Evaluation.fromJson(Map<String, dynamic> info, List<dynamic>? data) {
+  factory Evaluation.fromJson(
+      Map<String, dynamic> info, List<dynamic>? data, int patientId) {
     return Evaluation(
       evaluationId: info['evaluate_id'] ?? 0,
       evaluateLevel: info['evaluate_level'] ?? '',
-      patientId: info['patient_id'] ?? 0,
+      patientId: info['patient_id'] ?? patientId,
       evaluationDate: info['evaluate_date'] ?? '',
       evaluateType: info['evaluate_type'] ?? '',
       evaluateReport: info['evaluate_report'] ?? '',

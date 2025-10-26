@@ -29,7 +29,7 @@ class PreporcessingAlgorithm {
       features: json["params"] == null
           ? []
           : List<FeaturesParam>.from(
-          json["params"].map((x) => FeaturesParam.fromJson(x))),
+              json["params"].map((x) => FeaturesParam.fromJson(x))),
     );
   }
 

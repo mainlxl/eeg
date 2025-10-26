@@ -1,5 +1,4 @@
 import 'package:eeg/business/assess/mode/assess_evaluation.dart';
-import 'package:eeg/business/patient/mode/patient_info_mode.dart';
 
 class AssessRecord {
   //评估id

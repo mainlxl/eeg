@@ -1,11 +1,10 @@
-import 'package:eeg/app.dart';
 import 'package:eeg/business/patient/mode/patient_info_mode.dart';
-import 'package:eeg/business/user/user_info.dart';
 import 'package:eeg/common/widget/loading_status_page.dart';
 import 'package:eeg/core/base/view_model_builder.dart';
 import 'package:eeg/core/network/http_service.dart';
 import 'package:eeg/core/utils/router_utils.dart';
 
+// 用户列表视图
 class PatientListViewModel extends LoadingPageStatusViewModel {
   List<Patient>? _patients;
   List<Patient>? _searchResults;
@@ -18,8 +17,7 @@ class PatientListViewModel extends LoadingPageStatusViewModel {
   void init() {
     super.init();
     loadData();
-    addSubscription(
-        eventBus.on<PatientListRefreshEvent>().listen((event) => loadData()));
+    onEvent<PatientListRefreshEvent>((event) => loadData());
   }
 
   Future<void> loadData([bool enableLoadingPage = true]) async {

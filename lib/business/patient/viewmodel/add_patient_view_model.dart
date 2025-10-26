@@ -108,8 +108,8 @@ class AddPatientViewModel extends BaseViewModel {
       // 展示对话框如果用户确认删除
       if (await confirmDeleteDialog(patient)) {
         showLoading();
-        ResponseData post = await HttpService.post(
-            '/api/v2/patient/delete',data: {'patient_id': patient.patientId});
+        ResponseData post = await HttpService.post('/api/v2/patient/delete',
+            data: {'patient_id': patient.patientId});
         hideLoading();
         if (post.status == 0) {
           '用户信息已删除'.showToast();

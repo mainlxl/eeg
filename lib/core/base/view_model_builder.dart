@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:eeg/app.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
 import 'package:provider/provider.dart';
@@ -84,6 +85,20 @@ class _ViewModelBuilderState<T extends BaseViewModel>
 typedef Mounted = bool Function();
 
 enum PagePopType { refreshData, deleteData }
+
+abstract class EventViewModel extends BaseViewModel {
+  void onEvent<T>(
+    void Function(T event)? onData, {
+    Function? onError,
+    void Function()? onDone,
+    bool? cancelOnError,
+  }) {
+    addSubscription(eventBus.on<T>().listen(onData,
+        onError: onError, onDone: onDone, cancelOnError: cancelOnError));
+  }
+
+  void fireEvent(event) => eventBus.fire(event);
+}
 
 abstract class BaseViewModel extends ChangeNotifier {
   bool _isDisposed = false;

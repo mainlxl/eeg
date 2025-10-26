@@ -44,7 +44,8 @@ class HttpService {
       InterceptorsWrapper(
         onRequest: (options, handler) {
           if (isDebug) {
-            print('请求: ${options.method} ${options.path} ${jsonEncode(options.data)}');
+            print(
+                '请求: ${options.method} ${options.path} ${jsonEncode(options.data)}');
           }
           return handler.next(options); // continue
         },
