@@ -12,11 +12,13 @@ import 'package:eeg/common/app_colors.dart';
 import 'package:eeg/common/widget/loading_status_page.dart';
 import 'package:eeg/core/base/view_model_builder.dart';
 import 'package:eeg/core/network/http_service.dart';
+import 'package:eeg/core/utils/date_format.dart';
 import 'package:eeg/core/utils/router_utils.dart';
 import 'package:eeg/core/utils/toast.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:shadcn_ui/shadcn_ui.dart';
+import 'package:syncfusion_flutter_pdfviewer/pdfviewer.dart';
 
 class PatientDetailViewModel extends LoadingPageStatusViewModel {
   Patient patient;
@@ -33,7 +35,7 @@ class PatientDetailViewModel extends LoadingPageStatusViewModel {
     onEvent<UpdateOrInsertPatientEvaluateEvent>(_onCreatePatientEvaluateEvent);
   }
 
-  onClickUpdate() async {
+  void onClickPatientUpdate() async {
     var result = await showDialog(
       context: context,
       builder: (context) => Container(
@@ -153,7 +155,29 @@ class PatientDetailViewModel extends LoadingPageStatusViewModel {
   }
 
   /// 点击预览报告
-  void onClickItemReportPreview(Evaluation item) {}
+  void onClickItemReportPreview(Evaluation item) {
+    assessHomePageManager.addNextPage(
+        title: '预览报告${item.evaluationDate.yyyy_MM_dd_HH_mm_ss}',
+        builder: (patient) => Stack(
+              children: [
+                SfPdfViewer.memory(base64Decode(item.evaluateReport)),
+                TextButton(
+                  onPressed: () => onClickItemReportDownload(item),
+                  style: TextButton.styleFrom(
+                    backgroundColor: Colors.grey.withAlpha(50),
+                    padding: EdgeInsets.symmetric(horizontal: 15, vertical: 10),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(15), // 设置圆角
+                    ),
+                  ),
+                  child: Text(
+                    '下载',
+                    style: const TextStyle(fontSize: 18, color: Colors.blue),
+                  ),
+                ),
+              ],
+            ));
+  }
 
   /// 点击数据展示
   void onClickItemAnalyze(Evaluation data, DataItem item) {

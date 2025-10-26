@@ -189,7 +189,7 @@ class AssessViewModel extends LoadingPageStatusViewModel {
         patientEvaluationId = assessRecord.evaluationId;
       }
       if (patientEvaluationId > 0) {
-        eventBus.fire(UpdateOrInsertPatientEvaluateEvent(
+        fireEvent(UpdateOrInsertPatientEvaluateEvent(
             patientEvaluationId: patientEvaluationId,
             patientId: patient.patientId));
         Future.microtask(_onNextUploadData);

@@ -9,7 +9,7 @@ import 'package:flutter/material.dart';
 
 typedef PatientCallback = void Function(Patient);
 
-/// 用户列表选择页面
+/// 患者列表选择页面
 class PatientListSelectPage extends StatelessWidget {
   final PatientCallback onSelect;
 

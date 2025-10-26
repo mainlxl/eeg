@@ -43,7 +43,7 @@ main() async {
     });
   }
   if (isDebug) {
-    HttpService().setProxy('127.0.0.1:8888');
+    HttpService().setProxy('127.0.0.1:9090');
   }
   runApp(EasyLocalization(
     supportedLocales: const [Locale('en', 'US'), Locale('zh', 'CN')],

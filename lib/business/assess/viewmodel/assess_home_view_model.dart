@@ -13,7 +13,7 @@ class AssessHomeViewModel extends EventViewModel {
   late final items = <fluent.BreadcrumbItem<Widget>>[
     fluent.BreadcrumbItem(
       label: _buildTitle('选择用户'),
-      value: PatientListSelectPage(onSelect: onSelectPatient),
+      value: PatientListSelectPage(onSelect: onSelectPatient), // 选择患者
     ),
   ];
   Patient? patient;
@@ -36,6 +36,7 @@ class AssessHomeViewModel extends EventViewModel {
     ]);
   }
 
+  // 选择患者
   void onSelectPatient(Patient patient) {
     this.patient = patient;
     items.add(

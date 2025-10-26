@@ -10,7 +10,7 @@ import 'package:eeg/core/utils/date_format.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
-// 患者详情页面 home
+// 患者详情页面
 class PatientDetailPage extends StatelessWidget {
   final Patient patient;
   final bool embed;
@@ -35,7 +35,7 @@ class PatientDetailPage extends StatelessWidget {
                   actions: [
                     IconButton(
                       icon: const Icon(Icons.edit_outlined),
-                      onPressed: vm.onClickUpdate,
+                      onPressed: vm.onClickPatientUpdate,
                     )
                   ],
                 ),
@@ -116,23 +116,6 @@ class PatientDetailPage extends StatelessWidget {
         Icon(icon, size: 20),
         const SizedBox(width: 4),
         SelectableText(text, style: TextStyle(fontSize: 14, color: textColor)),
-      ],
-    );
-  }
-
-  Widget _buildDateItem(String label, DateTime date) {
-    return Row(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      mainAxisSize: MainAxisSize.min,
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: [
-        const SizedBox(width: 8),
-        Icon(Icons.calendar_today, size: 20),
-        const SizedBox(width: 4),
-        SelectableText(
-          '$label: ${date.yyyy_MM_dd}',
-          style: const TextStyle(fontSize: 14),
-        )
       ],
     );
   }
@@ -246,12 +229,32 @@ class PatientDetailPage extends StatelessWidget {
         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
         children: [
           TextButton(
-            onPressed: vm.onClickUpdate,
-            child: const Text('编辑用户信息'),
+            style: TextButton.styleFrom(
+              backgroundColor: Colors.grey.withAlpha(30),
+              padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 10),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(15), // 设置圆角
+              ),
+            ),
+            onPressed: vm.onClickPatientUpdate,
+            child: const Text(
+              '编辑用户信息',
+              style: const TextStyle(fontSize: 16, color: Colors.blue),
+            ),
           ),
           TextButton(
+            style: TextButton.styleFrom(
+              backgroundColor: Colors.grey.withAlpha(30),
+              padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 10),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(15), // 设置圆角
+              ),
+            ),
             onPressed: vm.onClickShowAssessDialog,
-            child: const Text('开始评估'),
+            child: const Text(
+              '开始评估',
+              style: const TextStyle(fontSize: 16, color: Colors.blue),
+            ),
           ),
         ],
       )

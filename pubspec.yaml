@@ -9,7 +9,7 @@ environment:
 dev_dependencies:
   flutter_test:
     sdk: flutter
-  flutter_lints: ^5.0.0
+  flutter_lints: ^6.0.0
   flutter_launcher_icons: ^0.14.2
 
 # 执行dart run flutter_launcher_icons替换图标
@@ -40,10 +40,10 @@ dependencies:
   window_manager: ^0.5.1
   system_theme: ^3.1.2
   flutter_acrylic: ^1.1.4
-  connectivity_plus: ^6.1.1
+  connectivity_plus: ^7.0.0
   crypto: ^3.0.6
   # 获取版本号
-  package_info_plus: ^8.1.2
+  package_info_plus: ^9.0.0
   event_bus: ^2.0.1
   # https://pub.dev/packages/isolate_easy_pool
   isolate_easy_pool: ^0.0.8
@@ -52,7 +52,7 @@ dependencies:
   # https://bdlukaa.github.io/fluent_ui/
   fluent_ui: ^4.12.0
   #https://flutter-shadcn-ui.mariuti.com/
-  shadcn_ui: ^0.28.1
+  shadcn_ui: ^0.38.5
   # 视频播放
   media_kit: ^1.1.5
   media_kit_video: ^1.2.5
@@ -60,6 +60,7 @@ dependencies:
   data_table_2: ^2.6.0
   file_picker: ^10.0.0
   flutter_svg: ^2.2.1
+  syncfusion_flutter_pdfviewer: ^31.2.3
 
 # 升级所有库版本到最新 flutter pub upgrade --major-versions
 
