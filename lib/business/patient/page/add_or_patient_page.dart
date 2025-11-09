@@ -8,6 +8,7 @@ import 'package:eeg/core/utils/id_card_check_utils.dart';
 import 'package:eeg/core/utils/phone_utils.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:shadcn_ui/shadcn_ui.dart';
 
 class AddPatientPage extends StatelessWidget {
   final Patient? patient;
@@ -123,15 +124,12 @@ class AddPatientPage extends StatelessWidget {
                       ),
                       const SizedBox(width: 20.0),
                       Expanded(
-                        child: _buildItem(
+                        child: _buildSelectItem(
                           labelText: '需求用途',
-                          hintText: '请输入需求用途',
-                          maxLength: 20,
-                          keyboardType: TextInputType.text,
-                          controller: vm.usageNeedsController,
-                          validator: (value) {
-                            return null;
-                          },
+                          hintText:
+                              vm.usageNeeds.isEmpty ? '请选择需求用途' : vm.usageNeeds,
+                          onChanged: vm.usageNeedsChange,
+                          enumList: ['数据分析', '康养评估', '康复训练'],
                         ),
                       ),
                     ],
@@ -263,6 +261,23 @@ class AddPatientPage extends StatelessWidget {
       ),
       style: const TextStyle(fontSize: 14.0),
       validator: validator,
+    );
+  }
+
+  Widget _buildSelectItem({
+    required String labelText,
+    required String hintText,
+    required ValueChanged<String> onChanged,
+    required List<String> enumList,
+  }) {
+    return ShadSelect<String>(
+      placeholder: Text(hintText),
+      options: enumList.map((e) => ShadOption(
+          padding: const EdgeInsets.symmetric(horizontal: 5),
+          value: e,
+          child: Text(e))),
+      selectedOptionBuilder: (context, value) => Text(value),
+      onChanged: (value) => onChanged.call(value!),
     );
   }
 }

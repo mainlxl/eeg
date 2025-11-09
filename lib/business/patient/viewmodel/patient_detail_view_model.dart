@@ -31,6 +31,7 @@ class PatientDetailViewModel extends LoadingPageStatusViewModel {
 
   @override
   void init() {
+    super.init();
     loadPatientEvaluateList();
     onEvent<UpdateOrInsertPatientEvaluateEvent>(_onCreatePatientEvaluateEvent);
   }

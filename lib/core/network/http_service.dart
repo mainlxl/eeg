@@ -3,6 +3,7 @@ import 'dart:io';
 
 import 'package:dio/dio.dart';
 import 'package:dio/io.dart';
+import 'package:eeg/core/utils/app_logger.dart';
 import 'package:eeg/core/utils/config.dart';
 import 'package:eeg/core/utils/toast.dart';
 
@@ -50,14 +51,15 @@ class HttpService {
           return handler.next(options); // continue
         },
         onResponse: (response, handler) {
-          // 处理响应数据
-          if (isDebug) {
-            print('响应: ${response.statusCode} ${jsonEncode(response.data)}');
-          }
+          // final uri = response.realUri;
+          // final path = uri.path;
+          final json = jsonEncode(response.data);
+          logi(
+              '${response.realUri} ==> ${json.length <= 30000 ? '\n $json' : response.statusCode}');
           return handler.next(response); // continue
         },
         onError: (DioException e, handler) {
-          print('错误: ${e.message}');
+          logi('网络错误: ${e.message}');
           return handler.next(e); // continue
         },
       ),

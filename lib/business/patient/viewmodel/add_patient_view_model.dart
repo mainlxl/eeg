@@ -11,7 +11,8 @@ import 'package:flutter/material.dart';
 
 class AddPatientViewModel extends BaseViewModel {
   late final TextEditingController nameController;
-  late final TextEditingController usageNeedsController;
+  String usageNeeds = '';
+
   late final TextEditingController phoneController;
   late final TextEditingController idCardController;
 
@@ -29,7 +30,7 @@ class AddPatientViewModel extends BaseViewModel {
   AddPatientViewModel(Patient? patient) {
     _patient = patient;
     nameController = TextEditingController(text: patient?.name);
-    usageNeedsController = TextEditingController(text: patient?.usageNeeds);
+    usageNeeds = patient?.usageNeeds ?? '';
     phoneController = TextEditingController(text: patient?.phoneNumber);
     idCardController = TextEditingController(text: patient?.identityInfo);
     medicalHistoryController =
@@ -47,7 +48,7 @@ class AddPatientViewModel extends BaseViewModel {
         "gender": IdCardUtils.getGender(idCard),
         "medical_history": medicalHistoryController.text.trim(),
         "phone_number": phoneController.text.trim(),
-        "usage_needs": usageNeedsController.text.trim(),
+        "usage_needs": usageNeeds,
         "identity_info": idCard,
       };
       ResponseData post = await HttpService.post('/api/v2/patient/update',
@@ -74,6 +75,10 @@ class AddPatientViewModel extends BaseViewModel {
   }
 
   void onClickAddPatient() async {
+    if (usageNeeds.isEmpty) {
+      '请先选择需求用途'.showToast();
+      return;
+    }
     if (formKey.currentState!.validate()) {
       showLoading();
       var idCard = idCardController.text;
@@ -83,7 +88,7 @@ class AddPatientViewModel extends BaseViewModel {
           "age": IdCardUtils.getAge(idCard),
           "gender": IdCardUtils.getGender(idCard),
           "medical_history": medicalHistoryController.text.trim(),
-          "usage_needs": usageNeedsController.text.trim(),
+          "usage_needs": usageNeeds,
           "phone_number": phoneController.text.trim(),
           "identity_info": idCard,
         }
@@ -165,5 +170,10 @@ class AddPatientViewModel extends BaseViewModel {
           },
         ) ??
         false;
+  }
+
+  void usageNeedsChange(String newValue) {
+    usageNeeds = newValue;
+    notifyListeners();
   }
 }

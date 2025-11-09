@@ -2,12 +2,15 @@ import 'package:easy_localization/easy_localization.dart';
 
 final _yyyy_MM_dd = DateFormat('yyyy-MM-dd');
 final _yyyy_MM_dd_HH_mm_ss = DateFormat('yyyy-MM-dd HH:mm:ss');
+final _yyyy_MM_dd_HH_mm_ss_file = DateFormat('yyyy-MM-dd HH_mm_ss');
 final _yyyy_MM_dd_n_HH_mm_ss = DateFormat('yyyy-MM-dd \n HH:mm:ss');
 
 extension DateFormatExtension on DateTime {
   String get yyyy_MM_dd => _yyyy_MM_dd.format(this);
 
   String get yyyy_MM_dd_HH_mm_ss => _yyyy_MM_dd_HH_mm_ss.format(this);
+
+  String get yyyy_MM_dd_HH_mm_ss_file => _yyyy_MM_dd_HH_mm_ss_file.format(this);
 }
 
 extension IntDateFormatExtension on int {

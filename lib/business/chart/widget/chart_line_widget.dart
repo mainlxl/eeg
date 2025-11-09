@@ -34,7 +34,7 @@ class ChannelLineChartPainter extends CustomPainter {
   void paint(Canvas canvas, Size size) {
     var channelData = data.data;
     var startIndex = (scrollOffset / pointGap).floor();
-    var checkShowChannelName = (maxShowCount / 5).ceil();
+    // var checkShowChannelName = (maxShowCount / 5).ceil();
     for (int i = 0; i < maxShowCount; i++) {
       var dataIndex = i + startIndex;
       var nextDataIndex = dataIndex + 1;
@@ -50,7 +50,9 @@ class ChannelLineChartPainter extends CustomPainter {
       final double y2 =
           mapYValueToPixel(channelData[nextDataIndex], size.height);
       canvas.drawLine(Offset(x1, y1), Offset(x2, y2), linePaint);
-      if (!isScroll && i % checkShowChannelName == 0) {
+      // 绘制多处 并且拖动隐藏
+      // if (!isScroll && i % checkShowChannelName == 0) {
+      if (i == 0) {
         drawChannelName(canvas, size, Offset(x1, y1), i == 0);
       }
     }

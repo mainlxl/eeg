@@ -2,11 +2,13 @@ import 'package:easy_localization/easy_localization.dart';
 import 'package:eeg/business/user/page/login_page.dart';
 import 'package:eeg/business/user/user_info.dart';
 import 'package:eeg/common/font_family.dart';
+import 'package:eeg/core/utils/app_logger.dart';
 import 'package:event_bus/event_bus.dart';
 import 'package:fluent_ui/fluent_ui.dart' as fluent;
 import 'package:flutter/material.dart';
 import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
 import 'package:shadcn_ui/shadcn_ui.dart';
+
 import 'business/home/page/home_page.dart';
 import 'core/base/module.dart';
 import 'core/utils/size.dart';

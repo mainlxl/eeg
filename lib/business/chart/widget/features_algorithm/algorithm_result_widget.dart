@@ -77,6 +77,7 @@ class AlgorithmResultViewModel extends LoadingPageStatusViewModel {
 
   @override
   void init() async {
+    super.init();
     setPageStatus(PageStatus.loading);
     var rawLoadData = await _rawLoadData();
 

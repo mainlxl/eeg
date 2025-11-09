@@ -4,6 +4,7 @@ import 'package:eeg/business/patient/page/patient_user_list_select_page.dart';
 import 'package:eeg/business/patient/viewmodel/patient_list_view_model.dart';
 import 'package:eeg/common/app_colors.dart';
 import 'package:eeg/core/base/view_model_builder.dart';
+import 'package:eeg/core/utils/app_logger.dart';
 import 'package:fluent_ui/fluent_ui.dart' as fluent;
 import 'package:fluent_ui/fluent_ui.dart';
 import 'package:flutter/services.dart';
@@ -27,8 +28,6 @@ class AssessHomeViewModel extends EventViewModel {
   void init() async {
     super.init();
     onEvent<PatientListRefreshEvent>((event) => _updatePatientName(event.name));
-    _initAssessHomeManager();
-
     //设置移动端强制横屏
     await SystemChrome.setPreferredOrientations([
       DeviceOrientation.landscapeLeft,
@@ -39,17 +38,14 @@ class AssessHomeViewModel extends EventViewModel {
   // 选择患者
   void onSelectPatient(Patient patient) {
     this.patient = patient;
-    items.add(
-      fluent.BreadcrumbItem(
-        label: _buildTitle('用户:${patient.name}'),
-        value: PatientDetailPage(
+    assessHomePageManager.addNextPage(
+        title: '用户:${patient.name}',
+        builder: (_) => PatientDetailPage(
             patient: patient,
             embed: true,
             onClosePage: () {
               onSelectedIndex(items[0]);
-            }),
-      ),
-    );
+            }));
     notifyListeners();
   }
 
@@ -59,6 +55,8 @@ class AssessHomeViewModel extends EventViewModel {
       if (index >= 0 && index < items.length - 1) {
         items.removeRange(index + 1, items.length);
       }
+      logi(
+          'AssessHomePageManager路由: ${items.map((e) => (e.label as Text).data)}');
       notifyListeners();
     }
   }
@@ -74,20 +72,27 @@ class AssessHomeViewModel extends EventViewModel {
         label: _buildTitle('用户:$name'),
         value: old.value,
       );
+      logi(
+          'AssessHomePageManager路由: ${items.map((e) => (e.label as Text).data)}');
       notifyListeners();
     }
   }
 
-  void _initAssessHomeManager() {
-    assessHomePageManager = AssessHomePageManager();
-    assessHomePageManager._notifyListeners = notifyListeners;
+  void _updateAssessHomeManager() {
     assessHomePageManager.viewModel = this;
+    assessHomePageManager._notifyListeners = notifyListeners;
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    _updateAssessHomeManager();
   }
 
   @override
   void dispose() {
     super.dispose();
-    assessHomePageManager = AssessHomePageManager();
+    assessHomePageManager.dispose();
   }
 
   @override
@@ -98,7 +103,7 @@ class AssessHomeViewModel extends EventViewModel {
 
 typedef AssessHomePageBuilder = Widget Function(Patient? patient);
 
-late final AssessHomePageManager assessHomePageManager;
+final AssessHomePageManager assessHomePageManager = AssessHomePageManager();
 
 class AssessHomePageManager {
   late AssessHomeViewModel viewModel;
@@ -114,6 +119,8 @@ class AssessHomePageManager {
         value: builder.call(viewModel.patient),
       ),
     );
+    logi(
+        'AssessHomePageManager路由: ${viewModel.items.map((e) => (e.label as Text).data)}');
     _notifyListeners.call();
   }
 
@@ -127,5 +134,9 @@ class AssessHomePageManager {
       viewModel.items.removeLast();
       _notifyListeners.call();
     }
+    logi(
+        'AssessHomePageManager路由: ${viewModel.items.map((e) => (e.label as Text).data)}');
   }
+
+  void dispose() {}
 }
