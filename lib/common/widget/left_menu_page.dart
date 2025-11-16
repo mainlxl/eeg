@@ -50,8 +50,8 @@ class PanePageWidget extends StatefulWidget {
 
 class _PanePageWidgetState extends State<PanePageWidget> {
   @override
-  void initState() {
-    super.initState();
+  void didChangeDependencies() {
+    super.didChangeDependencies();
     widget.controller._state = this;
   }
 
@@ -73,9 +73,7 @@ class _PanePageWidgetState extends State<PanePageWidget> {
         .map((entry) => _buildMenu(entry.key, entry.value))
         .toList();
     if (widget.bottomItems != null) {
-      menus.add(Expanded(
-        child: Container(),
-      ));
+      menus.add(Expanded(child: Container()));
       menus.addAll(widget.bottomItems!
           .asMap()
           .entries
@@ -111,9 +109,8 @@ class _PanePageWidgetState extends State<PanePageWidget> {
 
   Widget _buildMenu(int index, PanePageItem item) {
     var isSelect = index == widget.controller.selectedIndex;
-    return GestureDetector(
-      behavior: HitTestBehavior.deferToChild,
-      onTap: () {
+    return TextButton(
+      onPressed: () {
         if (item.onClick != null) {
           if (item.onClick!()) {
             return;

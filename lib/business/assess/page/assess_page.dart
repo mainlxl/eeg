@@ -40,15 +40,12 @@ class AssessPage extends StatelessWidget {
     return PanePageWidget(
       items: data.dataList.map((item) {
         return PanePageItem(
-          iconWidget: Icon(data.isImage ? Icons.image : Icons.ondemand_video),
+          iconWidget: Icon(data.isImage
+              ? Icons.image
+              : (data.isGame ? Icons.view_compact : Icons.ondemand_video)),
           title: item,
           needSaveDate: data.isImage,
-          body: Container(
-            constraints: BoxConstraints.expand(),
-            color: Colors.white,
-            alignment: Alignment.center,
-            child: _renderResource(vm, data, '${data.dataPath}/$item'),
-          ),
+          body: _buildAssessWidget(data, vm, item),
         );
       }).toList(),
       controller: vm.controller,
@@ -59,6 +56,22 @@ class AssessPage extends StatelessWidget {
             title: '上传评估数据',
             onClick: () {
               vm.onClickUploadData();
+              return true;
+            },
+          ),
+        if (data.isImage)
+          PanePageItem(
+            iconWidget: const Icon(Icons.podcasts),
+            title:
+                '循环次数:${vm.currentImageCount.clamp(0, vm.imageCount)}/${vm.imageCount}',
+            onClick: () => true,
+          ),
+        if (data.isImage)
+          PanePageItem(
+            iconWidget: const Icon(Icons.change_circle),
+            title: '调整播放频率',
+            onClick: () {
+              vm.onClickChangeFrequency(data);
               return true;
             },
           ),
@@ -82,9 +95,40 @@ class AssessPage extends StatelessWidget {
     );
   }
 
+  Widget _buildAssessWidget(AssessData data, AssessViewModel vm, String item) {
+    final widget = data.isGame
+        ? data.gameBuild!.call(vm.onGameFinish, vm.onResetControlChange)
+        : Container(
+            constraints: BoxConstraints.expand(),
+            color: Colors.white,
+            alignment: Alignment.center,
+            child: _renderResource(vm, data, '${data.dataPath}/$item'),
+          );
+    if (vm.isImageTimerIntermittent) {
+      return Stack(
+        children: [
+          widget,
+          _buildTimerIntermittent(data, vm, item),
+        ],
+      );
+    }
+    return widget;
+  }
+
   Widget _renderResource(AssessViewModel vm, AssessData data, String url) {
     return data.isVideo
         ? VideoWidget(player: vm.player)
         : Image.network(url, fit: BoxFit.cover);
+  }
+
+  Widget _buildTimerIntermittent(
+      AssessData data, AssessViewModel vm, String item) {
+    return Container(
+      constraints: BoxConstraints.expand(),
+      color: Colors.black12,
+      alignment: Alignment.center,
+      child: Text('运动间歇中,准备下一动作...',
+          style: TextStyle(fontSize: 24, color: Colors.red)),
+    );
   }
 }

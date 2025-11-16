@@ -1,8 +1,8 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:eeg/business/user/page/login_page.dart';
 import 'package:eeg/business/user/user_info.dart';
+import 'package:eeg/common/app_colors.dart';
 import 'package:eeg/common/font_family.dart';
-import 'package:eeg/core/utils/app_logger.dart';
 import 'package:event_bus/event_bus.dart';
 import 'package:fluent_ui/fluent_ui.dart' as fluent;
 import 'package:flutter/material.dart';
@@ -31,9 +31,16 @@ class MyApp extends StatelessWidget {
     initModule();
     SizeUtils.init();
     return ShadApp.custom(
+      theme: ShadThemeData(
+        textTheme: ShadTextTheme(
+          p: const TextStyle(
+              color: textColor, fontSize: 16, fontWeight: FontWeight.normal),
+          family: mainFont,
+        ),
+      ),
       appBuilder: (context) => fluent.FluentApp(
-        debugShowCheckedModeBanner: false,
         // 关闭右上角的DEBUG标识
+        debugShowCheckedModeBanner: false,
         navigatorKey: _navigatorKey,
         locale: context.locale,
         localizationsDelegates: context.localizationDelegates,

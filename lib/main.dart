@@ -8,6 +8,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_acrylic/flutter_acrylic.dart' as flutter_acrylic;
+import 'package:package_info_plus/package_info_plus.dart';
 import 'package:system_theme/system_theme.dart';
 import 'package:window_manager/window_manager.dart';
 
@@ -39,7 +40,7 @@ _main() async {
           skipTaskbar: false,
           titleBarStyle: TitleBarStyle.hidden,
         ), () async {
-      await windowManager.setPreventClose(true);
+      await windowManager.setPreventClose(false);
       await windowManager.show();
       await windowManager.focus();
     });
@@ -47,6 +48,7 @@ _main() async {
   if (isDebug) {
     HttpService().setProxy('127.0.0.1:9090');
   }
+  packageInfo = await PackageInfo.fromPlatform();
   runApp(EasyLocalization(
     supportedLocales: const [Locale('en', 'US'), Locale('zh', 'CN')],
     path: 'locals',

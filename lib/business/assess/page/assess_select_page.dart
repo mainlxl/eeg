@@ -49,9 +49,7 @@ class AssessSelectPage extends StatelessWidget {
           _buildSelectors(theme, vm),
           SizedBox(height: 30),
           EnableWidget(
-            enable: vm.selectedCategory != null &&
-                vm.selectedSubCategory != null &&
-                vm.selectedInspectionPoint != null,
+            enable: vm.isEnableNext,
             child: ShadButton(
               onPressed: vm.onClickStartAssess,
               gradient: const LinearGradient(colors: [
@@ -76,7 +74,7 @@ class AssessSelectPage extends StatelessWidget {
 
   Widget _buildTitle() {
     return Text(
-      '请选择需要评估的部位',
+      '请选择需要评估',
       maxLines: 1,
       overflow: TextOverflow.ellipsis,
       style: TextStyle(
@@ -117,7 +115,7 @@ class AssessSelectPage extends StatelessWidget {
   Widget _buildSubCategorySelector(
       ShadThemeData theme, AssessSelectViewModel vm) {
     return ShadSelect<AssessSubCategory>(
-      placeholder: const Text('选择部位'),
+      placeholder: Text(vm.isMovementCategory ? '选择部位' : '选择方向'),
       options: vm.selectedCategory!.data
           .map((e) => ShadOption(
                 value: e,

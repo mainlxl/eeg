@@ -1,6 +1,9 @@
 import 'package:eeg/business/assess/mode/assess_data.dart';
 import 'package:eeg/business/assess/page/assess_page.dart';
 import 'package:eeg/business/assess/viewmodel/assess_home_view_model.dart';
+import 'package:eeg/business/assess/widgets/game_cognition_color_widget.dart';
+import 'package:eeg/business/assess/widgets/game_cognition_image_widget.dart';
+import 'package:eeg/business/assess/widgets/game_cognition_number_widget.dart';
 import 'package:eeg/business/patient/mode/patient_info_mode.dart';
 import 'package:eeg/common/widget/loading_status_page.dart';
 import 'package:eeg/core/network/http_service.dart';
@@ -20,6 +23,13 @@ class AssessSelectViewModel extends LoadingPageStatusViewModel {
   AssessInspectionPoint? selectedInspectionPoint;
   ShadSelectController<AssessInspectionPoint> controllerInspectionPoint =
       ShadSelectController();
+
+  bool get isMovementCategory => selectedCategory?.name == '运动';
+
+  bool get isEnableNext =>
+      selectedCategory != null &&
+      selectedSubCategory != null &&
+      (selectedInspectionPoint != null || !isMovementCategory);
 
   AssessSelectViewModel(this.patient);
 
@@ -66,24 +76,52 @@ class AssessSelectViewModel extends LoadingPageStatusViewModel {
   }
 
   void onClickStartAssess() {
-    if (selectedCategory != null &&
-        selectedSubCategory != null &&
-        selectedInspectionPoint != null) {
-      if (selectedInspectionPoint?.data.isEmpty == true) {
-        showToast('评测数据异常');
-        return;
+    if (isMovementCategory) {
+      if (selectedCategory != null &&
+          selectedSubCategory != null &&
+          selectedInspectionPoint != null) {
+        if (selectedInspectionPoint?.data.isEmpty == true) {
+          showToast('评测数据异常');
+          return;
+        }
+        assessHomePageManager.removeLastPage();
+        context.push(
+          (ctx) => AssessPage(
+            patient: patient,
+            selectedCategory: selectedCategory!,
+            selectedSubCategory: selectedSubCategory!,
+            assessInspectionPoint: selectedInspectionPoint!,
+          ),
+        );
+      } else {
+        showToast('请先选择评测部位');
       }
-      assessHomePageManager.removeLastPage();
-      context.push(
-        (ctx) => AssessPage(
-          patient: patient,
-          selectedCategory: selectedCategory!,
-          selectedSubCategory: selectedSubCategory!,
-          assessInspectionPoint: selectedInspectionPoint!,
-        ),
-      );
     } else {
-      showToast('请先选择评测部位');
+      if (selectedCategory != null && selectedSubCategory != null) {
+        assessHomePageManager.removeLastPage();
+        // GameCognitionImageWidget.createAssessData(),
+        // GameCognitionNumberWidget.createAssessData(),
+        final subCategory = selectedSubCategory!;
+        var game = [GameCognitionColorWidget.createAssessData()];
+        if (subCategory.name == '想象') {
+          game = [GameCognitionNumberWidget.createAssessData()];
+        } else if (subCategory.name == '记忆') {
+          game = [GameCognitionImageWidget.createAssessData()];
+        }
+        context.push(
+          (ctx) {
+            return AssessPage(
+              patient: patient,
+              selectedCategory: selectedCategory!,
+              selectedSubCategory: subCategory,
+              assessInspectionPoint:
+                  AssessInspectionPoint(name: '-', data: game),
+            );
+          },
+        );
+      } else {
+        showToast('请先选择评测方向');
+      }
     }
   }
 }

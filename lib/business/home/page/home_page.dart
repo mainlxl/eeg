@@ -7,9 +7,7 @@ import 'package:eeg/common/widget/title_bar.dart';
 import 'package:eeg/core/utils/app_logger.dart';
 import 'package:eeg/core/utils/config.dart';
 import 'package:eeg/core/utils/router_utils.dart';
-import 'package:eeg/core/utils/toast.dart';
 import 'package:flutter/material.dart';
-import 'package:package_info_plus/package_info_plus.dart';
 
 class HomePage extends StatelessWidget {
   const HomePage({super.key});
@@ -25,30 +23,35 @@ class HomePage extends StatelessWidget {
         },
       );
     }
-    return Container(
-      color: bgColor,
-      child: Column(
-        children: [
-          TitleBar(
-            rightActionBar: rightActionBar,
-            child: Center(
-              child: GestureDetector(
-                onLongPress: () => onClickUploadLog(context),
-                child: Text(
-                  '上肢运动-认知协同康复训练及评估系统',
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                  style: TextStyle(
-                    fontSize: 28,
-                    fontWeight: FontWeight.bold,
+    return Stack(
+      children: [
+        Container(
+          color: bgColor,
+          child: Column(
+            children: [
+              TitleBar(
+                rightActionBar: rightActionBar,
+                child: Center(
+                  child: GestureDetector(
+                    onLongPress: () => onClickUploadLog(context),
+                    child: Text(
+                      '上肢运动-认知协同康复训练及评估系统',
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: TextStyle(
+                        fontSize: 28,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
                   ),
                 ),
               ),
-            ),
+              Expanded(child: AssessHomePage()),
+            ],
           ),
-          Expanded(child: AssessHomePage()),
-        ],
-      ),
+        ),
+        Positioned(bottom: 5, right: 5, child: Text('$appVersion', style: TextStyle(color: textColor, fontSize: 12))),
+      ],
     );
   }
 

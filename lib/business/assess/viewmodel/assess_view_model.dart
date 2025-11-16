@@ -1,6 +1,5 @@
 import 'dart:async' show Timer;
 
-import 'package:eeg/app.dart';
 import 'package:eeg/business/assess/mode/assess_data.dart';
 import 'package:eeg/business/assess/mode/assess_record.dart';
 import 'package:eeg/business/assess/page/assess_upload_page.dart';
@@ -12,6 +11,7 @@ import 'package:eeg/core/network/http_service.dart';
 import 'package:eeg/core/utils/router_utils.dart';
 import 'package:eeg/core/utils/toast.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
 import 'package:media_kit/media_kit.dart';
 import 'package:shadcn_ui/shadcn_ui.dart';
 
@@ -22,10 +22,18 @@ class AssessViewModel extends LoadingPageStatusViewModel {
   final AssessSubCategory _selectedSubCategory;
   final AssessInspectionPoint _assessInspectionPoint;
   late final AssessData data;
-  Timer? timer;
+  Timer? timerSingleRun;
+  Timer? timerIntermittent;
   int patientEvaluationId = 0;
-
   bool enableUploadData = false;
+
+  var timeSingleRun = Duration(seconds: 10);
+  var timeIntermittent = Duration(seconds: 5);
+  var imageCount = 8;
+  var currentImageCount = 0;
+  bool _isImageTimerIntermittent = false;
+
+  bool get isImageTimerIntermittent => _isImageTimerIntermittent;
 
   AssessViewModel(this.patient, this._selectedCategory,
       this._selectedSubCategory, this._assessInspectionPoint) {
@@ -51,19 +59,26 @@ class AssessViewModel extends LoadingPageStatusViewModel {
           }
         }));
       }
+    } else if (data.isGame) {
+      //ignore
     } else {
       WidgetsBinding.instance.addPostFrameCallback((_) => startImageAssess());
     }
     controller.onClickItem = _onClickItem;
   }
 
-  void startImageAssess() {
-    timer?.cancel();
-    timer = Timer.periodic(Duration(seconds: 2), _next);
+  void onGameFinish(int correctCount, int count) {
+    _finishAssess();
   }
 
-  bool _onClickItem(item, index) {
-    if (timer?.isActive == true) {
+  void startImageAssess() {
+    timerSingleRun?.cancel();
+    timerSingleRun = Timer(timeSingleRun, _next);
+    notifyListeners();
+  }
+
+  bool _onClickItem(PanePageItem item, int index) {
+    if (timerSingleRun?.isActive == true) {
       controller.setSelectedIndex(index);
       startImageAssess();
       return true;
@@ -78,7 +93,8 @@ class AssessViewModel extends LoadingPageStatusViewModel {
 
   @override
   void dispose() {
-    timer?.cancel();
+    timerSingleRun?.cancel();
+    timerIntermittent?.cancel();
     _player?.stop();
     _player?.dispose();
     super.dispose();
@@ -93,17 +109,39 @@ class AssessViewModel extends LoadingPageStatusViewModel {
     }
   }
 
-  void _next(Timer timer) {
-    int nextIndex = controller.selectedIndex + 1;
-    if (nextIndex < _assessInspectionPoint.data[0].dataList.length) {
-      controller.setSelectedIndex(nextIndex);
-    } else {
-      timer.cancel();
+  void _next() {
+    void fireNext(int nextIndex) {
+      timerIntermittent?.cancel();
+      _isImageTimerIntermittent = true;
+      timerIntermittent = Timer(timeIntermittent, () {
+        _isImageTimerIntermittent = false;
+        controller.setSelectedIndex(nextIndex);
+        timerSingleRun = Timer(timeSingleRun, _next);
+        notifyListeners();
+      });
+      notifyListeners();
+    }
+
+    void fireFinish() {
       _finishAssess();
+    }
+
+    int nextIndex = controller.selectedIndex + 1;
+    //是否单词完成
+    final isSingleFinish =
+        nextIndex >= _assessInspectionPoint.data[0].dataList.length;
+    if (isSingleFinish) {
+      if (++currentImageCount >= imageCount) {
+        fireFinish();
+      } else {
+        fireNext(0);
+      }
+    } else {
+      fireNext(nextIndex);
     }
   }
 
-  void _finishAssess() {
+  void _finishAssess({String? gameResult}) {
     enableUploadData = true;
     notifyListeners();
     showShadDialog(
@@ -113,7 +151,7 @@ class AssessViewModel extends LoadingPageStatusViewModel {
         description: Padding(
           padding: EdgeInsets.only(bottom: 8),
           child: Text(
-            '评估内容:[${_selectedCategory.name}]-[${_selectedSubCategory.name}]-[${_assessInspectionPoint.name}]',
+            '评估内容:[${_selectedCategory.name}]-[${_selectedSubCategory.name}]-[${gameResult ?? _assessInspectionPoint.name}]',
           ),
         ),
         actions: [
@@ -153,9 +191,14 @@ class AssessViewModel extends LoadingPageStatusViewModel {
     );
   }
 
-  void onClickRetryAssess() {
+  void onClickRetryAssess() => _resetAssess();
+
+  void _resetAssess() {
+    currentImageCount = 0;
     controller.setSelectedIndex(0);
-    if (data.isImage) {
+    if (data.isGame) {
+      gameReset?.call();
+    } else if (data.isImage) {
       startImageAssess();
     } else if (data.isVideo) {
       player.stop();
@@ -217,4 +260,86 @@ class AssessViewModel extends LoadingPageStatusViewModel {
 
   @override
   void onClickRetryLoadingData() {}
+  VoidCallback? gameReset;
+
+  void onResetControlChange(VoidCallback reset) {
+    gameReset = reset;
+  }
+
+  void onClickChangeFrequency(AssessData data) {
+    final TextEditingController intermittentController =
+        TextEditingController();
+    final TextEditingController singleRunController = TextEditingController();
+    final TextEditingController imageCountController = TextEditingController();
+    intermittentController.text = timeIntermittent.inSeconds.toString();
+    singleRunController.text = timeSingleRun.inSeconds.toString();
+    imageCountController.text = imageCount.toString();
+    final dialogTag = 'change_frequency_dialog';
+    var isReset = true;
+    SmartDialog.show(
+      tag: dialogTag,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text('修改参数'),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              TextField(
+                controller: intermittentController,
+                decoration: InputDecoration(labelText: '间歇时间（秒）'),
+                keyboardType: TextInputType.number,
+              ),
+              TextField(
+                controller: singleRunController,
+                decoration: InputDecoration(labelText: '单次运行时间（秒）'),
+                keyboardType: TextInputType.number,
+              ),
+              TextField(
+                controller: imageCountController,
+                decoration: InputDecoration(labelText: '循环次数'),
+                keyboardType: TextInputType.number,
+              ),
+              Row(
+                children: [
+                  Checkbox(
+                    value: isReset,
+                    onChanged: (bool? value) {
+                      isReset = value ?? true;
+                    },
+                  ),
+                  Text('是否重新开始'),
+                ],
+              ),
+            ],
+          ),
+          actions: <Widget>[
+            TextButton(
+              child: Text('确定'),
+              onPressed: () {
+                timeIntermittent =
+                    Duration(seconds: int.parse(intermittentController.text));
+                timeSingleRun =
+                    Duration(seconds: int.parse(singleRunController.text));
+                imageCount = int.parse(imageCountController.text);
+                if (currentImageCount > imageCount) {
+                  currentImageCount = imageCount;
+                }
+                if (isReset) {
+                  _resetAssess();
+                }
+                notifyListeners();
+                SmartDialog.dismiss(tag: dialogTag);
+              },
+            ),
+            TextButton(
+              child: Text('取消'),
+              onPressed: () {
+                SmartDialog.dismiss(tag: dialogTag);
+              },
+            ),
+          ],
+        );
+      },
+    );
+  }
 }

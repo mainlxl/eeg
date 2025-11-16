@@ -1,3 +1,6 @@
+import 'package:eeg/business/assess/widgets/game_cognition_color_widget.dart';
+import 'package:fluent_ui/fluent_ui.dart';
+
 class AssessCategoryJson {
   final List<AssessCategory> config;
 
@@ -88,10 +91,14 @@ class AssessData {
   final List<String> dataList;
   final String dataPath;
   final String dataDescription;
+  final Widget Function(OnGameCognitionFinish onFinish, OnGameResetControl onResetControlChange)?
+      gameBuild;
 
   bool get isVideo => dataType == 'video';
 
   bool get isImage => dataType == 'image';
+
+  bool get isGame => gameBuild != null && dataType == 'game';
 
   AssessData({
     required this.id,
@@ -99,6 +106,7 @@ class AssessData {
     required this.dataList,
     required this.dataPath,
     required this.dataDescription,
+    this.gameBuild,
   });
 
   factory AssessData.fromJson(Map<String, dynamic> json) => AssessData(
