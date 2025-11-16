@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:dio/dio.dart';
+import 'package:eeg/core/utils/config.dart';
 import 'package:eeg/core/utils/date_format.dart';
 import 'package:eeg/core/utils/toast.dart';
 import 'package:flutter/foundation.dart';
@@ -178,7 +179,7 @@ class AppLogger {
           data: FormData.fromMap({
             'logFile': await MultipartFile.fromFile(tarFile.path,
                 filename: path.basename('${dateTime.yyyy_MM_dd_HH_mm_ss}.tar')),
-            'version': '${packageInfo.version}+${packageInfo.buildNumber}',
+            'version': appVersion,
             'email': email,
             'account': account,
             'products': 'eeg',

@@ -17,7 +17,7 @@ bool get isWindows => _isWindows ??= Platform.isWindows;
 PackageInfo? packageInfo;
 
 String get appVersion => packageInfo != null
-    ? '${packageInfo?.version}+${packageInfo?.buildNumber}'
+    ? '${packageInfo?.version}.${packageInfo?.buildNumber}'
     : 'v1.0.0';
 
 bool get isDesktop => _isDesktop ??= !isWeb &&
