@@ -191,7 +191,7 @@ class _GameCognitionNumberWidgetState extends State<GameCognitionNumberWidget> {
       _currentCount = 0;
       _correctCount = 0;
       final num1 = Random().nextInt(11);
-      final num2 = Random().nextInt(10 - num1);
+      final num2 = Random().nextInt((10 - num1).clamp(0, 10));
       _currentItem = _Topic(num1: num1, num2: num2);
     } else {
       if (_currentCount < widget.count) {

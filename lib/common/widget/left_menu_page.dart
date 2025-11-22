@@ -84,15 +84,14 @@ class _PanePageWidgetState extends State<PanePageWidget> {
     return Row(
       children: [
         Container(
-          color: Colors.grey[200],
           constraints: const BoxConstraints(maxWidth: 300, minWidth: 0),
           padding: const EdgeInsets.symmetric(horizontal: 5.0, vertical: 5),
           child: IntrinsicWidth(child: Column(children: menus)),
         ),
+        VerticalDivider(color: Colors.black12, width: 1),
         Expanded(
           child: Container(
             padding: top != null ? EdgeInsets.only(top: top) : null,
-            color: const Color(0xFFF5F5F5),
             child: widget.items[widget.controller.selectedIndex].needSaveDate
                 ? IndexedStack(
                     index: widget.controller.selectedIndex,
@@ -123,28 +122,29 @@ class _PanePageWidgetState extends State<PanePageWidget> {
           widget.controller.setSelectedIndex(index);
         }
       },
-      child: Container(
-        padding: const EdgeInsets.symmetric(vertical: 5.0, horizontal: 5.0),
-        color: isSelect ? const Color(0x15303030) : Colors.transparent,
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.start,
-          children: [
-            Container(
-              height: 15, // 设置适当的高度
-              width: 3,
-              decoration: BoxDecoration(
-                color: isSelect ? Colors.blue : Colors.transparent,
-                borderRadius: const BorderRadius.vertical(
-                    top: Radius.circular(20),
-                    bottom: Radius.circular(20)), // 设置上下圆角
-              ),
+      style: TextButton.styleFrom(
+        alignment: Alignment.centerLeft,
+        backgroundColor:
+            isSelect ? const Color(0x15303030) : Colors.transparent,
+      ),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.start,
+        children: [
+          Container(
+            height: 15, // 设置适当的高度
+            width: 3,
+            decoration: BoxDecoration(
+              color: isSelect ? Colors.blue : Colors.transparent,
+              borderRadius: const BorderRadius.vertical(
+                  top: Radius.circular(20),
+                  bottom: Radius.circular(20)), // 设置上下圆角
             ),
-            const SizedBox(width: 5.0),
-            item.iconWidget,
-            const SizedBox(width: 10.0),
-            Text(item.title),
-          ],
-        ),
+          ),
+          const SizedBox(width: 5.0),
+          item.iconWidget,
+          const SizedBox(width: 10.0),
+          Text(item.title),
+        ],
       ),
     );
   }

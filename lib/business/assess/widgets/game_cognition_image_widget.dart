@@ -118,6 +118,7 @@ class _GameCognitionNumberWidgetState extends State<GameCognitionImageWidget> {
         const SizedBox(height: 30),
         if (_isStart && _currentItem.options.isNotEmpty)
           Row(
+            mainAxisAlignment: MainAxisAlignment.center,
             spacing: 30,
             children: List.generate(_currentItem.options.length,
                 (index) => _buildOptionItem(_currentItem.options[index])),

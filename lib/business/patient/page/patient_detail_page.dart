@@ -137,7 +137,7 @@ class PatientDetailPage extends StatelessWidget {
                   textAlign: TextAlign.center,
                 )),
                 DataCell(Text(
-                  '${item.evaluateLevel} - ${item.evaluateType} - ${item.evaluateClassification}',
+                  '${item.evaluateLevel} - ${item.evaluateType}${item.evaluateClassification.isNotEmpty && item.evaluateClassification != '-' ? ' - ${item.evaluateClassification}' : ''}',
                   textAlign: TextAlign.center,
                 )),
                 DataCell(Row(

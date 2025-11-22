@@ -91,8 +91,8 @@ class AssessData {
   final List<String> dataList;
   final String dataPath;
   final String dataDescription;
-  final Widget Function(OnGameCognitionFinish onFinish, OnGameResetControl onResetControlChange)?
-      gameBuild;
+  final Widget Function(OnGameCognitionFinish onFinish,
+      OnGameResetControl onResetControlChange)? gameBuild;
 
   bool get isVideo => dataType == 'video';
 

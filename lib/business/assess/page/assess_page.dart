@@ -37,79 +37,83 @@ class AssessPage extends StatelessWidget {
 
   Widget _renderBody(BuildContext context, AssessViewModel vm) {
     AssessData data = vm.data;
-    return PanePageWidget(
-      items: data.dataList.map((item) {
-        return PanePageItem(
-          iconWidget: Icon(data.isImage
-              ? Icons.image
-              : (data.isGame ? Icons.view_compact : Icons.ondemand_video)),
-          title: item,
-          needSaveDate: data.isImage,
-          body: _buildAssessWidget(data, vm, item),
-        );
-      }).toList(),
-      controller: vm.controller,
-      bottomItems: [
-        if (vm.enableUploadData)
+    return Container(
+      constraints: BoxConstraints.expand(),
+      decoration: BoxDecoration(
+        color: Color(0xffc7edcc),
+        border: Border(
+          top: const BorderSide(color: Color(0xFF1976D2), width: 20), // 上边框
+          bottom: const BorderSide(color: Color(0xFF1976D2), width: 20), // 下边框
+        ),
+        borderRadius: BorderRadius.circular(5), // 圆角边框
+      ),
+      alignment: Alignment.center,
+      child: PanePageWidget(
+        items: data.dataList.map((item) {
+          return PanePageItem(
+            iconWidget: Icon(data.isImage
+                ? Icons.image
+                : (data.isGame ? Icons.view_compact : Icons.ondemand_video)),
+            title: item,
+            needSaveDate: data.isImage,
+            body: _buildAssessWidget(data, vm, item),
+          );
+        }).toList(),
+        controller: vm.controller,
+        bottomItems: [
+          if (vm.enableUploadData)
+            PanePageItem(
+              iconWidget: const Icon(Icons.upload_file),
+              title: '上传评估数据',
+              onClick: () {
+                vm.onClickUploadData();
+                return true;
+              },
+            ),
+          if (data.isImage)
+            PanePageItem(
+              iconWidget: const Icon(Icons.podcasts),
+              title:
+                  '循环次数:${vm.currentImageCount.clamp(0, vm.imageCount)}/${vm.imageCount}',
+              onClick: () => true,
+            ),
+          if (data.isImage)
+            PanePageItem(
+              iconWidget: const Icon(Icons.change_circle),
+              title: '调整播放频率',
+              onClick: () {
+                vm.onClickChangeFrequency(data);
+                return true;
+              },
+            ),
           PanePageItem(
-            iconWidget: const Icon(Icons.upload_file),
-            title: '上传评估数据',
+            iconWidget: const Icon(Icons.transfer_within_a_station_outlined),
+            title: '重新评估',
             onClick: () {
-              vm.onClickUploadData();
+              vm.onClickRetryAssess();
               return true;
             },
           ),
-        if (data.isImage)
           PanePageItem(
-            iconWidget: const Icon(Icons.podcasts),
-            title:
-                '循环次数:${vm.currentImageCount.clamp(0, vm.imageCount)}/${vm.imageCount}',
-            onClick: () => true,
-          ),
-        if (data.isImage)
-          PanePageItem(
-            iconWidget: const Icon(Icons.change_circle),
-            title: '调整播放频率',
+            iconWidget: const Icon(Icons.cancel_presentation),
+            title: '退出评估',
             onClick: () {
-              vm.onClickChangeFrequency(data);
+              context.popPage();
               return true;
             },
           ),
-        PanePageItem(
-          iconWidget: const Icon(Icons.transfer_within_a_station_outlined),
-          title: '重新评估',
-          onClick: () {
-            vm.onClickRetryAssess();
-            return true;
-          },
-        ),
-        PanePageItem(
-          iconWidget: const Icon(Icons.cancel_presentation),
-          title: '退出评估',
-          onClick: () {
-            context.popPage();
-            return true;
-          },
-        ),
-      ],
+        ],
+      ),
     );
   }
 
   Widget _buildAssessWidget(AssessData data, AssessViewModel vm, String item) {
     final widget = data.isGame
         ? data.gameBuild!.call(vm.onGameFinish, vm.onResetControlChange)
-        : Container(
-            constraints: BoxConstraints.expand(),
-            color: Colors.white,
-            alignment: Alignment.center,
-            child: _renderResource(vm, data, '${data.dataPath}/$item'),
-          );
+        : _renderResource(vm, data, '${data.dataPath}/$item');
     if (vm.isImageTimerIntermittent) {
       return Stack(
-        children: [
-          widget,
-          _buildTimerIntermittent(data, vm, item),
-        ],
+        children: [widget, _buildTimerIntermittent(data, vm, item)],
       );
     }
     return widget;
@@ -118,17 +122,18 @@ class AssessPage extends StatelessWidget {
   Widget _renderResource(AssessViewModel vm, AssessData data, String url) {
     return data.isVideo
         ? VideoWidget(player: vm.player)
-        : Image.network(url, fit: BoxFit.cover);
+        : Center(child: Image.network(url, fit: BoxFit.cover));
   }
 
   Widget _buildTimerIntermittent(
       AssessData data, AssessViewModel vm, String item) {
     return Container(
       constraints: BoxConstraints.expand(),
+      alignment: Alignment.topCenter,
       color: Colors.black12,
-      alignment: Alignment.center,
-      child: Text('运动间歇中,准备下一动作...',
-          style: TextStyle(fontSize: 24, color: Colors.red)),
+      padding: const EdgeInsets.only(top: 10),
+      child: Text('运动间歇中，请熟悉一下动作......',
+          style: TextStyle(fontSize: 30, color: Colors.red.shade500)),
     );
   }
 }

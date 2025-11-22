@@ -50,9 +50,9 @@ class AssessViewModel extends LoadingPageStatusViewModel {
     if (data.isVideo) {
       MediaKit.ensureInitialized();
       await player.setPlaylistMode(PlaylistMode.none);
-      var firstOrNull = data.dataList.firstOrNull;
+      final firstOrNull = data.dataList.firstOrNull;
       if (firstOrNull != null) {
-        await player.open(Media('${data.dataPath}/${firstOrNull}'));
+        await player.open(Media('${data.dataPath}/$firstOrNull'));
         addSubscription(player.stream.completed.listen((event) {
           if (event) {
             _nextVideo();
@@ -82,7 +82,7 @@ class AssessViewModel extends LoadingPageStatusViewModel {
       controller.setSelectedIndex(index);
       startImageAssess();
       return true;
-    } else if (_player != null && player.stream.playing.last == true) {
+    } else if (_player != null && player.state.playing) {
       player.stop();
       player.open(Media('${data.dataPath}/${data.dataList[index]}'));
       player.play();
@@ -112,10 +112,10 @@ class AssessViewModel extends LoadingPageStatusViewModel {
   void _next() {
     void fireNext(int nextIndex) {
       timerIntermittent?.cancel();
+      controller.setSelectedIndex(nextIndex);
       _isImageTimerIntermittent = true;
       timerIntermittent = Timer(timeIntermittent, () {
         _isImageTimerIntermittent = false;
-        controller.setSelectedIndex(nextIndex);
         timerSingleRun = Timer(timeSingleRun, _next);
         notifyListeners();
       });
@@ -145,6 +145,7 @@ class AssessViewModel extends LoadingPageStatusViewModel {
     enableUploadData = true;
     notifyListeners();
     showShadDialog(
+      barrierDismissible: false,
       context: context,
       builder: (context) => ShadDialog.alert(
         title: Text('${patient.name}的本次评估已完成'),
@@ -178,7 +179,7 @@ class AssessViewModel extends LoadingPageStatusViewModel {
             ]),
             shadows: [
               BoxShadow(
-                color: Colors.blue.withOpacity(.4),
+                color: Colors.blue.withValues(alpha: .4),
                 spreadRadius: 4,
                 blurRadius: 10,
                 offset: const Offset(0, 2),
