@@ -122,7 +122,15 @@ class AssessPage extends StatelessWidget {
   Widget _renderResource(AssessViewModel vm, AssessData data, String url) {
     return data.isVideo
         ? VideoWidget(player: vm.player)
-        : Center(child: Image.network(url, fit: BoxFit.cover));
+        : Container(
+            constraints: BoxConstraints.expand(),
+            padding: const EdgeInsets.all(60),
+            alignment: Alignment.center,
+            child: ConstrainedBox(
+              constraints: BoxConstraints(minHeight: 500),
+              child: Image.network(url, fit: BoxFit.cover),
+            ),
+          );
   }
 
   Widget _buildTimerIntermittent(
